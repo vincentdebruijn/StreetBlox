@@ -39,6 +39,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		Connection connection = new Connection (coordinates);
 		Connection[] connections = new Connection[] {connection};
 		PuzzlePieceConnections puzzlePieceConnections = new PuzzlePieceConnections (connections);
+		Connections.Add ("puzzlePiece_straight_WE", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_straight_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_trainCrossing_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_bridge", puzzlePieceConnections);

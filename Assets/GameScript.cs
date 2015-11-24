@@ -117,7 +117,9 @@ public class GameScript : MonoBehaviour {
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
 		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
 
-		if (!dontPlayAnimation && !MenuScript.data.neverPlayAnimations) {
+		// TODO: neverPlayAnimations should become playAnimations. It is configured the other way around now.
+		if (!dontPlayAnimation && MenuScript.data.neverPlayAnimations) {
+			showingAnimation = true;
 			HidePuzzlePieces ();
 			StartPuzzlePieceAnimation ();
 		}
@@ -138,6 +140,14 @@ public class GameScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (showingAnimation) {
+			timeSinceStartAnimation += Time.deltaTime;
+			if (timeSinceStartAnimation > 0.125f && puzzlePieceAnimationIndex == 0) {
+				StartSecondPuzzlePiece();
+			}
+			MoveCurrentPuzzlePiece();
+		}
+
 		if (!gameStarted)
 			return;
 
@@ -146,14 +156,6 @@ public class GameScript : MonoBehaviour {
 			if (time < levelConfiguration.waitTimeAtStart)
 				return;
 			carScript.StartTheGame (levelConfiguration);
-		}
-
-		if (showingAnimation) {
-			timeSinceStartAnimation += Time.deltaTime;
-			if (timeSinceStartAnimation > 0.125f && puzzlePieceAnimationIndex == 0) {
-				StartSecondPuzzlePiece();
-			}
-			MoveCurrentPuzzlePiece();
 		}
 		if (carScript.GameOver ()) {
 			if (Input.GetMouseButton(0)) {

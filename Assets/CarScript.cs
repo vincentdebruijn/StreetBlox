@@ -80,7 +80,9 @@ public class CarScript : MonoBehaviour {
 		}
 
 		currentPuzzlePiece = ClosestPuzzlePiece (null);
+		Debug.Log (currentPuzzlePiece);
 		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
+		Debug.Log (currentPuzzlePieceConnections);
 		currentConnection = currentPuzzlePieceConnections.getConnectionForSide (PuzzlePieceScript.Coordinate.WEST);
 		currentDirection = currentConnection.OtherSide (PuzzlePieceScript.Coordinate.WEST);
 		currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
