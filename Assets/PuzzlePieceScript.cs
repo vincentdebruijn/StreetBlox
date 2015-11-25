@@ -43,6 +43,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		Connections.Add ("puzzlePiece_straight_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_trainCrossing_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_bridge", puzzlePieceConnections);
+		// w.i.p Exploration mode
 		puzzlePieces.Add (0, "puzzlePiece_straight_EW");
 		puzzlePieces.Add (1, "puzzlePiece_trainCrossing_EW");
 		
@@ -65,6 +66,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		connections = new Connection[] {connection, connection2};
 		puzzlePieceConnections = new PuzzlePieceConnections (connections);
 		Connections.Add ("puzzlePiece_crossing_NS_EW", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_crossing", puzzlePieceConnections);
 		
 		coordinate1 = new Coordinate(0.0f, 0.5f);
 		Coordinate coordinate1a = new Coordinate (0.2f, 0.475f); 
