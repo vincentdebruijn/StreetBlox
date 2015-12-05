@@ -297,7 +297,7 @@ public class GameScript : MonoBehaviour {
 	private void SetCarOnStartPiece() {
 		GameObject startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
 		Vector3 pos = startPiece.transform.position;
-		GameObject car = Resources.Load ("car_red") as GameObject;
+		GameObject car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		car = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
 		carScript = car.GetComponent<CarScript> ();
 	}

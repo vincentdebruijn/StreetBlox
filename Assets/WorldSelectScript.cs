@@ -13,7 +13,7 @@ public class WorldSelectScript : MonoBehaviour {
 	private static readonly string[] WorldNames = {"Grass World", "Lava World"};
 
 	// The world 1 levels
-	private static readonly string[] World1Levels = {
+	private static readonly string[] levelsWorld1 = {
 		"tutorial_1",
 		"tutorial_2",
 		"tutorial_3",
@@ -32,11 +32,13 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_13"
 	};
 	// The world2 levels
-	private static readonly string[] World2Levels = {
+	private static readonly string[] levelsWorld2 = {
 		"level_l01",
 		"level_l02",
 		"level_l03"
 	};
+
+	private string[][] worlds = {levelsWorld1, levelsWorld2};
 
 	// Mapping of World names to a mapping of level names to level configurations
 	private static Dictionary<string, Dictionary<string, LevelConfiguration>> worldConfigurations;
@@ -48,24 +50,12 @@ public class WorldSelectScript : MonoBehaviour {
 
 	// GUI stuff
 	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
-	private static Texture2D firstWorldTexture;
-	private static Texture2D secondWorldTexture;
-	private static Texture2D thirdWorldTexture;
-	private static Texture2D fourthWorldTexture;
 	
 	private static Rect leftBottomRect;
 	private static Rect rightBottomRect;
-	private static Rect firstWorldRect;
-	private static Rect secondWorldRect;
-	private static Rect thirdWorldRect;
-	private static Rect fourthWorldRect;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
-	private static GUIStyle firstWorldStyle;
-	private static GUIStyle secondWorldStyle;
-	private static GUIStyle thirdWorldStyle;
-	private static GUIStyle fourthWorldStyle;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -103,18 +93,13 @@ public class WorldSelectScript : MonoBehaviour {
 			MenuScript.PlayButtonSound ();
 			Application.LoadLevel ("menu");
 		}
-		if (GUI.Button (firstWorldRect, "", firstWorldStyle)) {
-			MenuScript.PlayButtonSound ();
-			levels = World1Levels;
-			levelConfigurations = worldConfigurations[WorldNames[0]];
-			Application.LoadLevel ("level_select");
-		}
-		if (GUI.Button (secondWorldRect, "", secondWorldStyle)) {
-			MenuScript.PlayButtonSound ();
-			levels = World2Levels;
-			levelConfigurations = worldConfigurations[WorldNames[1]];
-			Application.LoadLevel ("level_select");
-		}
+	}
+
+	public void SelectedWorld(int world) {
+		MenuScript.PlayButtonSound ();
+		levels = worlds [world - 1];
+		levelConfigurations = worldConfigurations [WorldNames [world - 1]];
+		Application.LoadLevel ("level_select");
 	}
 
 	private static void SetVariables() {
@@ -122,15 +107,9 @@ public class WorldSelectScript : MonoBehaviour {
 		float offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
-		firstWorldRect = new Rect (100, 100, 200, 200);
-		secondWorldRect = new Rect (Screen.width - 300, 100, 200, 200);
 		
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
-		firstWorldTexture = (Texture2D)Resources.Load("ui_world1_ph");
-		secondWorldTexture = (Texture2D)Resources.Load("ui_world2_ph");
-		thirdWorldTexture = (Texture2D)Resources.Load("ui_world1_ph");
-		fourthWorldTexture = (Texture2D)Resources.Load("ui_world1_ph");
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 		
 		endlessButtonStyle = new GUIStyle ();
@@ -138,15 +117,6 @@ public class WorldSelectScript : MonoBehaviour {
 		endlessButtonPressedStyle = new GUIStyle ();
 		endlessButtonPressedStyle.normal.background = endlessButtonPressedTexture;
 		endlessButtonChosenStyle = endlessButtonStyle;
-
-		firstWorldStyle = new GUIStyle ();
-		firstWorldStyle.normal.background = firstWorldTexture;
-		secondWorldStyle = new GUIStyle ();
-		secondWorldStyle.normal.background = secondWorldTexture;
-		thirdWorldStyle = new GUIStyle ();
-		thirdWorldStyle.normal.background = firstWorldTexture;
-		fourthWorldStyle = new GUIStyle ();
-		fourthWorldStyle.normal.background = firstWorldTexture;
 
 		AddLevels ();
 	}

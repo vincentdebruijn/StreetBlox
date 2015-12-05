@@ -43,6 +43,7 @@ public class MenuScript : MonoBehaviour {
 
 	void Awake() {
 		if (!staticVariablesSet) {
+			Screen.sleepTimeout = SleepTimeout.NeverSleep;
 			SetVariables ();
 			Load ();
 			staticVariablesSet = true;
@@ -178,5 +179,6 @@ public class MenuScript : MonoBehaviour {
 	public class PlayerData {
 		public Dictionary<string, int> levelProgress;
 		public Boolean neverPlayAnimations;
+		public String chosenCar;
 	}
 }
