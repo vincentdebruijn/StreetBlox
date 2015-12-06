@@ -11,8 +11,12 @@ public class puzzleBoxScript : MonoBehaviour {
 	private Boolean startedAnimation = false;
 	private Boolean animationReallyStarted = false;
 	private int worldNumber;
+
+	// Mutex lock for ensuring only one puzzlebox animation is playing at a time.
+	private static Boolean animationLock;
 	
 	void Awake () {
+		animationLock = false;
 		worldSelectScript = Camera.main.GetComponent<WorldSelectScript>();
 
 		switch(gameObject.name) {
@@ -35,12 +39,14 @@ public class puzzleBoxScript : MonoBehaviour {
 		}
 		if (animationReallyStarted && !anim.GetCurrentAnimatorStateInfo (0).IsName ("open")) {
 			animationReallyStarted = false;
+			animationLock = false;
 			worldSelectScript.SelectedWorld (worldNumber);
 		}
 	}
 
 	void OnMouseOver () {
-		if (Input.GetMouseButtonDown(0)) {
+		if (Input.GetMouseButtonDown(0) && !animationLock) {
+			animationLock = true;
 			anim.Play ("open");
 			startedAnimation = true;
 		}

@@ -8,13 +8,15 @@ public class OptionsScript : MonoBehaviour {
 	// GUI stuff
 	private static Rect leftBottomRect;
 	private static Rect option1Rect;
+	private static Rect option2Rect;
 	private static Rect option1TextRect;
+	private static Rect option2TextRect;
 	
 	private static Texture2D optionButtonTexture, optionSelectedButtonTexture;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle optionButtonStyle, optionSelectedButtonStyle;
-	private static GUIStyle optionButton1ChosenStyle;
+	private static GUIStyle optionButton1ChosenStyle, optionButton2ChosenStyle;
 	private static GUIStyle optionTextStyle;
 
 	// Dynamic one time loading of all static variables
@@ -46,15 +48,26 @@ public class OptionsScript : MonoBehaviour {
 			MenuScript.PlayButtonSound();
 			Application.LoadLevel ("menu");
 		}
+
 		if (GUI.Button(option1Rect, "", optionButton1ChosenStyle)) {
 			MenuScript.PlayButtonSound();
-			MenuScript.data.neverPlayAnimations = !MenuScript.data.neverPlayAnimations;
-			if (MenuScript.data.neverPlayAnimations)
+			MenuScript.data.playAnimations = !MenuScript.data.playAnimations;
+			if (MenuScript.data.playAnimations)
 				optionButton1ChosenStyle = optionSelectedButtonStyle;
 			else
 				optionButton1ChosenStyle = optionButtonStyle;
 		}
 		GUI.Label (option1TextRect, "Animations", optionTextStyle);
+
+		if (GUI.Button(option2Rect, "", optionButton2ChosenStyle)) {
+			MenuScript.PlayButtonSound();
+			MenuScript.data.playTutorials = !MenuScript.data.playTutorials;
+			if (MenuScript.data.playTutorials)
+				optionButton2ChosenStyle = optionSelectedButtonStyle;
+			else
+				optionButton2ChosenStyle = optionButtonStyle;
+		}
+		GUI.Label (option2TextRect, "Tutorials", optionTextStyle);
 	}
 
 	private static void SetVariables() {
@@ -62,7 +75,9 @@ public class OptionsScript : MonoBehaviour {
 		float offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		option1Rect = new Rect (buttonSize / 4, buttonSize / 4, buttonSize / 3, buttonSize / 3);
+		option2Rect = new Rect (buttonSize / 4, buttonSize / 2 + 20, buttonSize / 3, buttonSize / 3);
 		option1TextRect = new Rect (buttonSize / 2 + 30, buttonSize / 4, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
+		option2TextRect = new Rect (buttonSize / 2 + 30, buttonSize / 2 + 20, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");
@@ -71,10 +86,14 @@ public class OptionsScript : MonoBehaviour {
 		optionButtonStyle.normal.background = optionButtonTexture;
 		optionSelectedButtonStyle = new GUIStyle();
 		optionSelectedButtonStyle.normal.background = optionSelectedButtonTexture;
-		if (MenuScript.data.neverPlayAnimations)
+		if (MenuScript.data.playAnimations)
 			optionButton1ChosenStyle = optionSelectedButtonStyle;
 		else
 			optionButton1ChosenStyle = optionButtonStyle;
+		if (MenuScript.data.playTutorials)
+			optionButton2ChosenStyle = optionSelectedButtonStyle;
+		else
+			optionButton2ChosenStyle = optionButtonStyle;
 		
 		optionTextStyle = new GUIStyle ();
 		optionTextStyle.alignment = TextAnchor.MiddleLeft;

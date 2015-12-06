@@ -98,7 +98,9 @@ public class MenuScript : MonoBehaviour {
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
-			data.neverPlayAnimations = false;
+			data.playAnimations = true;
+			data.playTutorials = true;
+			data.chosenCar = "car1";
 		}
 	}
 
@@ -178,7 +180,8 @@ public class MenuScript : MonoBehaviour {
 	[Serializable]
 	public class PlayerData {
 		public Dictionary<string, int> levelProgress;
-		public Boolean neverPlayAnimations;
+		public Boolean playAnimations;
+		public Boolean playTutorials;
 		public String chosenCar;
 	}
 }

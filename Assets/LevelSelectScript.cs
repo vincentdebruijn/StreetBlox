@@ -41,7 +41,7 @@ public class LevelSelectScript : MonoBehaviour {
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle leftButtonStyle;
 	private static GUIStyle rightButtonStyle;
-	private static GUIStyle unsolvedLevelStyle, unsolvedLevelPressedStyle, unsolvedLevelChosenStyle;
+	private static GUIStyle unsolvedLevelStyle, unsolvedLevelPressedStyle;
 	private static GUIStyle solvedLevelStyle, solvedLevelPressedStyle, solvedLevelChosenStyle;
 	private static GUIStyle unavailableLevelStyle;
 	private static GUIStyle levelTextStyle;
@@ -193,7 +193,6 @@ public class LevelSelectScript : MonoBehaviour {
 		unsolvedLevelStyle.normal.background = unsolvedLevelTexture;
 		unsolvedLevelPressedStyle = new GUIStyle();
 		unsolvedLevelPressedStyle.normal.background = unsolvedLevelPressedTexture;
-		unsolvedLevelChosenStyle = unsolvedLevelStyle;
 		
 		solvedLevelStyle = new GUIStyle();
 		solvedLevelStyle.normal.background = solvedLevelTexture;

@@ -65,6 +65,7 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D boostTexture2;
 	private static Texture2D boostTexture3;
 	private static Texture2D boostTexture4;
+	private static Texture2D tutorialTexture;
 	
 	private static GUIStyle retryButtonStyle, retryButtonPressedStyle, retryButtonChosenStyle;
 	private static GUIStyle nextButtonStyle, nextButtonPressedStyle, nextButtonChosenStyle;
@@ -89,8 +90,8 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle boostStyle3;
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
+	private static GUIStyle tutorialStyle;
 	
-	private static Rect timerArea;
 	private static Rect rightButtonRect;
 	private static Rect leftButtonRect;
 	private static Rect textArea;
@@ -101,6 +102,9 @@ public class GameScript : MonoBehaviour {
 	private static Rect goRect;
 	private static Rect displayRect;
 	private static Rect boostRect;
+	private static Rect tutorialRect;
+
+	private Boolean tutorial2Accepted;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -117,12 +121,12 @@ public class GameScript : MonoBehaviour {
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
 		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
 
-		// TODO: neverPlayAnimations should become playAnimations. It is configured the other way around now.
-		if (!dontPlayAnimation && MenuScript.data.neverPlayAnimations) {
+		if (!dontPlayAnimation && MenuScript.data.playAnimations) {
 			showingAnimation = true;
 			HidePuzzlePieces ();
 			StartPuzzlePieceAnimation ();
 		}
+		tutorial2Accepted = false;
 	}
 
 	void Awake() {	
@@ -172,6 +176,9 @@ public class GameScript : MonoBehaviour {
 	}
 	
 	void OnGUI() {
+		if (!showingAnimation && !gameStarted && !carScript.carStarted)
+			DisplayTutorialMessages ();
+
 		if (!carScript.ended && !carScript.crashed && !carScript.fell)
 			DisplayButtonBar();
 
@@ -226,6 +233,17 @@ public class GameScript : MonoBehaviour {
 		}
 	}
 
+	private void DisplayTutorialMessages() {
+		if (MenuScript.data.playTutorials) {
+			if (chosenLevel == "tutorial_2" && !tutorial2Accepted) {
+				if (GUI.Button (tutorialRect, "The beacon piece always moves to the empty spot.\nIt does not have to be next to the empty spot.", tutorialStyle)) {
+					MenuScript.PlayButtonSound();
+					tutorial2Accepted = true;
+				}
+			}
+		}
+	}
+		
 	private void SetStars() {	
 		stars = 2;
 		if (movesMade < levelConfiguration.par)
@@ -564,7 +582,6 @@ public class GameScript : MonoBehaviour {
 	private static void SetVariables() {
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
-		timerArea = new Rect (buttonSize / 4, buttonSize / 4, 325, buttonSize / 8);
 		rightButtonRect = new Rect (Screen.width / 5 * 4 - offset, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		leftButtonRect = new Rect (Screen.width / 5 + offset - buttonSize, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		textArea = new Rect (0, 10, Screen.width, buttonSize);
@@ -577,6 +594,7 @@ public class GameScript : MonoBehaviour {
 		goRect = new Rect (0, uiButtonSize * 4, uiButtonSize * 2, 2 * uiButtonSize);
 		displayRect = new Rect (0, uiButtonSize * 6, uiButtonSize * 2, uiButtonSize);
 		boostRect = new Rect (0, uiButtonSize * 7, uiButtonSize * 2, 2 * uiButtonSize);
+		tutorialRect = new Rect (Screen.width / 2 - 450, 50, 900, 100);
 		
 		retryButtonTexture = (Texture2D)Resources.Load ("ui_button_retry");
 		retryButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_retry_pressed");
@@ -597,6 +615,7 @@ public class GameScript : MonoBehaviour {
 		boostTexture2 = (Texture2D)Resources.Load ("speed2");
 		boostTexture3 = (Texture2D)Resources.Load ("speed3");
 		boostTexture4 = (Texture2D)Resources.Load ("speed4");
+		tutorialTexture = displayTexture;
 		
 		retryButtonStyle = new GUIStyle ();
 		retryButtonStyle.normal.background = retryButtonTexture;
@@ -621,6 +640,15 @@ public class GameScript : MonoBehaviour {
 		textAreaStyle.fontSize = 64;
 		textAreaStyle.normal.textColor = Color.white;
 		textAreaStyle.alignment = TextAnchor.MiddleCenter;
+
+		tutorialStyle = new GUIStyle ();
+		tutorialStyle.fontSize = 32;
+		tutorialStyle.normal.textColor = Color.white;
+		tutorialStyle.alignment = TextAnchor.MiddleCenter;
+		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
+		texture.Apply ();
+		tutorialStyle.normal.background = texture;
 		
 		statStyle = new GUIStyle ();
 		statStyle.fontSize = 32;
@@ -629,14 +657,14 @@ public class GameScript : MonoBehaviour {
 		
 		statTextStyle = new GUIStyle ();
 		statTextStyle.normal.textColor = Color.white;
-		statTextStyle.fontSize = 32;
+		statTextStyle.fontSize = 24;
 		statTextStyle.alignment = TextAnchor.MiddleLeft;
 		statTextStyle.normal.background = statTextTexture;
 
 		timerStyle = new GUIStyle ();
 		timerStyle.fontSize = 32;
 		timerStyle.normal.textColor = Color.white;
-		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
 		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
 		texture.Apply ();
 		timerStyle.normal.background = texture;
