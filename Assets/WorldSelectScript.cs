@@ -134,7 +134,7 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_01", new LevelConfiguration (5, 5, 0f, 0f, 5));
 		world1Configuration.Add ("level_02", new LevelConfiguration (5, 5, 0f, 0f, 10));
 		world1Configuration.Add ("level_03", new LevelConfiguration (5, 5, 0f, 0f, 11));
-		world1Configuration.Add ("level_04", new LevelConfiguration (7, 5, 0f, 0f, 15));
+		world1Configuration.Add ("level_04", new LevelConfiguration (7, 5, 0f, 0f, 20));
 		world1Configuration.Add ("level_05", new LevelConfiguration (7, 5, 0f, 0f, 11));
 		world1Configuration.Add ("level_06", new LevelConfiguration (5, 5, 0f, 0f, 15));
 		world1Configuration.Add ("level_07", new LevelConfiguration (5, 5, 0f, 0f, 20));
