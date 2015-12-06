@@ -34,6 +34,6 @@ public class CarDisplayScript : MonoBehaviour {
 			Destroy (obj);
 		Vector3 carPosition = gameObject.transform.position;
 		GameObject carDisplaySelector = Resources.Load ("carDisplaySelector") as GameObject;
-		Instantiate (carDisplaySelector, new Vector3(carPosition.x, carPosition.y + 0.5f, carPosition.z), Quaternion.Euler (0, 90, 0));
+		Instantiate (carDisplaySelector, new Vector3(carPosition.x, carPosition.y + 0.6f, carPosition.z), Quaternion.Euler (0, 90, 0));
 	}
 }

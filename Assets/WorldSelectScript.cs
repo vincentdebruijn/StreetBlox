@@ -29,7 +29,8 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_10",
 		"level_11",
 		"level_12",
-		"level_13"
+		"level_13",
+		"level_14"
 	};
 	// The world2 levels
 	private static readonly string[] levelsWorld2 = {
@@ -143,6 +144,7 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_11", new LevelConfiguration (5, 5, 0f, 0f, 16));
 		world1Configuration.Add ("level_12", new LevelConfiguration (4, 5, 0f, 0f, 35));
 		world1Configuration.Add ("level_13", new LevelConfiguration (7, 7, 0f, 0f, 30));
+		world1Configuration.Add ("level_14", new LevelConfiguration (7, 7, 0f, 0f, 30));
 
 		Dictionary<string, LevelConfiguration> world2Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[1], world2Configuration);
