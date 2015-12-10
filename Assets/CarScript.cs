@@ -45,6 +45,10 @@ public class CarScript : MonoBehaviour {
 
 	private float time;
 
+	private Boolean enteredPortalPiece;
+	private Boolean portalEntryAnimationDone;
+	private Boolean portalExitAnimationDone;
+
 	void Awake() {
 		Reset ();
 		MakeCarInivisible ();
@@ -59,6 +63,14 @@ public class CarScript : MonoBehaviour {
 			return;
 		// Very stupid, but needed because GameEnding could have made GameOver true now
 		} else if ((!carStarted) || GameOver ()) {
+			return;
+		}
+		// For world 3 portals
+		if (!portalEntryAnimationDone) {
+			ShowPortalEntryAnimation ();
+			return;
+		} else if (!portalExitAnimationDone) {
+			ShowPortalExitAnimation ();
 			return;
 		}
 		timeSinceOnLastPuzzlePiece += Time.deltaTime;
@@ -115,6 +127,9 @@ public class CarScript : MonoBehaviour {
 		crashed = false;
 		carStarted = false;
 		time = 0f;
+		portalEntryAnimationDone = true;
+		portalExitAnimationDone = true;
+		enteredPortalPiece = false;
 	}
 
 	Boolean GameEnding() {
@@ -204,6 +219,11 @@ public class CarScript : MonoBehaviour {
 				// Check if the end piece is nearby
 				if (AtEndPiece ())
 					return;
+				if (AtPortal()) {
+					portalEntryAnimationDone = false;
+					portalExitAnimationDone = false;
+					return;
+				}
 				// Get the next puzzle piece
 				previousPuzzlePiece = currentPuzzlePiece;
 				currentPuzzlePiece = ClosestPuzzlePiece (previousPuzzlePiece);
@@ -217,6 +237,8 @@ public class CarScript : MonoBehaviour {
 					crashing = true;
 					return;
 				}
+				enteredPortalPiece = currentPuzzlePiece.name.Contains("portal");
+
 				currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
 				int startSide = currentCoordinate.InverseSide (currentDirection);
 				Debug.Log ("Entering at: " + startSide);
@@ -315,5 +337,42 @@ public class CarScript : MonoBehaviour {
 	Boolean AtEndPiece() {
 		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < levelConfiguration.PieceSize;
 		return atEnd;
+	}
+
+	Boolean AtPortal() {
+		if (!currentPuzzlePiece.name.Contains ("portal") || !enteredPortalPiece)
+			return false;
+
+		GameObject portal = null;
+		foreach(Transform child in currentPuzzlePiece.transform) {
+			if (child.gameObject.tag == "Portal") {
+				portal = child.gameObject;
+			}
+		}
+		return (portal.transform.position - transform.position).sqrMagnitude < 0.1f;
+	}
+
+	// TODO: actually show an animation
+	void ShowPortalEntryAnimation() {
+		portalEntryAnimationDone = true;
+
+		previousPuzzlePiece = currentPuzzlePiece;
+		currentPuzzlePiece = gameScript.GetOtherPortalPiece (currentPuzzlePiece);
+
+		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
+		int startSide = currentCoordinate.InverseSide (currentDirection);
+		piecesTouched[currentPuzzlePiece.name] = piecesTouched[currentPuzzlePiece.name] + 1;
+		currentConnection = currentPuzzlePieceConnections.getConnectionForSide (startSide);
+		currentDirection = currentConnection.OtherSide (startSide);
+		currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
+		currentCoordinateIndex = currentConnection.getNextCoordinateIndex (currentCoordinateIndex, currentDirection);
+		currentCoordinate = currentConnection.coordinates [currentCoordinateIndex];
+	
+		Vector3 newPosition = new Vector3(currentPuzzlePiece.transform.position.x, transform.position.y, currentPuzzlePiece.transform.position.z);
+		transform.position = newPosition;
+		timeSinceOnLastPuzzlePiece = 0f;
+	}
+	void ShowPortalExitAnimation() {
+		portalExitAnimationDone = true;
 	}
 }

@@ -22,6 +22,7 @@ public class puzzleBoxScript : MonoBehaviour {
 		switch(gameObject.name) {
 			case "puzzleBoxWorld1": worldNumber = 1; break;
 			case "puzzleBoxWorld2": worldNumber = 2; break;
+			case "puzzleBoxWorld3": worldNumber = 3; break;
 			default: throw new System.ArgumentException("Undefined puzzle box name", gameObject.name);
 		}
 	}

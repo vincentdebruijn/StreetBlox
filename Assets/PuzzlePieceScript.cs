@@ -43,6 +43,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 		Connections.Add ("puzzlePiece_straight_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_trainCrossing_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_bridge", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_portal_E", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_portal_W", puzzlePieceConnections);
 		// w.i.p Exploration mode
 		puzzlePieces.Add (0, "puzzlePiece_straight_EW");
 		puzzlePieces.Add (1, "puzzlePiece_trainCrossing_EW");
@@ -177,6 +179,32 @@ public class PuzzlePieceScript : MonoBehaviour {
 		connections = new Connection[] {connection};
 		puzzlePieceConnections = new PuzzlePieceConnections (connections);
 		Connections.Add ("puzzlePiece_turnabout_S", puzzlePieceConnections);
+
+		coordinate1 = new Coordinate(0.0f, 0.5f);
+		coordinate1a = new Coordinate (0.1f, 0.5f);
+		coordinate2 = new Coordinate(0.4f, 0.4f);
+		coordinate2a = new Coordinate (0.8f, 0.5f);
+		coordinate3 = new Coordinate(0.4f, 0.6f);
+		coordinate4 = new Coordinate(0.1f, 0.9f);
+		coordinate5 = new Coordinate(0.0f, 0.5f);
+		coordinates = new Coordinate[] {coordinate1, coordinate1a, coordinate2, coordinate2a, coordinate3, coordinate4, coordinate5};
+		connection = new Connection (coordinates);
+		connections = new Connection[] {connection};
+		puzzlePieceConnections = new PuzzlePieceConnections (connections);
+		Connections.Add ("puzzlePiece_turnabout_W", puzzlePieceConnections);
+
+		coordinate1 = new Coordinate(1.0f, 0.5f);
+		coordinate1a = new Coordinate (0.9f, 0.5f);
+		coordinate2 = new Coordinate(0.6f, 0.4f);
+		coordinate2a = new Coordinate (0.2f, 0.5f);
+		coordinate3 = new Coordinate(0.6f, 0.6f);
+		coordinate4 = new Coordinate(0.9f, 0.9f);
+		coordinate5 = new Coordinate(1.0f, 0.5f);
+		coordinates = new Coordinate[] {coordinate1, coordinate1a, coordinate2, coordinate2a, coordinate3, coordinate4, coordinate5};
+		connection = new Connection (coordinates);
+		connections = new Connection[] {connection};
+		puzzlePieceConnections = new PuzzlePieceConnections (connections);
+		Connections.Add ("puzzlePiece_turnabout_E", puzzlePieceConnections);
 	}
 	
 	public class PuzzlePieceConnections {

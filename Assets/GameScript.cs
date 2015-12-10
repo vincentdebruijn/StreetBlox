@@ -431,6 +431,19 @@ public class GameScript : MonoBehaviour {
 			throw new System.InvalidOperationException ("Bridge is in invalid position: " + relativeX);
 	}
 
+	public GameObject GetOtherPortalPiece(GameObject portalPiece) {
+		foreach (GameObject puzzlePiece in puzzlePieces) {
+			if (puzzlePiece == portalPiece)
+				continue;
+			foreach (Transform child in puzzlePiece.transform) {
+				if (child.gameObject.tag == "Portal") {
+					return puzzlePiece;
+				}
+			}
+		}
+		return null;
+	}
+
 	public GameObject[] GetPuzzlePieces() {
 		if (puzzlePieces != null && puzzlePieces.Length > 0) 
 			return puzzlePieces;

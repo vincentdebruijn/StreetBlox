@@ -10,7 +10,7 @@ using System.Collections.Generic;
 public class WorldSelectScript : MonoBehaviour {
 
 	// The names of the available worlds, in order.
-	private static readonly string[] WorldNames = {"Grass World", "Lava World"};
+	private static readonly string[] WorldNames = {"Grass World", "Lava World", "Space World"};
 
 	// The world 1 levels
 	private static readonly string[] levelsWorld1 = {
@@ -30,7 +30,9 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_11",
 		"level_12",
 		"level_13",
-		"level_14"
+		"level_14",
+		"level_15",
+		"level_16"
 	};
 	// The world2 levels
 	private static readonly string[] levelsWorld2 = {
@@ -38,8 +40,12 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_l02",
 		"level_l03"
 	};
+	// The world3 levels
+	private static readonly string[] levelsWorld3 = {
+		"level_s01"
+	};
 
-	private string[][] worlds = {levelsWorld1, levelsWorld2};
+	private string[][] worlds = {levelsWorld1, levelsWorld2, levelsWorld3};
 
 	// Mapping of World names to a mapping of level names to level configurations
 	private static Dictionary<string, Dictionary<string, LevelConfiguration>> worldConfigurations;
@@ -145,6 +151,8 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_12", new LevelConfiguration (4, 5, 0f, 0f, 35));
 		world1Configuration.Add ("level_13", new LevelConfiguration (7, 7, 0f, 0f, 30));
 		world1Configuration.Add ("level_14", new LevelConfiguration (7, 7, 0f, 0f, 30));
+		world1Configuration.Add ("level_15", new LevelConfiguration (7, 5, 0f, 0f, 30));
+		world1Configuration.Add ("level_16", new LevelConfiguration (6, 5, 0f, 0f, 30));
 
 		Dictionary<string, LevelConfiguration> world2Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[1], world2Configuration);
@@ -152,6 +160,11 @@ public class WorldSelectScript : MonoBehaviour {
 		world2Configuration.Add ("level_l01", new LevelConfiguration (5, 5, 0f, 0f, 15));
 		world2Configuration.Add ("level_l02", new LevelConfiguration (5, 5, 0f, 0f, 10));
 		world2Configuration.Add ("level_l03", new LevelConfiguration (9, 5, 0f, 0f, 11));
+
+		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
+		worldConfigurations.Add (WorldNames[2], world2Configuration);
+		
+		world2Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 15));
 	}
 }
 
