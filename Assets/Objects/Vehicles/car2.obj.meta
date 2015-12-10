@@ -1,0 +1,173 @@
+fileFormatVersion: 2
+guid: a8d70fa97b29e3b4f9affd62f7223f9e
+timeCreated: 1448388124
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: polySurface17
+    100002: polySurface22_polySurface5_polySurface25
+    100004: polySurface23_polySurface22_polySurface5
+    100006: polySurface24
+    100008: polySurface46
+    100010: polySurface48
+    100012: polySurface52
+    100014: polySurface58
+    100016: //RootNode
+    100018: polySurface23_polySurface60
+    100020: polySurface23_polySurface63
+    100022: polySurface23_polySurface64
+    100024: polySurface23_polySurface65
+    100026: polySurface23_polySurface66
+    100028: polySurface23_polySurface67
+    100030: polySurface59_polySurface23
+    100032: polySurface61
+    100034: polySurface73
+    100036: polySurface75
+    100038: polySurface79
+    100040: vehicle_car3:polySurface35
+    400000: polySurface17
+    400002: polySurface22_polySurface5_polySurface25
+    400004: polySurface23_polySurface22_polySurface5
+    400006: polySurface24
+    400008: polySurface46
+    400010: polySurface48
+    400012: polySurface52
+    400014: polySurface58
+    400016: //RootNode
+    400018: polySurface23_polySurface60
+    400020: polySurface23_polySurface63
+    400022: polySurface23_polySurface64
+    400024: polySurface23_polySurface65
+    400026: polySurface23_polySurface66
+    400028: polySurface23_polySurface67
+    400030: polySurface59_polySurface23
+    400032: polySurface61
+    400034: polySurface73
+    400036: polySurface75
+    400038: polySurface79
+    400040: vehicle_car3:polySurface35
+    2300000: polySurface17
+    2300002: polySurface22_polySurface5_polySurface25
+    2300004: polySurface23_polySurface22_polySurface5
+    2300006: polySurface24
+    2300008: polySurface46
+    2300010: polySurface48
+    2300012: polySurface52
+    2300014: polySurface58
+    2300016: polySurface23_polySurface60
+    2300018: polySurface23_polySurface63
+    2300020: polySurface23_polySurface64
+    2300022: polySurface23_polySurface65
+    2300024: polySurface23_polySurface66
+    2300026: polySurface23_polySurface67
+    2300028: polySurface59_polySurface23
+    2300030: polySurface61
+    2300032: polySurface73
+    2300034: polySurface75
+    2300036: polySurface79
+    2300038: vehicle_car3:polySurface35
+    3300000: polySurface17
+    3300002: polySurface22_polySurface5_polySurface25
+    3300004: polySurface23_polySurface22_polySurface5
+    3300006: polySurface24
+    3300008: polySurface46
+    3300010: polySurface48
+    3300012: polySurface52
+    3300014: polySurface58
+    3300016: polySurface23_polySurface60
+    3300018: polySurface23_polySurface63
+    3300020: polySurface23_polySurface64
+    3300022: polySurface23_polySurface65
+    3300024: polySurface23_polySurface66
+    3300026: polySurface23_polySurface67
+    3300028: polySurface59_polySurface23
+    3300030: polySurface61
+    3300032: polySurface73
+    3300034: polySurface75
+    3300036: polySurface79
+    3300038: vehicle_car3:polySurface35
+    4300000: polySurface17
+    4300002: polySurface22_polySurface5_polySurface25
+    4300004: polySurface23_polySurface22_polySurface5
+    4300006: polySurface24
+    4300008: polySurface46
+    4300010: polySurface48
+    4300012: polySurface52
+    4300014: polySurface58
+    4300016: polySurface23_polySurface60
+    4300018: polySurface23_polySurface63
+    4300020: polySurface23_polySurface64
+    4300022: polySurface23_polySurface65
+    4300024: polySurface23_polySurface66
+    4300026: polySurface23_polySurface67
+    4300028: polySurface59_polySurface23
+    4300030: polySurface61
+    4300032: polySurface73
+    4300034: polySurface75
+    4300036: polySurface79
+    4300038: vehicle_car3:polySurface35
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
