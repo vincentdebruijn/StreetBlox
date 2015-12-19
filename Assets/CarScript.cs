@@ -219,9 +219,8 @@ public class CarScript : MonoBehaviour {
 				// Check if the end piece is nearby
 				if (AtEndPiece ())
 					return;
-				if (AtPortal()) {
-					portalEntryAnimationDone = false;
-					portalExitAnimationDone = false;
+				if (enteredPortalPiece) {
+					MoveCarToOtherPortal();
 					return;
 				}
 				// Get the next puzzle piece
@@ -339,29 +338,23 @@ public class CarScript : MonoBehaviour {
 		return atEnd;
 	}
 
-	Boolean AtPortal() {
-		if (!currentPuzzlePiece.name.Contains ("portal") || !enteredPortalPiece)
-			return false;
-
-		GameObject portal = null;
-		foreach(Transform child in currentPuzzlePiece.transform) {
-			if (child.gameObject.tag == "Portal") {
-				portal = child.gameObject;
-			}
-		}
-		return (portal.transform.position - transform.position).sqrMagnitude < 0.1f;
-	}
-
 	// TODO: actually show an animation
 	void ShowPortalEntryAnimation() {
 		portalEntryAnimationDone = true;
+	}
 
+	void ShowPortalExitAnimation() {
+		portalExitAnimationDone = true;
+	}
+
+	void MoveCarToOtherPortal() {
 		previousPuzzlePiece = currentPuzzlePiece;
 		currentPuzzlePiece = gameScript.GetOtherPortalPiece (currentPuzzlePiece);
 
 		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
-		int startSide = currentCoordinate.InverseSide (currentDirection);
+		int startSide = PuzzlePieceScript.GetSideOfPortal (currentPuzzlePiece);
 		piecesTouched[currentPuzzlePiece.name] = piecesTouched[currentPuzzlePiece.name] + 1;
+
 		currentConnection = currentPuzzlePieceConnections.getConnectionForSide (startSide);
 		currentDirection = currentConnection.OtherSide (startSide);
 		currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
@@ -369,10 +362,17 @@ public class CarScript : MonoBehaviour {
 		currentCoordinate = currentConnection.coordinates [currentCoordinateIndex];
 	
 		Vector3 newPosition = new Vector3(currentPuzzlePiece.transform.position.x, transform.position.y, currentPuzzlePiece.transform.position.z);
+		Vector3 newEulerAngles = transform.eulerAngles;
+		if (currentDirection == PuzzlePieceScript.Coordinate.NORTH)
+			newEulerAngles.y = 0f;
+		else if (currentDirection == PuzzlePieceScript.Coordinate.EAST)
+			newEulerAngles.y = 90f;
+		else if (currentDirection == PuzzlePieceScript.Coordinate.SOUTH)
+			newEulerAngles.y = 180f;
+		else if (currentDirection == PuzzlePieceScript.Coordinate.WEST)
+			newEulerAngles.y = -90f;
 		transform.position = newPosition;
-		timeSinceOnLastPuzzlePiece = 0f;
-	}
-	void ShowPortalExitAnimation() {
-		portalExitAnimationDone = true;
+		transform.eulerAngles = newEulerAngles;
+		enteredPortalPiece = false;
 	}
 }

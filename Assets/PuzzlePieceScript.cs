@@ -28,7 +28,28 @@ public class PuzzlePieceScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 	}
-
+	
+	public static string FormattedName(GameObject puzzlePiece) {
+		string name = puzzlePiece.name;
+		return Regex.Replace (name, "\\s*\\(\\d+\\)\\s*", "");
+	}
+	
+	public static int GetSideOfPortal(GameObject portalPiece) {
+		String name = FormattedName(portalPiece);
+		Char side = name [name.Length - 1];
+		if (side == 'N') {
+			return Coordinate.SOUTH;
+		} else if (side == 'E') {
+			return Coordinate.WEST;
+		} else if (side == 'S') {
+			return Coordinate.NORTH;
+		} else if (side == 'W') {
+			return Coordinate.EAST;
+		} else {
+			throw new Exception();
+		}
+	}
+	
 	public static void MakePuzzlePieceConnections() {
 		Connections = new Dictionary<string, PuzzlePieceConnections>();
 		puzzlePieces = new Dictionary<int, string> ();
@@ -56,6 +77,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 		connections = new Connection[] {connection};
 		puzzlePieceConnections = new PuzzlePieceConnections (connections);
 		Connections.Add ("puzzlePiece_straight_NS", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_portal_N", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_portal_S", puzzlePieceConnections);
 		
 		coordinate1 = new Coordinate(0.0f, 0.5f);
 		coordinate2 = new Coordinate(1.0f, 0.5f);
@@ -224,20 +247,15 @@ public class PuzzlePieceScript : MonoBehaviour {
 		}
 		
 		public static PuzzlePieceConnections GetPuzzlePieceConnections(GameObject puzzlePiece) {
-			string name = FormattedName (puzzlePiece);
+			string name = PuzzlePieceScript.FormattedName (puzzlePiece);
 			if (!Connections.ContainsKey (name))
 				return null;
 			return Connections [name];
 		}
 
 		public static Boolean HasPuzzlePieceConnections(GameObject puzzlePiece) {
-			string name = FormattedName(puzzlePiece);
+			string name =  PuzzlePieceScript.FormattedName(puzzlePiece);
 			return Connections.ContainsKey (name);
-		}
-
-		private static string FormattedName(GameObject puzzlePiece) {
-			string name = puzzlePiece.name;
-			return Regex.Replace (name, "\\s*\\(\\d+\\)\\s*", "");
 		}
 	}
 	

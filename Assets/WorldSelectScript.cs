@@ -42,7 +42,8 @@ public class WorldSelectScript : MonoBehaviour {
 	};
 	// The world3 levels
 	private static readonly string[] levelsWorld3 = {
-		"level_s01"
+		"level_s01",
+		"level_s_test"
 	};
 
 	private string[][] worlds = {levelsWorld1, levelsWorld2, levelsWorld3};
@@ -90,6 +91,8 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 	
 	void OnGUI() {
+		if (puzzleBoxScript.animationLock)
+			return;
 		if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
 			MenuScript.PlayButtonSound ();
 			endlessButtonChosenStyle = endlessButtonStyle;
@@ -162,9 +165,10 @@ public class WorldSelectScript : MonoBehaviour {
 		world2Configuration.Add ("level_l03", new LevelConfiguration (9, 5, 0f, 0f, 11));
 
 		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
-		worldConfigurations.Add (WorldNames[2], world2Configuration);
+		worldConfigurations.Add (WorldNames[2], world3Configuration);
 		
-		world2Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 15));
+		world3Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 15));
+		world3Configuration.Add ("level_s_test", new LevelConfiguration (4, 5, 0f, 0f, 15));
 	}
 }
 

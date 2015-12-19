@@ -269,7 +269,9 @@ public class GameScript : MonoBehaviour {
 				chosenGoStyle = goStyle3;
 			else if (restTime == 1)
 				chosenGoStyle = goStyle4;
-			GUI.Label (goRect, restTime + "   ", chosenGoStyle);
+			if (GUI.Button (goRect, restTime + "   ", chosenGoStyle)) {
+				time += (float)restTime;
+			}
 		} else if (gameStarted) {
 			GUI.Label (goRect, "", chosenGoStyle);
 		} else {
@@ -432,16 +434,22 @@ public class GameScript : MonoBehaviour {
 	}
 
 	public GameObject GetOtherPortalPiece(GameObject portalPiece) {
-		foreach (GameObject puzzlePiece in puzzlePieces) {
-			if (puzzlePiece == portalPiece)
-				continue;
-			foreach (Transform child in puzzlePiece.transform) {
-				if (child.gameObject.tag == "Portal") {
-					return puzzlePiece;
-				}
+		GameObject portal = null;
+		foreach(Transform child in portalPiece.transform) {
+			if (child.gameObject.name == "Portal") {
+				portal = child.gameObject;
+				break;
 			}
 		}
-		return null;
+
+		GameObject[] portals = GameObject.FindGameObjectsWithTag (portal.tag);
+		GameObject otherPortal = null;
+		if (portals [0] == portal)
+			otherPortal = portals [1];
+		else
+			otherPortal = portals [0];
+
+		return otherPortal.transform.parent.gameObject;
 	}
 
 	public GameObject[] GetPuzzlePieces() {

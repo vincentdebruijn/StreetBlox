@@ -28,6 +28,7 @@ public class MenuScript : MonoBehaviour {
 	public static GUIStyle exitButtonStyle, exitButtonPressedStyle, exitButtonChosenStyle;
 	public static GUIStyle vinliaStyle;
 	public static GUIStyle backButtonStyle, backButtonPressedStyle;
+	public static GUIStyle logoStyle;
 
 	public static GameObject soundButton;
 	public static GameObject soundPuzzlePiece;
@@ -68,7 +69,12 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	void OnGUI() {
-		GUI.DrawTexture(logoRect, logoTexture, ScaleMode.ScaleToFit);
+		if (GUI.Button(logoRect, "", logoStyle)) {
+			Application.OpenURL("https://www.facebook.com/vinliagames");
+		}
+		if (GUI.Button (vinliaRect, "", vinliaStyle)) {
+			Application.OpenURL("https://www.facebook.com/vinliagames");
+		}
 		if (GUI.Button (leftButtonRect, "", optionButtonChosenStyle)) {
 			optionButtonChosenStyle = optionButtonStyle;
 			PlayButtonSound();
@@ -85,7 +91,6 @@ public class MenuScript : MonoBehaviour {
 			Save ();
 			Application.Quit();
 		}
-		GUI.Label (vinliaRect, "", vinliaStyle);
 	}
 	
 	public static void Load() {
@@ -170,6 +175,9 @@ public class MenuScript : MonoBehaviour {
 
 		vinliaStyle = new GUIStyle ();
 		vinliaStyle.normal.background = vinliaTexture;
+
+		logoStyle = new GUIStyle ();
+		logoStyle.normal.background = logoTexture;
 		
 		backButtonStyle = new GUIStyle();
 		backButtonStyle.normal.background = backButtonTexture;
