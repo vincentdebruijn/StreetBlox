@@ -17,8 +17,10 @@ public class puzzleBoxScript : MonoBehaviour {
 	// Mutex lock for ensuring only one puzzlebox animation is playing at a time.
 	public static Boolean animationLock;
 	private Boolean moving;
+	private Boolean selectedWorld;
 	
 	void Awake () {
+		selectedWorld = false;
 		animationLock = false;
 		worldSelectScript = Camera.main.GetComponent<WorldSelectScript>();
 
@@ -46,20 +48,20 @@ public class puzzleBoxScript : MonoBehaviour {
 			transform.localScale = newScale;
 		}
 		
-		if (Math.Abs (transform.position.z - cameraPosition.z) < 0.01f) {
+		if (!selectedWorld && !animationReallyStarted && !startedAnimation && Math.Abs (transform.position.z - cameraPosition.z) < 0.01f) {
 			moving = false;
 			anim.Play ("open");
 			startedAnimation = true;
 		}
 		
-		if (startedAnimation && anim.GetCurrentAnimatorStateInfo (0).IsName ("open")) {
+		if (!selectedWorld && startedAnimation && anim.GetCurrentAnimatorStateInfo (0).IsName ("open")) {
 			startedAnimation = false;
 			animationReallyStarted = true;
 		}
 
-		if (animationReallyStarted && !anim.GetCurrentAnimatorStateInfo (0).IsName ("open")) {
+		if (!selectedWorld && animationReallyStarted && !anim.GetCurrentAnimatorStateInfo (0).IsName ("open")) {
 			animationReallyStarted = false;
-			animationLock = false;
+			selectedWorld = true;
 			worldSelectScript.SelectedWorld (worldNumber);
 		}
 	}
@@ -68,6 +70,12 @@ public class puzzleBoxScript : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0) && !animationLock) {
 			animationLock = true;
 			moving = true;
+			PlayBoxOpenSound();
 		}
+	}
+
+	public void PlayBoxOpenSound() {
+		if (MenuScript.data.playSoundEffects)
+			GetComponent<AudioSource> ().Play ();
 	}
 }

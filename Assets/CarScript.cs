@@ -52,6 +52,7 @@ public class CarScript : MonoBehaviour {
 	void Awake() {
 		Reset ();
 		MakeCarInivisible ();
+		PlayCarHorn ();
 	}
 
 	// Update is called once per frame
@@ -109,6 +110,7 @@ public class CarScript : MonoBehaviour {
 		inRangeOfButton = false;
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		carStarted = true;
+		PlayEngineSound ();
 	}
 
 	public Boolean GameOver() {
@@ -116,6 +118,7 @@ public class CarScript : MonoBehaviour {
 	}
 
 	public void Reset() {
+		StopEngineSound ();
 		atEnd = false;
 		startEnd = 0f;
 		ended = false;
@@ -138,6 +141,7 @@ public class CarScript : MonoBehaviour {
 				return false;
 			if (startEnd >= 3.0) {
 				ended = true;
+				StopEngineSound();
 				return false;
 			}
 			if (startEnd >= 2.5) {
@@ -156,6 +160,7 @@ public class CarScript : MonoBehaviour {
 			if (fell)
 				return false;
 			if (startFall > 1.0) {
+				StopEngineSound();
 				fell = true;
 				return false;
 			}
@@ -234,6 +239,8 @@ public class CarScript : MonoBehaviour {
 				Debug.Log ("Entering from: " + currentDirection);
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || OnOpenBridgePiece(currentPuzzlePiece)) {
 					crashing = true;
+					StopEngineSound();
+					PlayCrashSound();
 					return;
 				}
 				enteredPortalPiece = currentPuzzlePiece.name.Contains("portal");
@@ -244,6 +251,8 @@ public class CarScript : MonoBehaviour {
 				currentConnection = currentPuzzlePieceConnections.getConnectionForSide (startSide);
 				if (currentConnection == null) {
 					crashing = true;
+					StopEngineSound();
+					PlayCrashSound ();
 					return;
 				}
 				piecesTouched[currentPuzzlePiece.name] = piecesTouched[currentPuzzlePiece.name] + 1;
@@ -338,6 +347,9 @@ public class CarScript : MonoBehaviour {
 		return atEnd;
 	}
 
+	// Animation stuff
+	//
+
 	// TODO: actually show an animation
 	void ShowPortalEntryAnimation() {
 		portalEntryAnimationDone = true;
@@ -374,5 +386,27 @@ public class CarScript : MonoBehaviour {
 		transform.position = newPosition;
 		transform.eulerAngles = newEulerAngles;
 		enteredPortalPiece = false;
+	}
+
+	// Sound stuff
+	//
+
+	public void PlayCarHorn() {
+		if (MenuScript.data.playSoundEffects)
+			GetComponents<AudioSource> () [0].Play ();
+	}
+
+	public void PlayCrashSound() {
+		if (MenuScript.data.playSoundEffects)
+			GetComponents<AudioSource> () [1].Play ();
+	}
+
+	public void PlayEngineSound() {
+		if (MenuScript.data.playSoundEffects)
+			GetComponents<AudioSource> () [2].Play ();
+	}
+
+	public void StopEngineSound() {
+		GetComponents<AudioSource> () [2].Stop ();
 	}
 }

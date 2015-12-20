@@ -32,6 +32,8 @@ public class MenuScript : MonoBehaviour {
 
 	public static GameObject soundButton;
 	public static GameObject soundPuzzlePiece;
+	public static GameObject soundGearShift;
+	public static GameObject soundMenu;
 
 	private static Rect logoRect;
 	private static Rect leftButtonRect;
@@ -47,6 +49,7 @@ public class MenuScript : MonoBehaviour {
 			Screen.sleepTimeout = SleepTimeout.NeverSleep;
 			SetVariables ();
 			Load ();
+			PlayMenuMusic();
 			staticVariablesSet = true;
 		}
 	}
@@ -105,6 +108,8 @@ public class MenuScript : MonoBehaviour {
 			data.levelProgress = new Dictionary<string, int>();
 			data.playAnimations = true;
 			data.playTutorials = true;
+			data.playMusic = true;
+			data.playSoundEffects = true;
 			data.chosenCar = "car1";
 		}
 	}
@@ -119,11 +124,28 @@ public class MenuScript : MonoBehaviour {
 	}
 
 	public static void PlayButtonSound() {
-		soundButton.GetComponent<AudioSource> ().Play ();
+		if (data.playSoundEffects)
+			soundButton.GetComponent<AudioSource> ().Play ();
 	}
 
 	public static void PlayPuzzlePieceSound() {
-		soundPuzzlePiece.GetComponent<AudioSource> ().Play ();
+		if (data.playSoundEffects)
+			soundPuzzlePiece.GetComponent<AudioSource> ().Play ();
+	}
+	
+	
+	public static void PlayGearShiftSound() {
+		if (data.playSoundEffects)
+			soundGearShift.GetComponent<AudioSource> ().Play ();
+	}
+	
+	public static void PlayMenuMusic() {
+		if (data.playMusic)
+			soundMenu.GetComponent<AudioSource> ().Play ();
+	}
+
+	public static void StopMenuMusic() {
+		soundMenu.GetComponent<AudioSource> ().Stop ();
 	}
 
 	private static void SetVariables() {
@@ -135,6 +157,10 @@ public class MenuScript : MonoBehaviour {
 		DontDestroyOnLoad (soundButton);
 		soundPuzzlePiece = GameObject.Find ("sound_piece_click");
 		DontDestroyOnLoad (soundPuzzlePiece);
+		soundGearShift = GameObject.Find ("sound_gear_shift");
+		DontDestroyOnLoad (soundGearShift);
+		soundMenu = GameObject.Find ("sound_menu");
+		DontDestroyOnLoad (soundMenu);
 		
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
@@ -190,6 +216,8 @@ public class MenuScript : MonoBehaviour {
 		public Dictionary<string, int> levelProgress;
 		public Boolean playAnimations;
 		public Boolean playTutorials;
+		public Boolean playMusic;
+		public Boolean playSoundEffects;
 		public String chosenCar;
 	}
 }

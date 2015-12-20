@@ -287,7 +287,7 @@ public class GameScript : MonoBehaviour {
 		if (gameStarted) {
 			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
 				if (carScript.boost < 3f) {
-					MenuScript.PlayButtonSound ();
+					MenuScript.PlayGearShiftSound ();
 					if (chosenBoostStyle == boostStyle1)
 						chosenBoostStyle = boostStyle2;
 					else if (chosenBoostStyle == boostStyle2)
@@ -351,8 +351,12 @@ public class GameScript : MonoBehaviour {
 		Debug.Log("Clicked: " + puzzlePiece.name);
 		if (carScript.GameOver () || !gameStarted || carScript.falling || carScript.crashing)
 			return;
-		if (carScript.currentPuzzlePiece == puzzlePiece || puzzlePiece.CompareTag ("UnmovablePuzzlePiece") || 
-		    (carScript.previousPuzzlePiece == puzzlePiece && carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost)))
+		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
+		    	carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost))) {
+			carScript.PlayCarHorn ();
+			return;
+		}
+		 if (puzzlePiece.CompareTag ("UnmovablePuzzlePiece"))
 			return;
 		
 		int boardHeight = levelConfiguration.BoardHeight;

@@ -9,14 +9,18 @@ public class OptionsScript : MonoBehaviour {
 	private static Rect leftBottomRect;
 	private static Rect option1Rect;
 	private static Rect option2Rect;
+	private static Rect option3Rect;
+	private static Rect option4Rect;
 	private static Rect option1TextRect;
 	private static Rect option2TextRect;
+	private static Rect option3TextRect;
+	private static Rect option4TextRect;
 	
 	private static Texture2D optionButtonTexture, optionSelectedButtonTexture;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle optionButtonStyle, optionSelectedButtonStyle;
-	private static GUIStyle optionButton1ChosenStyle, optionButton2ChosenStyle;
+	private static GUIStyle optionButton1ChosenStyle, optionButton2ChosenStyle, optionButton3ChosenStyle, optionButton4ChosenStyle;
 	private static GUIStyle optionTextStyle;
 
 	// Dynamic one time loading of all static variables
@@ -68,6 +72,29 @@ public class OptionsScript : MonoBehaviour {
 				optionButton2ChosenStyle = optionButtonStyle;
 		}
 		GUI.Label (option2TextRect, "Tutorials", optionTextStyle);
+
+		if (GUI.Button(option3Rect, "", optionButton3ChosenStyle)) {
+			MenuScript.PlayButtonSound();
+			MenuScript.data.playMusic = !MenuScript.data.playMusic;
+			if (MenuScript.data.playMusic) {
+				MenuScript.PlayMenuMusic();
+				optionButton3ChosenStyle = optionSelectedButtonStyle;
+			} else {
+				MenuScript.StopMenuMusic();
+				optionButton3ChosenStyle = optionButtonStyle;
+			}
+		}
+		GUI.Label (option3TextRect, "Music", optionTextStyle);
+
+		if (GUI.Button(option4Rect, "", optionButton4ChosenStyle)) {
+			MenuScript.PlayButtonSound();
+			MenuScript.data.playSoundEffects = !MenuScript.data.playSoundEffects;
+			if (MenuScript.data.playSoundEffects)
+				optionButton4ChosenStyle = optionSelectedButtonStyle;
+			else
+				optionButton4ChosenStyle = optionButtonStyle;
+		}
+		GUI.Label (option4TextRect, "Sound effects", optionTextStyle);
 	}
 
 	private static void SetVariables() {
@@ -76,8 +103,12 @@ public class OptionsScript : MonoBehaviour {
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		option1Rect = new Rect (buttonSize / 4, buttonSize / 4, buttonSize / 3, buttonSize / 3);
 		option2Rect = new Rect (buttonSize / 4, buttonSize / 2 + 20, buttonSize / 3, buttonSize / 3);
+		option3Rect = new Rect (buttonSize / 4, buttonSize * 3 / 4 + 40, buttonSize / 3, buttonSize / 3);
+		option4Rect = new Rect (buttonSize / 4, buttonSize + 60, buttonSize / 3, buttonSize / 3);
 		option1TextRect = new Rect (buttonSize / 2 + 30, buttonSize / 4, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 		option2TextRect = new Rect (buttonSize / 2 + 30, buttonSize / 2 + 20, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
+		option3TextRect = new Rect (buttonSize / 2 + 30, buttonSize * 3 / 4 + 40, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
+		option4TextRect = new Rect (buttonSize / 2 + 30, buttonSize + 60, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");
@@ -94,6 +125,14 @@ public class OptionsScript : MonoBehaviour {
 			optionButton2ChosenStyle = optionSelectedButtonStyle;
 		else
 			optionButton2ChosenStyle = optionButtonStyle;
+		if (MenuScript.data.playMusic)
+			optionButton3ChosenStyle = optionSelectedButtonStyle;
+		else
+			optionButton3ChosenStyle = optionButtonStyle;
+		if (MenuScript.data.playSoundEffects)
+			optionButton4ChosenStyle = optionSelectedButtonStyle;
+		else
+			optionButton4ChosenStyle = optionButtonStyle;
 		
 		optionTextStyle = new GUIStyle ();
 		optionTextStyle.alignment = TextAnchor.MiddleLeft;

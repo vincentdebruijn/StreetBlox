@@ -58,6 +58,7 @@ public class LevelSelectScript : MonoBehaviour {
 	private static Boolean staticVariablesSet = false;
 
 	void Awake() {
+		puzzleBoxScript.animationLock = false;
 		levels = WorldSelectScript.levels;
 		levelConfigurations = WorldSelectScript.levelConfigurations;
 		loading = false;
