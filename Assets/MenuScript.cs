@@ -106,7 +106,7 @@ public class MenuScript : MonoBehaviour {
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
-			data.playAnimations = true;
+			data.playAnimations = false;
 			data.playTutorials = true;
 			data.playMusic = true;
 			data.playSoundEffects = true;

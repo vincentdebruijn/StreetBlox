@@ -37,9 +37,8 @@ public class CarScript : MonoBehaviour {
 	public Boolean carStarted;
 	// Can be set to make the car move faster
 	public float boost;
-
-	// True if the Car is in range of a button
-	private Boolean inRangeOfButton;
+	
+	private Boolean clickedButtonWhileOnCurrentPuzzlePiece;
 
 	private GameObject[] buttons;
 
@@ -51,15 +50,14 @@ public class CarScript : MonoBehaviour {
 
 	void Awake() {
 		Reset ();
-		MakeCarInivisible ();
 		PlayCarHorn ();
 	}
 
 	// Update is called once per frame
 	void Update () {
 		time += Time.deltaTime;
-		if (time < 1.5)
-			DecreaseTransparancy ();
+		//if (time < 1.5)
+		//	DecreaseTransparancy ();
 		if ((!carStarted) || GameOver () || GameEnding ()) {
 			return;
 		// Very stupid, but needed because GameEnding could have made GameOver true now
@@ -107,7 +105,6 @@ public class CarScript : MonoBehaviour {
 			PuzzlePieceScript.Coordinate.GetCoordinateFor (currentCoordinate.x, currentCoordinate.z, currentPuzzlePiece, levelConfiguration.PieceSize);
 		Debug.Log ("Which is at: x: " + startDestination.x + " z: " + startDestination.z);
 		Debug.Log ("And point of car is at: x: " + PointOfCar ().x + " z: " + PointOfCar ().z);
-		inRangeOfButton = false;
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		carStarted = true;
 		PlayEngineSound ();
@@ -130,6 +127,7 @@ public class CarScript : MonoBehaviour {
 		crashed = false;
 		carStarted = false;
 		time = 0f;
+		clickedButtonWhileOnCurrentPuzzlePiece = false;
 		portalEntryAnimationDone = true;
 		portalExitAnimationDone = true;
 		enteredPortalPiece = false;
@@ -149,9 +147,9 @@ public class CarScript : MonoBehaviour {
 					child.GetComponent<Renderer> ().enabled = false;
 				}
 			}
-			if (startEnd >= 1.5) {
-				IncreaseTransparancy();
-			}
+			//if (startEnd >= 1.5) {
+			//	IncreaseTransparancy();
+			//}
 			startEnd += Time.deltaTime;
 			transform.Translate (Vector3.forward * levelConfiguration.movement * Time.deltaTime);
 			return true;
@@ -182,30 +180,6 @@ public class CarScript : MonoBehaviour {
 		return false;
 	}
 
-	void IncreaseTransparancy() {
-		foreach (Transform child in gameObject.transform) {
-			Color tempcolor = child.GetComponent<Renderer> ().material.color;
-			tempcolor.a = Mathf.MoveTowards (tempcolor.a, 0, Time.deltaTime * 4 / 5);
-			child.GetComponent<Renderer> ().material.color = tempcolor;
-		}
-	}
-
-	void DecreaseTransparancy() {
-		foreach (Transform child in gameObject.transform) {
-			Color tempcolor = child.GetComponent<Renderer> ().material.color;
-			tempcolor.a = Mathf.MoveTowards (tempcolor.a, 1, Time.deltaTime);
-			child.GetComponent<Renderer> ().material.color = tempcolor;
-		}
-	}
-
-	void MakeCarInivisible() {
-		foreach (Transform child in gameObject.transform) {
-			Color tempcolor = child.GetComponent<Renderer> ().material.color;
-			tempcolor.a = 0f;
-			child.GetComponent<Renderer> ().material.color = tempcolor;
-		}
-	}
-
 	void UpdateCarPosition() {
 		float r_x = currentCoordinate.x;
 		float r_z = currentCoordinate.z;
@@ -221,6 +195,7 @@ public class CarScript : MonoBehaviour {
 			Debug.Log ("New coordinate index: " + currentCoordinateIndex);
 			if (currentCoordinateIndex == currentConnection.coordinates.Length || currentCoordinateIndex == -1) {
 				timeSinceOnLastPuzzlePiece = 0f;
+				clickedButtonWhileOnCurrentPuzzlePiece = false;
 				// Check if the end piece is nearby
 				if (AtEndPiece ())
 					return;
@@ -313,6 +288,8 @@ public class CarScript : MonoBehaviour {
 	}
 
 	void CheckForNearbyButton() {
+		if (clickedButtonWhileOnCurrentPuzzlePiece)
+			return;
 		Vector3 pos = PointOfCar ();
 		Boolean nearby = false;
 		foreach (GameObject button in buttons) {
@@ -320,9 +297,10 @@ public class CarScript : MonoBehaviour {
 			if (Math.Abs(pos.x - (buttonPos.x + 0.25f)) < 0.03f && Math.Abs(pos.z - (buttonPos.z - 0.25f)) < 0.03f)
 				nearby = true;
 		}
-		if (!inRangeOfButton && nearby)
+		if (nearby) {
+			clickedButtonWhileOnCurrentPuzzlePiece = true;
 			gameScript.FlipBridgePositions ();
-		inRangeOfButton = nearby;
+		}
 	}
 
 	Boolean OnOpenBridgePiece(GameObject currentPuzzlePiece) {

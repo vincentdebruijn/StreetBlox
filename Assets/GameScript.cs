@@ -28,7 +28,7 @@ public class GameScript : MonoBehaviour {
 	private LevelConfiguration levelConfiguration;
 	
 	// The animation at the start
-	private Boolean showingAnimation = true;
+	private Boolean showingAnimation;
 	private float timeSinceStartAnimation = 0f;
 	// The puzzle pieces that are currently in the start animation
 	private GameObject[] currentPuzzlePiecesAnimation;
@@ -104,7 +104,9 @@ public class GameScript : MonoBehaviour {
 	private static Rect boostRect;
 	private static Rect tutorialRect;
 
-	private Boolean tutorial2Accepted;
+	private int tutorialMessageCounter;
+	
+	private static Dictionary<String, String[]> tutorialMessages;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -120,18 +122,20 @@ public class GameScript : MonoBehaviour {
 		chosenBoostStyle = boostStyle1;
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
 		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
+		tutorialMessageCounter = 0;
+		showingAnimation = false;
 
 		if (!dontPlayAnimation && MenuScript.data.playAnimations) {
 			showingAnimation = true;
 			HidePuzzlePieces ();
 			StartPuzzlePieceAnimation ();
 		}
-		tutorial2Accepted = false;
 	}
 
 	void Awake() {	
 		if (!staticVariablesSet) {
 			PuzzlePieceScript.MakePuzzlePieceConnections ();
+			AddTutorialMessages();
 			SetVariables ();
 			staticVariablesSet = true;
 		}
@@ -234,12 +238,14 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayTutorialMessages() {
-		if (MenuScript.data.playTutorials) {
-			if (chosenLevel == "tutorial_2" && !tutorial2Accepted) {
-				if (GUI.Button (tutorialRect, "The beacon piece always moves to the empty spot.\nIt does not have to be next to the empty spot.", tutorialStyle)) {
-					MenuScript.PlayButtonSound();
-					tutorial2Accepted = true;
-				}
+		if (!MenuScript.data.playTutorials)
+			return;
+
+		String[] messagesForCurrentLevel = tutorialMessages [chosenLevel];
+		if (tutorialMessageCounter < messagesForCurrentLevel.Length) {
+			if (GUI.Button (tutorialRect, messagesForCurrentLevel[tutorialMessageCounter], tutorialStyle)) {
+				MenuScript.PlayButtonSound();
+				tutorialMessageCounter += 1;
 			}
 		}
 	}
@@ -737,6 +743,22 @@ public class GameScript : MonoBehaviour {
 		boostStyle4.normal.background = boostTexture4;
 		
 		backButtonChosenStyle = MenuScript.backButtonStyle;
+	}
+
+	private static void AddTutorialMessages() {
+		tutorialMessages = new Dictionary<string, string[]> ();
+
+		// tutorial level 1
+		String[] messages1 = new String[3];
+		messages1 [0] = "The goal of this game is to let the car reach\nthe portal at the other end of the map.";
+		messages1 [1] = "You can start the game by pressing the 'GO' button\non the left. You cannot move the puzzle pieces\nuntil you pressed this button.";
+		messages1 [2] = "Move the puzzle pieces next to the empty spot by clicking on them.\nClick 'Reset' to restart or 'Quit' to go back to the menu.";
+		tutorialMessages.Add ("tutorial_1", messages1);
+
+		// tutorial level 2
+		String[] messages2 = new String[1];
+		messages2 [0] = "The beacon piece always moves to the empty spot.\nIt does not have to be next to the empty spot.";
+		tutorialMessages.Add ("tutorial_2", messages2);
 	}
 
 	// Comparer to sort puzzle pieces
