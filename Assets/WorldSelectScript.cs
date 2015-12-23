@@ -9,11 +9,13 @@ using System.Collections.Generic;
 
 public class WorldSelectScript : MonoBehaviour {
 
+	public static String chosenWorldName;
+
 	// The names of the available worlds, in order.
 	private static readonly string[] WorldNames = {"Tutorial", "Grass World", "Lava World", "Space World"};
 
 	// The tutorial levels
-	private static readonly string[] levelsTutorial = {
+	public static readonly string[] levelsTutorial = {
 		"tutorial_1",
 		"tutorial_2",
 		"tutorial_3"
@@ -50,7 +52,7 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_s_test"
 	};
 
-	private string[][] worlds = {levelsTutorial, levelsWorld1, levelsWorld2, levelsWorld3};
+	private static string[][] worlds = {levelsTutorial, levelsWorld1, levelsWorld2, levelsWorld3};
 
 	// Mapping of World names to a mapping of level names to level configurations
 	private static Dictionary<string, Dictionary<string, LevelConfiguration>> worldConfigurations;
@@ -62,21 +64,27 @@ public class WorldSelectScript : MonoBehaviour {
 
 	// GUI stuff
 	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
+	private static Texture2D levelTextTexture;
 	
 	private static Rect leftBottomRect;
 	private static Rect rightBottomRect;
+	private static Rect loadingRect;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
+	private static GUIStyle loadingStyle;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
+	
+	private Boolean loading;
 	
 	void Awake() {
 		if (!staticVariablesSet) {
 			SetVariables ();
 			staticVariablesSet = true;
 		}
+		loading = false;
 	}
 	
 	// Use this for initialization
@@ -95,12 +103,17 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 	
 	void OnGUI() {
+		if (loading)
+			GUI.Label(loadingRect, "Loading...", loadingStyle);
+
 		if (puzzleBoxScript.animationLock)
 			return;
 		if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
 			MenuScript.PlayButtonSound ();
 			endlessButtonChosenStyle = endlessButtonStyle;
-			Application.LoadLevel ("endless");
+			MenuScript.canvas.GetComponent<Image>().color = GameScript.backgroundColor;
+			loading = true;
+			Application.LoadLevel ("explorer");
 		}
 		if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
 			backButtonChosenStyle = MenuScript.backButtonStyle;
@@ -111,9 +124,14 @@ public class WorldSelectScript : MonoBehaviour {
 
 	public void SelectedWorld(int world) {
 		MenuScript.PlayButtonSound ();
-		levels = worlds [world ];
-		levelConfigurations = worldConfigurations [WorldNames [world]];
+		SetLevelInfo (world);
+		chosenWorldName = WorldNames [world];
 		Application.LoadLevel ("level_select");
+	}
+
+	public static void SetLevelInfo(int world) {
+		levels = worlds [world];
+		levelConfigurations = worldConfigurations [WorldNames [world]];
 	}
 
 	private static void SetVariables() {
@@ -121,9 +139,11 @@ public class WorldSelectScript : MonoBehaviour {
 		float offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
+		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
 		
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
+		levelTextTexture = (Texture2D) Resources.Load ("ui_border_levelname");
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 		
 		endlessButtonStyle = new GUIStyle ();
@@ -132,10 +152,16 @@ public class WorldSelectScript : MonoBehaviour {
 		endlessButtonPressedStyle.normal.background = endlessButtonPressedTexture;
 		endlessButtonChosenStyle = endlessButtonStyle;
 
+		loadingStyle = new GUIStyle ();
+		loadingStyle.normal.textColor = Color.white;
+		loadingStyle.fontSize = 28;
+		loadingStyle.alignment = TextAnchor.MiddleCenter;
+		loadingStyle.normal.background = levelTextTexture;
+
 		AddLevels ();
 	}
 
-	private static void AddLevels() {
+	public static void AddLevels() {
 		worldConfigurations = new Dictionary<string, Dictionary<string, LevelConfiguration>>();
 
 		Dictionary<string, LevelConfiguration> world0Configuration = new Dictionary<string, LevelConfiguration> ();

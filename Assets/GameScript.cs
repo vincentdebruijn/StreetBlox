@@ -45,7 +45,7 @@ public class GameScript : MonoBehaviour {
 
 	private List<GameObject> bridgePieces;
 	
-	private string chosenLevel;
+	public string chosenLevel;
 
 	// GUI stuff
 	private static Texture2D retryButtonTexture, retryButtonPressedTexture;
@@ -113,7 +113,10 @@ public class GameScript : MonoBehaviour {
 
 	private void OnLevelWasLoaded(int iLevel) {
 		chosenLevel = Application.loadedLevelName;
-		levelConfiguration = LevelSelectScript.levelConfigurations[chosenLevel];
+		if (chosenLevel == "explorer")
+			levelConfiguration = new LevelConfiguration (60, 60, 0f, 0f, 0);
+		else
+			levelConfiguration = LevelSelectScript.levelConfigurations[chosenLevel];
 
 		SetCarOnStartPiece ();
 		GetPuzzlePieces ();
@@ -124,6 +127,7 @@ public class GameScript : MonoBehaviour {
 		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
 		tutorialMessageCounter = 0;
 		showingAnimation = false;
+		CreateBoard ();
 
 		if (!dontPlayAnimation && MenuScript.data.playAnimations) {
 			showingAnimation = true;
@@ -261,7 +265,12 @@ public class GameScript : MonoBehaviour {
 	private void DisplayButtonBar() {
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
-			Application.LoadLevel ("level_select");
+			if (chosenLevel == "explorer")
+				Application.LoadLevel ("world_select");
+			else if (MenuScript.InTutorialPhase() != null)
+				Application.LoadLevel ("menu");
+			else
+				Application.LoadLevel ("level_select");
 		}
 
 		if (GUI.Button (resetRect, "", resetStyle)) {
@@ -311,7 +320,6 @@ public class GameScript : MonoBehaviour {
 	// Start the counter!
 	private void StartTheGame() {
 		EndAnimation ();
-		CreateBoard ();
 		time = 0.0f;
 		movesMade = 0;
 		processedGameOver = false;
@@ -336,6 +344,18 @@ public class GameScript : MonoBehaviour {
 	public void Reset(string button) {
 		gameStarted = false;
 		carScript.Reset ();
+		Boolean tutorialsFinished = 
+			MenuScript.InTutorialPhase() == null && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
+		
+		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
+			MenuScript.canvas.GetComponent<Image> ().color = MenuScript.originalCanvasColor;
+			dontPlayAnimation = false;
+			MenuScript.data.worldSelectShown = true;
+			MenuScript.Save ();
+			Application.LoadLevel ("world_select");
+			return;
+		}
+
 		switch(button) {
 		case "Next":
 			dontPlayAnimation = false;
@@ -348,7 +368,12 @@ public class GameScript : MonoBehaviour {
 		case "Back":
 			MenuScript.canvas.GetComponent<Image>().color = MenuScript.originalCanvasColor;
 			dontPlayAnimation = false;
-			Application.LoadLevel("level_select");
+			if (chosenLevel == "explorer")
+				Application.LoadLevel ("world_select");
+			else if (MenuScript.InTutorialPhase() != null)
+				Application.LoadLevel ("menu");
+			else
+				Application.LoadLevel("level_select");
 			break;
 		}
 	}

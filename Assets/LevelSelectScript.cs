@@ -12,7 +12,7 @@ public class LevelSelectScript : MonoBehaviour {
 	public static Dictionary<string, LevelConfiguration> levelConfigurations;	
 
 	private static string[] levels;
-	private static string chosenLevel;
+	public static string chosenLevel;
 	
 	// The first level the user has the focus on
 	private int focus;
@@ -31,6 +31,10 @@ public class LevelSelectScript : MonoBehaviour {
 	private static Texture2D oneStarMedalTexture;
 	private static Texture2D twoStarMedalTexture;
 	private static Texture2D threeStarMedalTexture;
+
+	private static Texture tutorialTexture;
+	private static Texture lavaWorldTexture;
+	private static Texture spaceWorldTexture;
 
 	private static Rect leftBottomRect;
 	private static Rect rightBottomRect;
@@ -58,14 +62,28 @@ public class LevelSelectScript : MonoBehaviour {
 	private static Boolean staticVariablesSet = false;
 
 	void Awake() {
+		SetLevelInfo ();
 		puzzleBoxScript.animationLock = false;
-		levels = WorldSelectScript.levels;
-		levelConfigurations = WorldSelectScript.levelConfigurations;
 		loading = false;
 
 		if (!staticVariablesSet) {
 			SetVariables ();
 			staticVariablesSet = true;
+		}
+
+		Transform puzzleBox = GameObject.Find ("puzzleBoxWorld").transform;
+		Material boxMaterial = puzzleBox.FindChild ("box").GetComponent<Renderer> ().material;
+		Material lidMaterial = puzzleBox.FindChild ("lid").GetComponent<Renderer> ().material;
+
+		if (WorldSelectScript.chosenWorldName == "Tutorial") {
+			boxMaterial.mainTexture = tutorialTexture;
+			lidMaterial.mainTexture = tutorialTexture;
+		} else if (WorldSelectScript.chosenWorldName == "Lava World") {
+			boxMaterial.mainTexture = lavaWorldTexture;
+			lidMaterial.mainTexture = lavaWorldTexture;
+		} else if (WorldSelectScript.chosenWorldName == "Space World") {
+			boxMaterial.mainTexture = spaceWorldTexture;
+			lidMaterial.mainTexture = spaceWorldTexture;
 		}
 	}
 
@@ -181,6 +199,10 @@ public class LevelSelectScript : MonoBehaviour {
 		oneStarMedalTexture = (Texture2D) Resources.Load ("ui_medal_painted_star1");
 		twoStarMedalTexture = (Texture2D) Resources.Load ("ui_medal_painted_star2");
 		threeStarMedalTexture = (Texture2D) Resources.Load ("ui_medal_painted_star3");
+
+		tutorialTexture = (Texture) Resources.Load ("Grey");
+		lavaWorldTexture = (Texture2D) Resources.Load ("lavaTexture_puzzlePiece_M");
+		spaceWorldTexture = (Texture2D) Resources.Load ("spaceTexture_puzzlePiece_M");
 		
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 
@@ -224,5 +246,10 @@ public class LevelSelectScript : MonoBehaviour {
 		loadingStyle.normal.background = levelTextTexture;
 		
 		buttonHeight =  Screen.height / 2 - buttonSize / 2;
+	}
+
+	public static void SetLevelInfo() {
+		levels = WorldSelectScript.levels;
+		levelConfigurations = WorldSelectScript.levelConfigurations;
 	}
 }

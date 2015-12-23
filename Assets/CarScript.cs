@@ -212,13 +212,14 @@ public class CarScript : MonoBehaviour {
 				}
 				Debug.Log ("New destination: " + currentPuzzlePiece.name);
 				Debug.Log ("Entering from: " + currentDirection);
-				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || OnOpenBridgePiece(currentPuzzlePiece)) {
+				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
+				    	OnOpenBridgePiece(currentPuzzlePiece)) {
 					crashing = true;
 					StopEngineSound();
 					PlayCrashSound();
 					return;
 				}
-				enteredPortalPiece = currentPuzzlePiece.name.Contains("portal");
+				enteredPortalPiece = currentPuzzlePiece.name.Contains("portal") && !EnteredPortalPieceFromWrongSide();
 
 				currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
 				int startSide = currentCoordinate.InverseSide (currentDirection);
@@ -241,6 +242,10 @@ public class CarScript : MonoBehaviour {
 			RotateTowardsTarget ();
 		}
 		CheckForNearbyButton();
+	}
+
+	Boolean EnteredPortalPieceFromWrongSide() {
+		return currentPuzzlePiece.name.Contains ("portal") && PuzzlePieceScript.GetSideOfPortal (currentPuzzlePiece) != currentDirection;
 	}
 
 	void MoveTowardsTarget(float x, float z) {
@@ -321,6 +326,8 @@ public class CarScript : MonoBehaviour {
 	}
 
 	Boolean AtEndPiece() {
+		if (gameScript.chosenLevel == "explorer")
+			return false;
 		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < levelConfiguration.PieceSize;
 		return atEnd;
 	}

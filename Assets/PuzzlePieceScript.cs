@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 public class PuzzlePieceScript : MonoBehaviour {
-
-	public static Dictionary<int, string> puzzlePieces;
+	
 	public static Dictionary<string, PuzzlePieceConnections> Connections;
 
 	private GameScript gameScript;
@@ -52,7 +51,6 @@ public class PuzzlePieceScript : MonoBehaviour {
 	
 	public static void MakePuzzlePieceConnections() {
 		Connections = new Dictionary<string, PuzzlePieceConnections>();
-		puzzlePieces = new Dictionary<int, string> ();
 		
 		Coordinate coordinate1 = new Coordinate(0.0f, 0.5f);
 		Coordinate coordinate2 = new Coordinate(1.0f, 0.5f);
@@ -64,11 +62,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 		Connections.Add ("puzzlePiece_straight_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_trainCrossing_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_bridge", puzzlePieceConnections);
-		Connections.Add ("puzzlePiece_portal_E", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_portal_W", puzzlePieceConnections);
-		// w.i.p Exploration mode
-		puzzlePieces.Add (0, "puzzlePiece_straight_EW");
-		puzzlePieces.Add (1, "puzzlePiece_trainCrossing_EW");
+		Connections.Add ("puzzlePiece_portal_E", puzzlePieceConnections);
 		
 		coordinate1 = new Coordinate(0.5f, 0.0f);
 		coordinate2 = new Coordinate(0.5f, 1.0f);

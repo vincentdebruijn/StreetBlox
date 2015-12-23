@@ -86,7 +86,16 @@ public class MenuScript : MonoBehaviour {
 		if (GUI.Button (middleButtonRect, "", selectButtonChosenStyle)) {
 			selectButtonChosenStyle = selectButtonStyle;
 			PlayButtonSound();
-			Application.LoadLevel ("world_select");
+			String tutorialLevel = InTutorialPhase();
+			if (tutorialLevel != null) {
+				WorldSelectScript.AddLevels();
+				WorldSelectScript.SetLevelInfo(0);
+				LevelSelectScript.SetLevelInfo();
+				LevelSelectScript.chosenLevel = tutorialLevel;
+				Application.LoadLevel(tutorialLevel);
+			} else {
+				Application.LoadLevel ("world_select");
+			}
 		}
 		if (GUI.Button (rightButtonRect, "", exitButtonChosenStyle)) {
 			exitButtonChosenStyle = exitButtonStyle;
@@ -94,6 +103,17 @@ public class MenuScript : MonoBehaviour {
 			Save ();
 			Application.Quit();
 		}
+	}
+
+	public static String InTutorialPhase() {
+		String tutorialLevel = null;
+		foreach (String levelName in WorldSelectScript.levelsTutorial) {
+			if (!data.levelProgress.ContainsKey (levelName)) {
+				tutorialLevel = levelName;
+				break;
+			}
+		}
+		return tutorialLevel;
 	}
 	
 	public static void Load() {
@@ -111,6 +131,8 @@ public class MenuScript : MonoBehaviour {
 			data.playMusic = true;
 			data.playSoundEffects = true;
 			data.chosenCar = "car1";
+			data.worldSelectShown = false;
+			data.marbles = 0;
 		}
 	}
 
@@ -219,5 +241,7 @@ public class MenuScript : MonoBehaviour {
 		public Boolean playMusic;
 		public Boolean playSoundEffects;
 		public String chosenCar;
+		public Boolean worldSelectShown;
+		public int marbles;
 	}
 }
