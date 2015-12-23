@@ -10,13 +10,17 @@ using System.Collections.Generic;
 public class WorldSelectScript : MonoBehaviour {
 
 	// The names of the available worlds, in order.
-	private static readonly string[] WorldNames = {"Grass World", "Lava World", "Space World"};
+	private static readonly string[] WorldNames = {"Tutorial", "Grass World", "Lava World", "Space World"};
+
+	// The tutorial levels
+	private static readonly string[] levelsTutorial = {
+		"tutorial_1",
+		"tutorial_2",
+		"tutorial_3"
+	};
 
 	// The world 1 levels
 	private static readonly string[] levelsWorld1 = {
-		"tutorial_1",
-		"tutorial_2",
-		"tutorial_3",
 		"level_01",
 		"level_02",
 		"level_03",
@@ -46,7 +50,7 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_s_test"
 	};
 
-	private string[][] worlds = {levelsWorld1, levelsWorld2, levelsWorld3};
+	private string[][] worlds = {levelsTutorial, levelsWorld1, levelsWorld2, levelsWorld3};
 
 	// Mapping of World names to a mapping of level names to level configurations
 	private static Dictionary<string, Dictionary<string, LevelConfiguration>> worldConfigurations;
@@ -107,8 +111,8 @@ public class WorldSelectScript : MonoBehaviour {
 
 	public void SelectedWorld(int world) {
 		MenuScript.PlayButtonSound ();
-		levels = worlds [world - 1];
-		levelConfigurations = worldConfigurations [WorldNames [world - 1]];
+		levels = worlds [world ];
+		levelConfigurations = worldConfigurations [WorldNames [world]];
 		Application.LoadLevel ("level_select");
 	}
 
@@ -134,12 +138,15 @@ public class WorldSelectScript : MonoBehaviour {
 	private static void AddLevels() {
 		worldConfigurations = new Dictionary<string, Dictionary<string, LevelConfiguration>>();
 
-		Dictionary<string, LevelConfiguration> world1Configuration = new Dictionary<string, LevelConfiguration> ();
-		worldConfigurations.Add (WorldNames[0], world1Configuration);
+		Dictionary<string, LevelConfiguration> world0Configuration = new Dictionary<string, LevelConfiguration> ();
+		worldConfigurations.Add (WorldNames[0], world0Configuration);
+		world0Configuration.Add ("tutorial_1", new LevelConfiguration (4, 5, 0f, 0f, 5));
+		world0Configuration.Add ("tutorial_2", new LevelConfiguration (4, 5, 0f, 0f, 6));
+		world0Configuration.Add ("tutorial_3", new LevelConfiguration (4, 5, 0f, 0f, 8));
 
-		world1Configuration.Add ("tutorial_1", new LevelConfiguration (4, 5, 0f, 0f, 5));
-		world1Configuration.Add ("tutorial_2", new LevelConfiguration (4, 5, 0f, 0f, 6));
-		world1Configuration.Add ("tutorial_3", new LevelConfiguration (4, 5, 0f, 0f, 8));;
+		Dictionary<string, LevelConfiguration> world1Configuration = new Dictionary<string, LevelConfiguration> ();
+		worldConfigurations.Add (WorldNames[1], world1Configuration);
+
 		world1Configuration.Add ("level_01", new LevelConfiguration (5, 5, 0f, 0f, 5));
 		world1Configuration.Add ("level_02", new LevelConfiguration (5, 5, 0f, 0f, 10));
 		world1Configuration.Add ("level_03", new LevelConfiguration (5, 5, 0f, 0f, 11));
@@ -158,14 +165,14 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_16", new LevelConfiguration (6, 5, 0f, 0f, 30));
 
 		Dictionary<string, LevelConfiguration> world2Configuration = new Dictionary<string, LevelConfiguration> ();
-		worldConfigurations.Add (WorldNames[1], world2Configuration);
+		worldConfigurations.Add (WorldNames[2], world2Configuration);
 
 		world2Configuration.Add ("level_l01", new LevelConfiguration (5, 5, 0f, 0f, 15));
 		world2Configuration.Add ("level_l02", new LevelConfiguration (5, 5, 0f, 0f, 10));
 		world2Configuration.Add ("level_l03", new LevelConfiguration (9, 5, 0f, 0f, 11));
 
 		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
-		worldConfigurations.Add (WorldNames[2], world3Configuration);
+		worldConfigurations.Add (WorldNames[3], world3Configuration);
 		
 		world3Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 15));
 		world3Configuration.Add ("level_s_test", new LevelConfiguration (4, 5, 0f, 0f, 15));

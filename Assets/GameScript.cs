@@ -238,7 +238,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayTutorialMessages() {
-		if (!MenuScript.data.playTutorials)
+		if (!MenuScript.data.playTutorials || !tutorialMessages.ContainsKey(chosenLevel))
 			return;
 
 		String[] messagesForCurrentLevel = tutorialMessages [chosenLevel];
