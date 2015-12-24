@@ -133,6 +133,12 @@ public class MenuScript : MonoBehaviour {
 			data.chosenCar = "car1";
 			data.worldSelectShown = false;
 			data.marbles = 0;
+			data.carsUnlocked = new Boolean[7];
+			for(int i = 0; i < data.carsUnlocked.Length; i++)
+				data.carsUnlocked[i] = true;
+			data.puzzleBoxesUnlocked = new Boolean[3];
+			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
+				data.puzzleBoxesUnlocked[i] = true;
 		}
 	}
 
@@ -240,8 +246,13 @@ public class MenuScript : MonoBehaviour {
 		public Boolean playTutorials;
 		public Boolean playMusic;
 		public Boolean playSoundEffects;
-		public String chosenCar;
+
 		public Boolean worldSelectShown;
 		public int marbles;
+		
+		public String chosenCar;
+		public Boolean[] carsUnlocked;
+
+		public Boolean[] puzzleBoxesUnlocked;
 	}
 }

@@ -149,7 +149,7 @@ public class LevelSelectScript : MonoBehaviour {
 		}
 	}
 
-	private static Boolean TutorialLevel(String levelName) {
+	public static Boolean TutorialLevel(String levelName) {
 		foreach (String tutorialLevel in WorldSelectScript.levelsTutorial) {
 			if (tutorialLevel == levelName)
 				return true;

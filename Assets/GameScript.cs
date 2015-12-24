@@ -50,9 +50,6 @@ public class GameScript : MonoBehaviour {
 	// GUI stuff
 	private static Texture2D retryButtonTexture, retryButtonPressedTexture;
 	private static Texture2D nextButtonTexture, nextButtonPressedTexture;
-	private static Texture2D oneStarMedalTexture;
-	private static Texture2D twoStarMedalTexture;
-	private static Texture2D threeStarMedalTexture;
 	private static Texture2D statTextTexture;
 	private static Texture2D quitTexture;
 	private static Texture2D resetTexture;
@@ -71,9 +68,6 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle nextButtonStyle, nextButtonPressedStyle, nextButtonChosenStyle;
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle textAreaStyle;
-	private static GUIStyle oneStarMedalStyle;
-	private static GUIStyle twoStarMedalStyle;
-	private static GUIStyle threeStarMedalStyle;
 	private static GUIStyle statStyle;
 	private static GUIStyle statTextStyle;
 	private static GUIStyle timerStyle;
@@ -95,7 +89,6 @@ public class GameScript : MonoBehaviour {
 	private static Rect rightButtonRect;
 	private static Rect leftButtonRect;
 	private static Rect textArea;
-	private static Rect medalRect;
 	private static Rect statTextRect;
 	private static Rect quitRect;
 	private static Rect resetRect;
@@ -223,13 +216,7 @@ public class GameScript : MonoBehaviour {
 				if (PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections(piece) != null)
 					total += 1;
 			}
-			GUIStyle medalStyle = oneStarMedalStyle;
-			if (marbles == 2)
-				medalStyle = twoStarMedalStyle;
-			else if(marbles == 3)
-				medalStyle = threeStarMedalStyle;
-			GUI.Label(medalRect, "", medalStyle);
-			GUI.Label (statTextRect, "     Moves made: " + movesMade+"\n     Level par: " + levelConfiguration.par + "\n     Pieces touched: " + touchedTotal+"/"+total, statTextStyle);
+			GUI.Label (statTextRect, "     Moves made: " + movesMade+"\n     Level par: " + levelConfiguration.par, statTextStyle);
 		}
 		if (text != null) {
 			GUI.Label (textArea, text, textAreaStyle);
@@ -255,20 +242,22 @@ public class GameScript : MonoBehaviour {
 	}
 	
 	private void UpdateProgress() {
+		marbles = 0;
 		if (MenuScript.data.levelProgress.ContainsKey (chosenLevel)) {
 			if (MenuScript.data.levelProgress [chosenLevel] == 2 && movesMade < levelConfiguration.par) {
 				MenuScript.data.levelProgress [chosenLevel] = 5;
 				marbles = 3;
-				MenuScript.data.marbles += marbles;
 			}
 		} else {
 			if (movesMade < levelConfiguration.par)
 				marbles = 5;
 			else
 				marbles = 2;
-			MenuScript.data.marbles += marbles;
+
 			MenuScript.data.levelProgress.Add (chosenLevel, marbles);
 		}
+		if (LevelSelectScript.TutorialLevel (chosenLevel))
+			marbles = 0;
 		MenuScript.data.marbles += marbles;
 		MenuScript.Save ();
 	}
@@ -342,6 +331,7 @@ public class GameScript : MonoBehaviour {
 	private void SetCarOnStartPiece() {
 		GameObject startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
 		Vector3 pos = startPiece.transform.position;
+		Debug.Log (MenuScript.data.chosenCar);
 		GameObject car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		car = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
 		carScript = car.GetComponent<CarScript> ();
@@ -665,7 +655,6 @@ public class GameScript : MonoBehaviour {
 		rightButtonRect = new Rect (Screen.width / 5 * 4 - offset, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		leftButtonRect = new Rect (Screen.width / 5 + offset - buttonSize, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		textArea = new Rect (0, 10, Screen.width, buttonSize);
-		medalRect = new Rect (Screen.width / 2 - buttonSize / 2, buttonSize + 20, buttonSize, buttonSize);
 		statTextRect = new Rect (Screen.width / 5 + offset, Screen.height / 2 + buttonSize / 2, Screen.width / 5 * 3 - 2 * offset, buttonSize * 1.5f);
 
 		float uiButtonSize = Screen.height / 10;
@@ -680,9 +669,6 @@ public class GameScript : MonoBehaviour {
 		retryButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_retry_pressed");
 		nextButtonTexture = (Texture2D)Resources.Load ("ui_button_next");
 		nextButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_next_pressed");
-		oneStarMedalTexture = (Texture2D)Resources.Load ("ui_medal_painted_star1");
-		twoStarMedalTexture = (Texture2D)Resources.Load ("ui_medal_painted_star2");
-		threeStarMedalTexture = (Texture2D)Resources.Load ("ui_medal_painted_star3");
 		statTextTexture = (Texture2D)Resources.Load ("ui_border_levelname");
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
@@ -708,13 +694,6 @@ public class GameScript : MonoBehaviour {
 		nextButtonPressedStyle = new GUIStyle ();
 		nextButtonPressedStyle.normal.background = nextButtonPressedTexture;
 		nextButtonChosenStyle = nextButtonStyle;
-		
-		oneStarMedalStyle = new GUIStyle ();
-		oneStarMedalStyle.normal.background = oneStarMedalTexture;
-		twoStarMedalStyle = new GUIStyle ();
-		twoStarMedalStyle.normal.background = twoStarMedalTexture;
-		threeStarMedalStyle = new GUIStyle ();
-		threeStarMedalStyle.normal.background = threeStarMedalTexture;
 		
 		textAreaStyle = new GUIStyle ();
 		textAreaStyle.fontSize = 64;

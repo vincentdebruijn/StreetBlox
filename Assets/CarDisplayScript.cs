@@ -3,12 +3,10 @@ using System.Collections;
 
 public class CarDisplayScript : MonoBehaviour {
 	private static GameObject carDisplaySelector;
-	
+
 	void Awake () {
 		if (carDisplaySelector == null)
 			carDisplaySelector = Resources.Load ("carDisplaySelector") as GameObject;
-		if (name == MenuScript.data.chosenCar)
-			ShowCarIsSelected ();
 	}
 	
 	void OnMouseOver () {
@@ -19,7 +17,12 @@ public class CarDisplayScript : MonoBehaviour {
 		}
 	}
 
-	private void ShowCarIsSelected() {
+	public void SelectCarIfItIsChosen() {
+		if (name == MenuScript.data.chosenCar)
+			ShowCarIsSelected ();
+	}
+
+	public void ShowCarIsSelected() {
 		// Remove the selector currently visible
 		GameObject obj = GameObject.FindGameObjectWithTag("CarDisplaySelector");
 		if (obj != null)

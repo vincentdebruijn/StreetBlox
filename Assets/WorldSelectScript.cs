@@ -56,18 +56,20 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_s04",
 		"level_s05"
 	};
-
+	// Mapping of level names to the name that should be displayed in level select
 	public static Dictionary<string, string> displayNames;
-
+	// All the available worlds
 	private static string[][] worlds = {levelsTutorial, levelsWorld1, levelsWorld2, levelsWorld3};
-
 	// Mapping of World names to a mapping of level names to level configurations
 	private static Dictionary<string, Dictionary<string, LevelConfiguration>> worldConfigurations;
-
 	// The levels (in order) that the LevelSelect should show
 	public static string[] levels;
 	//  The configurations for the selected levels that LevelSelect should use
 	public static Dictionary<string, LevelConfiguration> levelConfigurations;
+	// Car to position mapping.
+	public static Dictionary<string, Pair<Vector3, Quaternion>> carPositions;
+	// Puzzle box to position mapping
+	public static Dictionary<string, Pair<Vector3, Quaternion>> puzzleBoxPositions;
 
 	// GUI stuff
 	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
@@ -81,6 +83,14 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
 	private static GUIStyle loadingStyle;
 
+	// cars
+	private static GameObject displayCar2;
+	private static GameObject displayCar3;
+	private static GameObject displayCar4;
+	private static GameObject displayCar5;
+	private static GameObject displayCar10;
+	private static GameObject displayCar11;
+
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
 	
@@ -91,6 +101,9 @@ public class WorldSelectScript : MonoBehaviour {
 			SetVariables ();
 			staticVariablesSet = true;
 		}
+
+		LoadCars ();
+
 		loading = false;
 	}
 	
@@ -142,6 +155,40 @@ public class WorldSelectScript : MonoBehaviour {
 		levelConfigurations = worldConfigurations [WorldNames [world]];
 	}
 
+	private static void LoadCars() {
+		GameObject.Find ("car1").transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		if (MenuScript.data.carsUnlocked [1]) {
+			GameObject clone = (GameObject)Instantiate (displayCar2);
+			clone.name = "car2";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[2]) {
+			GameObject clone = (GameObject)Instantiate (displayCar3);
+			clone.name = "car3";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[3]) {
+			GameObject clone = (GameObject)Instantiate (displayCar4);
+			clone.name = "car4";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[4]) {
+			GameObject clone = (GameObject)Instantiate (displayCar5);
+			clone.name = "car5";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[5]) {
+			GameObject clone = (GameObject)Instantiate (displayCar10);
+			clone.name = "car10";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[6]) {
+			GameObject clone = (GameObject)Instantiate (displayCar11);
+			clone.name = "car11";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+	}
+
 	private static void SetVariables() {
 		float buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
@@ -165,8 +212,23 @@ public class WorldSelectScript : MonoBehaviour {
 		loadingStyle.fontSize = 28;
 		loadingStyle.alignment = TextAnchor.MiddleCenter;
 		loadingStyle.normal.background = levelTextTexture;
-
+	
+		AddCars ();
+		AddPuzzleBoxes ();
 		AddLevels ();
+	}
+
+	public static void AddCars() {
+		displayCar2 = Resources.Load ("displayCar2") as GameObject;
+		displayCar3 = Resources.Load ("displayCar3") as GameObject;
+		displayCar4 = Resources.Load ("displayCar4") as GameObject;
+		displayCar5 = Resources.Load ("displayCar5") as GameObject;
+		displayCar10 = Resources.Load ("displayCar10") as GameObject;
+		displayCar11 = Resources.Load ("displayCar11") as GameObject;
+	}
+
+	public static void AddPuzzleBoxes() {
+
 	}
 
 	public static void AddLevels() {
@@ -297,4 +359,17 @@ public class LevelConfiguration {
 		this.CarLength = 0.24f * PieceSize;
 	}
 }
+
+public class Pair<T, U> {
+	public Pair() {
+	}
+	
+	public Pair(T first, U second) {
+		this.First = first;
+		this.Second = second;
+	}
+	
+	public T First { get; set; }
+	public U Second { get; set; }
+};
 
