@@ -2,21 +2,13 @@
 using System.Collections;
 
 public class CarDisplayScript : MonoBehaviour {
-	
-	// private WorldSelectScript worldSelectScript;
+	private static GameObject carDisplaySelector;
 	
 	void Awake () {
-		// worldSelectScript = Camera.main.GetComponent<WorldSelectScript>();
+		if (carDisplaySelector == null)
+			carDisplaySelector = Resources.Load ("carDisplaySelector") as GameObject;
 		if (name == MenuScript.data.chosenCar)
 			ShowCarIsSelected ();
-	}
-	
-	// Use this for initialization
-	void Start () {
-	}
-	
-	// Update is called once per frame
-	void Update () {
 	}
 	
 	void OnMouseOver () {
@@ -33,7 +25,6 @@ public class CarDisplayScript : MonoBehaviour {
 		if (obj != null)
 			Destroy (obj);
 		Vector3 carPosition = gameObject.transform.position;
-		GameObject carDisplaySelector = Resources.Load ("carDisplaySelector") as GameObject;
 		Instantiate (carDisplaySelector, new Vector3(carPosition.x, carPosition.y + 0.6f, carPosition.z), Quaternion.Euler (0, 90, 0));
 	}
 }

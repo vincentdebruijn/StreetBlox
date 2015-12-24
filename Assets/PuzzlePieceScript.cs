@@ -203,7 +203,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		coordinate2 = new Coordinate(0.4f, 0.4f);
 		coordinate2a = new Coordinate (0.8f, 0.5f);
 		coordinate3 = new Coordinate(0.4f, 0.6f);
-		coordinate4 = new Coordinate(0.1f, 0.9f);
+		coordinate4 = new Coordinate(0.1f, 0.5f);
 		coordinate5 = new Coordinate(0.0f, 0.5f);
 		coordinates = new Coordinate[] {coordinate1, coordinate1a, coordinate2, coordinate2a, coordinate3, coordinate4, coordinate5};
 		connection = new Connection (coordinates);
@@ -216,7 +216,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		coordinate2 = new Coordinate(0.6f, 0.4f);
 		coordinate2a = new Coordinate (0.2f, 0.5f);
 		coordinate3 = new Coordinate(0.6f, 0.6f);
-		coordinate4 = new Coordinate(0.9f, 0.9f);
+		coordinate4 = new Coordinate(0.9f, 0.5f);
 		coordinate5 = new Coordinate(1.0f, 0.5f);
 		coordinates = new Coordinate[] {coordinate1, coordinate1a, coordinate2, coordinate2a, coordinate3, coordinate4, coordinate5};
 		connection = new Connection (coordinates);

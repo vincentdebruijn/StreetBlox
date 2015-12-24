@@ -40,7 +40,7 @@ public class GameScript : MonoBehaviour {
 	// The time passed since the start of the game
 	private float time;	
 	private int movesMade;
-	private int stars;
+	private int marbles;
 	private Boolean processedGameOver;
 
 	private List<GameObject> bridgePieces;
@@ -114,7 +114,7 @@ public class GameScript : MonoBehaviour {
 	private void OnLevelWasLoaded(int iLevel) {
 		chosenLevel = Application.loadedLevelName;
 		if (chosenLevel == "explorer")
-			levelConfiguration = new LevelConfiguration (60, 60, 0f, 0f, 0);
+			levelConfiguration = new LevelConfiguration (61, 60, 0f, 0f, 0);
 		else
 			levelConfiguration = LevelSelectScript.levelConfigurations[chosenLevel];
 
@@ -193,8 +193,8 @@ public class GameScript : MonoBehaviour {
 		if (!processedGameOver && carScript.GameOver ()) {
 			SetBackgroundColor();
 			processedGameOver = true;
-			SetStars ();
-			LevelSelectScript.UpdateProgress (carScript.ended, stars);
+			if (carScript.ended)
+				UpdateProgress();
 		}
 
 		string text = null;
@@ -224,9 +224,9 @@ public class GameScript : MonoBehaviour {
 					total += 1;
 			}
 			GUIStyle medalStyle = oneStarMedalStyle;
-			if (stars == 2)
+			if (marbles == 2)
 				medalStyle = twoStarMedalStyle;
-			else if(stars == 3)
+			else if(marbles == 3)
 				medalStyle = threeStarMedalStyle;
 			GUI.Label(medalRect, "", medalStyle);
 			GUI.Label (statTextRect, "     Moves made: " + movesMade+"\n     Level par: " + levelConfiguration.par + "\n     Pieces touched: " + touchedTotal+"/"+total, statTextStyle);
@@ -253,13 +253,24 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 	}
-		
-	private void SetStars() {	
-		stars = 2;
-		if (movesMade < levelConfiguration.par)
-			stars = 3;
-		else if (movesMade > levelConfiguration.par)
-			stars = 1;
+	
+	private void UpdateProgress() {
+		if (MenuScript.data.levelProgress.ContainsKey (chosenLevel)) {
+			if (MenuScript.data.levelProgress [chosenLevel] == 2 && movesMade < levelConfiguration.par) {
+				MenuScript.data.levelProgress [chosenLevel] = 5;
+				marbles = 3;
+				MenuScript.data.marbles += marbles;
+			}
+		} else {
+			if (movesMade < levelConfiguration.par)
+				marbles = 5;
+			else
+				marbles = 2;
+			MenuScript.data.marbles += marbles;
+			MenuScript.data.levelProgress.Add (chosenLevel, marbles);
+		}
+		MenuScript.data.marbles += marbles;
+		MenuScript.Save ();
 	}
 
 	private void DisplayButtonBar() {
@@ -396,9 +407,21 @@ public class GameScript : MonoBehaviour {
 		float pieceSize = levelConfiguration.PieceSize;
 		float topZPosition = levelConfiguration.TopZPosition;
 
+		Debug.Log ("hier");
+		Debug.Log (boardHeight);
+		Debug.Log (boardWidth);
+		Debug.Log (leftXPosition);
+		Debug.Log (pieceSize);
+		Debug.Log (topZPosition);
+
 		Vector3 temp = puzzlePiece.transform.position;
+		Debug.Log (temp);
 		int x = (int)((temp.x - leftXPosition) / pieceSize);
 		int y = (int)(-(temp.z - topZPosition) / pieceSize);
+		Debug.Log (x);
+		Debug.Log (y);
+		if (board [y] [x] != puzzlePiece)
+			throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
 		int new_x = -1;
 		int new_y = -1;
 		if (puzzlePiece.name.Contains ("beacon")) {
@@ -531,7 +554,8 @@ public class GameScript : MonoBehaviour {
 		int x = 0;
 		int y = 0;
 		foreach (GameObject piece in puzzlePieces) {
-			if (piece.transform.position.x != expected_x) {
+			Debug.Log ("handling piece: " + piece.name);
+			while (piece.transform.position.x != expected_x) {
 				Debug.Log ("Empty piece added at: " + x + " " + y);
 				board [y] [x] = null;
 				x += 1;
