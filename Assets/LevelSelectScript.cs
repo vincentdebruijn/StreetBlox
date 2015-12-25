@@ -204,17 +204,13 @@ public class LevelSelectScript : MonoBehaviour {
 
 	private static void SetBackgroundTexture() {
 		Transform puzzleBox = GameObject.Find ("puzzleBoxWorld").transform;
-		Material boxMaterial = puzzleBox.FindChild ("box").GetComponent<Renderer> ().material;
 		Material lidMaterial = puzzleBox.FindChild ("lid").GetComponent<Renderer> ().material;
 		
 		if (WorldSelectScript.chosenWorldName == "Tutorial") {
-			boxMaterial.mainTexture = tutorialTexture;
 			lidMaterial.mainTexture = tutorialTexture;
 		} else if (WorldSelectScript.chosenWorldName == "Lava World") {
-			boxMaterial.mainTexture = lavaWorldTexture;
 			lidMaterial.mainTexture = lavaWorldTexture;
 		} else if (WorldSelectScript.chosenWorldName == "Space World") {
-			boxMaterial.mainTexture = spaceWorldTexture;
 			lidMaterial.mainTexture = spaceWorldTexture;
 		}
 	}

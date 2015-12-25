@@ -1,17 +1,17 @@
 fileFormatVersion: 2
-guid: 378ca222edb4f604a96916b8375ab78a
-timeCreated: 1450803188
+guid: ebd1f89e595048146a706309b4f9ae92
+timeCreated: 1451002269
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
-    100000: pPrism2
+    100000: polySurface23
     100002: //RootNode
-    400000: pPrism2
+    400000: polySurface23
     400002: //RootNode
-    2300000: pPrism2
-    3300000: pPrism2
-    4300000: pPrism2
+    2300000: polySurface23
+    3300000: polySurface23
+    4300000: polySurface23
   materials:
     importMaterials: 1
     materialName: 0
