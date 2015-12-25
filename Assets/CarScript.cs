@@ -17,9 +17,8 @@ public class CarScript : MonoBehaviour {
 	public GameObject currentPuzzlePiece;
 	public GameObject previousPuzzlePiece;
 	public float timeSinceOnLastPuzzlePiece = 0f;
+	public float time;
 
-	// Keeps track of which pieces the car touched and how often.
-	public Dictionary<string, int> piecesTouched;
 	// true if we are going to the end piece
 	private Boolean atEnd = false;
 	private float startEnd = 0f;
@@ -37,20 +36,21 @@ public class CarScript : MonoBehaviour {
 	public Boolean carStarted;
 	// Can be set to make the car move faster
 	public float boost;
-	
-	private Boolean clickedButtonWhileOnCurrentPuzzlePiece;
 
 	private GameObject[] buttons;
-
-	private float time;
+	
+	private Boolean clickedButtonWhileOnCurrentPuzzlePiece;
 
 	private Boolean enteredPortalPiece;
 	private Boolean portalEntryAnimationDone;
 	private Boolean portalExitAnimationDone;
 
+	private Transform camera;
+
 	void Awake() {
 		Reset ();
 		PlayCarHorn ();
+		camera = Camera.main.transform;
 	}
 
 	// Update is called once per frame
@@ -78,17 +78,13 @@ public class CarScript : MonoBehaviour {
 
 	private GameScript GameScript() {
 		if (gameScript == null) {
-			gameScript = Camera.main.GetComponent<GameScript> ();
+			gameScript = camera.GetComponent<GameScript> ();
 		}
 		return gameScript;
 	}
 
 	public void StartTheGame(LevelConfiguration levelConfiguration) {
 		this.levelConfiguration = levelConfiguration;
-		piecesTouched = new Dictionary<string, int>();
-		foreach (GameObject piece in GameScript ().GetPuzzlePieces()) {
-			piecesTouched.Add (piece.name, 0);
-		}
 
 		currentPuzzlePiece = ClosestPuzzlePiece (null);
 		Debug.Log (currentPuzzlePiece);
@@ -100,7 +96,6 @@ public class CarScript : MonoBehaviour {
 		Debug.Log ("First coordinate index: " + currentCoordinateIndex);
 		currentCoordinate = currentConnection.coordinates [currentCoordinateIndex];
 		Debug.Log ("Going to " + currentPuzzlePiece.name + ", first waypoint x: " + currentCoordinate.x + " z: " + currentCoordinate.z);
-		piecesTouched [currentPuzzlePiece.name] = 1;
 		PuzzlePieceScript.Coordinate startDestination = 
 			PuzzlePieceScript.Coordinate.GetCoordinateFor (currentCoordinate.x, currentCoordinate.z, currentPuzzlePiece, levelConfiguration.PieceSize);
 		Debug.Log ("Which is at: x: " + startDestination.x + " z: " + startDestination.z);
@@ -110,8 +105,21 @@ public class CarScript : MonoBehaviour {
 		PlayEngineSound ();
 	}
 
+	public void Resume(LevelConfiguration levelConfiguration) {
+		this.levelConfiguration = levelConfiguration;
+		buttons = GameObject.FindGameObjectsWithTag ("Button");
+		enteredPortalPiece = currentPuzzlePiece.name.Contains ("portal") && PuzzlePieceScript.GetSideOfPortal(currentPuzzlePiece) == currentDirection;
+		clickedButtonWhileOnCurrentPuzzlePiece = ButtonNearby ();
+		carStarted = true;
+		PlayEngineSound ();
+	}
+
 	public Boolean GameOver() {
 		return ended || crashed || fell;
+	}
+
+	public Boolean Quittable() {
+		return !GameOver () && !falling && !crashing && portalEntryAnimationDone && portalExitAnimationDone;
 	}
 
 	public void Reset() {
@@ -205,7 +213,9 @@ public class CarScript : MonoBehaviour {
 				}
 				// Get the next puzzle piece
 				previousPuzzlePiece = currentPuzzlePiece;
+				Debug.Log (previousPuzzlePiece);
 				currentPuzzlePiece = ClosestPuzzlePiece (previousPuzzlePiece);
+				Debug.Log (currentPuzzlePiece);
 				if (currentPuzzlePiece == null) {
 					falling = true;
 					return;
@@ -231,7 +241,6 @@ public class CarScript : MonoBehaviour {
 					PlayCrashSound ();
 					return;
 				}
-				piecesTouched[currentPuzzlePiece.name] = piecesTouched[currentPuzzlePiece.name] + 1;
 				currentDirection = currentConnection.OtherSide (startSide);
 				Debug.Log ("new bearing: " + currentDirection);
 				currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
@@ -252,7 +261,12 @@ public class CarScript : MonoBehaviour {
 		Vector3 point = PointOfCar ();
 		Vector3 position = transform.position;
 		float movement = (levelConfiguration.movement + boost) * Time.deltaTime;
-		transform.position = Vector3.MoveTowards (point, new Vector3 (x, position.y, z), movement) + (position - point);
+		Vector3 newPosition = Vector3.MoveTowards (point, new Vector3 (x, position.y, z), movement) + (position - point);
+		transform.position = newPosition;
+		if (ExplorerLevel ()) {
+			Vector3 cameraPosition = camera.position;
+			camera.position = cameraPosition + (newPosition - position);
+		}
 	}
 
 	void RotateTowardsTarget() {
@@ -295,24 +309,27 @@ public class CarScript : MonoBehaviour {
 	void CheckForNearbyButton() {
 		if (clickedButtonWhileOnCurrentPuzzlePiece)
 			return;
+		if (ButtonNearby()) {
+			clickedButtonWhileOnCurrentPuzzlePiece = true;
+			GameScript().FlipBridgePositions ();
+		}
+	}
+
+	Boolean ButtonNearby() {
 		Vector3 pos = PointOfCar ();
-		Boolean nearby = false;
 		foreach (GameObject button in buttons) {
 			Vector3 buttonPos = button.transform.position;
-			if (Math.Abs(pos.x - (buttonPos.x + 0.25f)) < 0.03f && Math.Abs(pos.z - (buttonPos.z - 0.25f)) < 0.03f)
-				nearby = true;
+			if (Math.Abs (pos.x - (buttonPos.x + 0.25f)) < 0.03f && Math.Abs (pos.z - (buttonPos.z - 0.25f)) < 0.03f)
+				return true;
 		}
-		if (nearby) {
-			clickedButtonWhileOnCurrentPuzzlePiece = true;
-			gameScript.FlipBridgePositions ();
-		}
+		return false;
 	}
 
 	Boolean OnOpenBridgePiece(GameObject currentPuzzlePiece) {
 		if (!currentPuzzlePiece.name.Contains ("bridge"))
 			return false;
 		Vector3 pos = currentPuzzlePiece.transform.Find ("bridgePiece").position;
-		return gameScript.IsBridgeOpen (pos);
+		return GameScript().IsBridgeOpen (pos);
 	}
 
 	Vector3 PointOfCar() {
@@ -326,10 +343,14 @@ public class CarScript : MonoBehaviour {
 	}
 
 	Boolean AtEndPiece() {
-		if (gameScript.chosenLevel == "explorer")
+		if (ExplorerLevel())
 			return false;
 		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < levelConfiguration.PieceSize;
 		return atEnd;
+	}
+
+	Boolean ExplorerLevel() {
+		return GameScript().chosenLevel == "explorer";
 	}
 
 	// Animation stuff
@@ -346,11 +367,10 @@ public class CarScript : MonoBehaviour {
 
 	void MoveCarToOtherPortal() {
 		previousPuzzlePiece = currentPuzzlePiece;
-		currentPuzzlePiece = gameScript.GetOtherPortalPiece (currentPuzzlePiece);
+		currentPuzzlePiece = GameScript().GetOtherPortalPiece (currentPuzzlePiece);
 
 		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
 		int startSide = PuzzlePieceScript.GetSideOfPortal (currentPuzzlePiece);
-		piecesTouched[currentPuzzlePiece.name] = piecesTouched[currentPuzzlePiece.name] + 1;
 
 		currentConnection = currentPuzzlePieceConnections.getConnectionForSide (startSide);
 		currentDirection = currentConnection.OtherSide (startSide);

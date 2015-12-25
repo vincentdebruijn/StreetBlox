@@ -63,6 +63,10 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D boostTexture3;
 	private static Texture2D boostTexture4;
 	private static Texture2D tutorialTexture;
+
+	// explorer
+	private static Texture2D explorerBoostTexture1;
+	private static Texture2D explorerBoostTexture2;
 	
 	private static GUIStyle retryButtonStyle, retryButtonPressedStyle, retryButtonChosenStyle;
 	private static GUIStyle nextButtonStyle, nextButtonPressedStyle, nextButtonChosenStyle;
@@ -97,27 +101,45 @@ public class GameScript : MonoBehaviour {
 	private static Rect boostRect;
 	private static Rect tutorialRect;
 
+	// explorer
+	private static Rect explorerQuitRect;
+	private static Rect explorerGoRect;
+	private static Rect explorerBoostRect;
+
 	private int tutorialMessageCounter;
 	
 	private static Dictionary<String, String[]> tutorialMessages;
+
+	private GameObject car;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
 
 	private void OnLevelWasLoaded(int iLevel) {
 		chosenLevel = Application.loadedLevelName;
-		if (chosenLevel == "explorer")
+		chosenGoStyle = goStyle1;
+		chosenBoostStyle = boostStyle1;
+		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
+		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
+
+		if (chosenLevel == "explorer") {
+			dontPlayAnimation = true;
 			levelConfiguration = new LevelConfiguration (61, 60, 0f, 0f, 0);
-		else
+			if (MenuScript.data.board != null) {
+				LoadFromSave();
+				MovePiecesToCorrectPosition();
+				SetCarToCorrectPosition();
+				SetBridgePieces();
+				return;
+			}
+		} else
 			levelConfiguration = LevelSelectScript.levelConfigurations[chosenLevel];
 
 		SetCarOnStartPiece ();
 		GetPuzzlePieces ();
 		SetBridgePieces ();
-		chosenGoStyle = goStyle1;
-		chosenBoostStyle = boostStyle1;
+
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
-		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
 		tutorialMessageCounter = 0;
 		showingAnimation = false;
 		CreateBoard ();
@@ -158,9 +180,12 @@ public class GameScript : MonoBehaviour {
 
 		if (!carScript.carStarted) {
 			time += Time.deltaTime;
-			if (time < levelConfiguration.waitTimeAtStart)
+			if (chosenLevel != "explorer" && time < levelConfiguration.waitTimeAtStart)
 				return;
-			carScript.StartTheGame (levelConfiguration);
+			if (chosenLevel == "explorer" && MenuScript.data.board != null)
+				carScript.Resume (levelConfiguration);
+			else	
+				carScript.StartTheGame (levelConfiguration);
 		}
 		if (carScript.GameOver ()) {
 			if (Input.GetMouseButton(0)) {
@@ -207,14 +232,6 @@ public class GameScript : MonoBehaviour {
 				retryButtonChosenStyle = retryButtonStyle;
 				MenuScript.PlayButtonSound();
 				Reset("Next");
-			}
-			int total = 0;
-			int touchedTotal = 0;
-			foreach(GameObject piece in GetPuzzlePieces()) {
-				if (carScript.piecesTouched[piece.name] > 0)
-					touchedTotal += 1;
-				if (PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections(piece) != null)
-					total += 1;
 			}
 			GUI.Label (statTextRect, "     Moves made: " + movesMade+"\n     Level par: " + levelConfiguration.par, statTextStyle);
 		}
@@ -263,11 +280,14 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayButtonBar() {
+		if (chosenLevel == "explorer") {
+			DisplayExplorerButtonBar ();
+			return;
+		}
+
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
-			if (chosenLevel == "explorer")
-				Application.LoadLevel ("world_select");
-			else if (MenuScript.InTutorialPhase() != null)
+			if (MenuScript.InTutorialPhase() != null)
 				Application.LoadLevel ("menu");
 			else
 				Application.LoadLevel ("level_select");
@@ -317,6 +337,36 @@ public class GameScript : MonoBehaviour {
 		}
 	}
 
+	private void DisplayExplorerButtonBar() {
+		if (carScript.Quittable () && GUI.Button (explorerQuitRect, "", quitStyle)) {
+			MenuScript.PlayButtonSound ();
+			Save ();
+			Application.LoadLevel ("world_select");
+		}
+
+		if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
+			MenuScript.PlayButtonSound ();
+			chosenGoStyle = goStyle4;
+			StartTheGame();
+		}
+		
+		if (gameStarted) {
+			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
+				if (carScript.boost == 0f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle4;
+					carScript.boost = 1f;
+				} else if (carScript.boost == 1f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle1;
+					carScript.boost = 0f;
+				}
+			}
+		} else {
+			GUI.Label (boostRect, "", chosenBoostStyle);
+		}
+	}
+
 	// Start the counter!
 	private void StartTheGame() {
 		EndAnimation ();
@@ -331,10 +381,39 @@ public class GameScript : MonoBehaviour {
 	private void SetCarOnStartPiece() {
 		GameObject startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
 		Vector3 pos = startPiece.transform.position;
-		Debug.Log (MenuScript.data.chosenCar);
-		GameObject car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
-		car = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
-		carScript = car.GetComponent<CarScript> ();
+		GameObject instantiatedCar = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
+		carScript = instantiatedCar.GetComponent<CarScript> ();
+	}
+
+	private void SetCarToCorrectPosition() {
+		Vector3 position = new Vector3 (MenuScript.data.carPositionX, MenuScript.data.carPositionY, MenuScript.data.carPositionZ);
+		Quaternion rotation = new Quaternion (MenuScript.data.carRotationX, MenuScript.data.carRotationY, MenuScript.data.carRotationZ, MenuScript.data.carRotationW);
+		GameObject instantiatedCar = (GameObject)Instantiate (car, position, rotation);
+		carScript = instantiatedCar.GetComponent<CarScript> ();
+
+		carScript.currentCoordinate = MenuScript.data.currentCoordinate;
+		carScript.currentCoordinateIndex = MenuScript.data.currentCoordinateIndex;		
+		carScript.currentDirection = MenuScript.data.currentDirection;
+		carScript.currentConnection = MenuScript.data.currentConnection;
+		carScript.currentPuzzlePieceConnections = MenuScript.data.currentPuzzlePieceConnections;
+		carScript.currentPuzzlePiece = GameObject.Find (MenuScript.data.currentPuzzlePiece);
+		if (MenuScript.data.previousPuzzlePiece == null)
+			carScript.previousPuzzlePiece = null;
+		else
+			carScript.previousPuzzlePiece = GameObject.Find (MenuScript.data.previousPuzzlePiece);
+		carScript.timeSinceOnLastPuzzlePiece = MenuScript.data.timeSinceOnLastPuzzlePiece;
+		carScript.time = MenuScript.data.time;
+	}
+	
+	private void MovePiecesToCorrectPosition() {
+		float pieceSize = levelConfiguration.PieceSize;
+		for (int y = 0; y < board.Length; y++) {
+			for (int x = 0; x < board[y].Length; x++) {
+				GameObject piece = board [y] [x];
+				if (piece != null)
+					piece.transform.position = new Vector3 (x * pieceSize, 0f, -(y * pieceSize));
+			}
+		}
 	}
 
 	private void SetBackgroundColor() {
@@ -397,19 +476,10 @@ public class GameScript : MonoBehaviour {
 		float pieceSize = levelConfiguration.PieceSize;
 		float topZPosition = levelConfiguration.TopZPosition;
 
-		Debug.Log ("hier");
-		Debug.Log (boardHeight);
-		Debug.Log (boardWidth);
-		Debug.Log (leftXPosition);
-		Debug.Log (pieceSize);
-		Debug.Log (topZPosition);
-
 		Vector3 temp = puzzlePiece.transform.position;
 		Debug.Log (temp);
 		int x = (int)((temp.x - leftXPosition) / pieceSize);
 		int y = (int)(-(temp.z - topZPosition) / pieceSize);
-		Debug.Log (x);
-		Debug.Log (y);
 		if (board [y] [x] != puzzlePiece)
 			throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
 		int new_x = -1;
@@ -460,7 +530,9 @@ public class GameScript : MonoBehaviour {
 
 	// Closes the bridges that are open, opens the bridges that are closed.
 	public void FlipBridgePositions() {
+		MenuScript.PlayBridgeSound ();
 		foreach (GameObject bridgePiece in bridgePieces) {
+			// bridgePiece.transform.GetComponent<AudioSource>().Play();
 			Vector3 pos = bridgePiece.transform.position;
 			if (IsBridgeOpen(pos))
 				pos.x -= BridgeOpenDistance;
@@ -571,6 +643,10 @@ public class GameScript : MonoBehaviour {
 				}
 			}
 		}
+		for (int i = 0; i < board.Length; i++) {
+			if (board [i] == null)
+				board [i] = new GameObject[boardWidth];
+		}
 	}
 
 	private Vector3 GetPuzzlePiecePosition(int x, int y) {
@@ -648,6 +724,73 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 	}
+
+	// VARIABLE STUFF
+	//
+
+	private void LoadFromSave() {
+		string[][] savedBoard = MenuScript.data.board;
+		board = new GameObject[savedBoard.Length][];
+		for (int y = 0; y < savedBoard.Length; y++) {
+			board[y] = new GameObject[savedBoard[y].Length];
+			for (int x = 0; x < savedBoard[y].Length; x++) {
+				GameObject result = null;
+				if (board [y] [x] != null)
+					result = GameObject.Find (savedBoard [y] [x]);
+				board [y] [x] = result;
+			}
+		}
+
+		string[] savedPuzzlePieces = MenuScript.data.puzzlePieces;
+		puzzlePieces = new GameObject[savedPuzzlePieces.Length];
+		for (int i = 0; i < savedPuzzlePieces.Length; i++) {
+			puzzlePieces [i] = GameObject.Find (savedPuzzlePieces [i]);
+		}
+	}
+
+	private void Save() {
+		string[][] serializableBoard = new string[board.Length][];
+		for (int y = 0; y < board.Length; y++) {
+			serializableBoard[y] = new string[board[y].Length];
+			for (int x = 0; x < board[y].Length; x++) {
+				String result = null;
+				if (board [y] [x] != null)
+					result = board [y] [x].name;
+				serializableBoard [y] [x] = result;
+			}
+		}
+
+		string[] serializablePuzzlePieces = new string[puzzlePieces.Length];
+		for (int i = 0; i < puzzlePieces.Length; i++) {
+			serializablePuzzlePieces [i] = puzzlePieces [i].name;
+		}
+
+		MenuScript.data.board = serializableBoard;
+		MenuScript.data.puzzlePieces = serializablePuzzlePieces;
+
+		MenuScript.data.carPositionX = carScript.gameObject.transform.position.x;
+		MenuScript.data.carPositionY = carScript.gameObject.transform.position.y;
+		MenuScript.data.carPositionZ = carScript.gameObject.transform.position.z;
+
+		MenuScript.data.carRotationW = carScript.gameObject.transform.rotation.w;
+		MenuScript.data.carRotationX = carScript.gameObject.transform.rotation.x;
+		MenuScript.data.carRotationY = carScript.gameObject.transform.rotation.y;
+		MenuScript.data.carRotationZ = carScript.gameObject.transform.rotation.z;
+
+		MenuScript.data.currentCoordinate = carScript.currentCoordinate;
+		MenuScript.data.currentCoordinateIndex = carScript.currentCoordinateIndex;
+		MenuScript.data.currentDirection = carScript.currentDirection;
+		MenuScript.data.currentConnection = carScript.currentConnection;
+		MenuScript.data.currentPuzzlePieceConnections = carScript.currentPuzzlePieceConnections;
+		MenuScript.data.currentPuzzlePiece = carScript.currentPuzzlePiece.name;
+		if (carScript.previousPuzzlePiece == null)
+			MenuScript.data.previousPuzzlePiece = null;
+		else
+			MenuScript.data.previousPuzzlePiece = carScript.previousPuzzlePiece.name;
+		MenuScript.data.timeSinceOnLastPuzzlePiece = carScript.timeSinceOnLastPuzzlePiece;
+		MenuScript.data.time = carScript.time;
+		MenuScript.Save ();
+	}
 	
 	private static void SetVariables() {
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
@@ -664,6 +807,10 @@ public class GameScript : MonoBehaviour {
 		displayRect = new Rect (0, uiButtonSize * 6, uiButtonSize * 2, uiButtonSize);
 		boostRect = new Rect (0, uiButtonSize * 7, uiButtonSize * 2, 2 * uiButtonSize);
 		tutorialRect = new Rect (Screen.width / 2 - 450, 50, 900, 100);
+
+		explorerQuitRect = quitRect;
+		explorerGoRect = goRect;
+		explorerBoostRect = boostRect;
 		
 		retryButtonTexture = (Texture2D)Resources.Load ("ui_button_retry");
 		retryButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_retry_pressed");

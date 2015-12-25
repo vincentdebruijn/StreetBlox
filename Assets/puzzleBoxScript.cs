@@ -23,13 +23,6 @@ public class puzzleBoxScript : MonoBehaviour {
 		selectedWorld = false;
 		animationLock = false;
 		worldSelectScript = Camera.main.GetComponent<WorldSelectScript>();
-
-		switch(gameObject.name) {
-			case "puzzleBoxWorld1": worldNumber = 1; break;
-			case "puzzleBoxWorld2": worldNumber = 2; break;
-			case "puzzleBoxWorld3": worldNumber = 3; break;
-			default: throw new System.ArgumentException("Undefined puzzle box name", gameObject.name);
-		}
 	}
 	
 	// Use this for initialization
@@ -72,6 +65,10 @@ public class puzzleBoxScript : MonoBehaviour {
 			moving = true;
 			PlayBoxOpenSound();
 		}
+	}
+
+	public void SetWorldNumber(int number) {
+		worldNumber = number;
 	}
 
 	public void PlayBoxOpenSound() {

@@ -34,6 +34,7 @@ public class MenuScript : MonoBehaviour {
 	public static GameObject soundPuzzlePiece;
 	public static GameObject soundGearShift;
 	public static GameObject soundMenu;
+	public static GameObject soundBridgePiece;
 
 	private static Rect logoRect;
 	private static Rect leftButtonRect;
@@ -87,7 +88,7 @@ public class MenuScript : MonoBehaviour {
 			selectButtonChosenStyle = selectButtonStyle;
 			PlayButtonSound();
 			String tutorialLevel = InTutorialPhase();
-			if (tutorialLevel != null) {
+			if (tutorialLevel != null && data.playTutorials) {
 				WorldSelectScript.AddLevels();
 				WorldSelectScript.SetLevelInfo(0);
 				LevelSelectScript.SetLevelInfo();
@@ -166,6 +167,11 @@ public class MenuScript : MonoBehaviour {
 		if (data.playSoundEffects)
 			soundGearShift.GetComponent<AudioSource> ().Play ();
 	}
+
+	public static void PlayBridgeSound() {
+		if (data.playSoundEffects)
+			soundBridgePiece.GetComponent<AudioSource>().Play();
+	}
 	
 	public static void PlayMenuMusic() {
 		if (data.playMusic)
@@ -189,6 +195,9 @@ public class MenuScript : MonoBehaviour {
 		DontDestroyOnLoad (soundGearShift);
 		soundMenu = GameObject.Find ("sound_menu");
 		DontDestroyOnLoad (soundMenu);
+		soundBridgePiece = GameObject.Find ("sound_bridge_piece");
+		DontDestroyOnLoad (soundBridgePiece);
+
 		
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
@@ -254,5 +263,27 @@ public class MenuScript : MonoBehaviour {
 		public Boolean[] carsUnlocked;
 
 		public Boolean[] puzzleBoxesUnlocked;
+
+		// Explorer save stuff
+		public string[] puzzlePieces;
+		public string[][] board;
+
+		public float carPositionX;
+		public float carPositionY;
+		public float carPositionZ;
+		public float carRotationW;
+		public float carRotationX;
+		public float carRotationY;
+		public float carRotationZ;
+
+		public PuzzlePieceScript.Coordinate currentCoordinate;
+		public int currentCoordinateIndex;
+		public int currentDirection;
+		public PuzzlePieceScript.Connection currentConnection;
+		public PuzzlePieceScript.PuzzlePieceConnections currentPuzzlePieceConnections;
+		public string currentPuzzlePiece;
+		public string previousPuzzlePiece;
+		public float timeSinceOnLastPuzzlePiece = 0f;
+		public float time;
 	}
 }

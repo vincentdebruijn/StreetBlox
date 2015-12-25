@@ -224,7 +224,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 		puzzlePieceConnections = new PuzzlePieceConnections (connections);
 		Connections.Add ("puzzlePiece_turnabout_E", puzzlePieceConnections);
 	}
-	
+
+	[Serializable]
 	public class PuzzlePieceConnections {
 		public Connection[] connections;
 		
@@ -253,7 +254,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 			return Connections.ContainsKey (name);
 		}
 	}
-	
+
+	[Serializable]
 	public class Connection {
 		public Coordinate[] coordinates;
 		
@@ -287,7 +289,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 				return oldIndex - 1;
 		}
 	}
-	
+
+	[Serializable]
 	public class Coordinate {
 		public const int NORTH = 0;
 		public const int EAST = 1;

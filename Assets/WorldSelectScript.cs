@@ -66,10 +66,6 @@ public class WorldSelectScript : MonoBehaviour {
 	public static string[] levels;
 	//  The configurations for the selected levels that LevelSelect should use
 	public static Dictionary<string, LevelConfiguration> levelConfigurations;
-	// Car to position mapping.
-	public static Dictionary<string, Pair<Vector3, Quaternion>> carPositions;
-	// Puzzle box to position mapping
-	public static Dictionary<string, Pair<Vector3, Quaternion>> puzzleBoxPositions;
 
 	// GUI stuff
 	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
@@ -84,12 +80,18 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GUIStyle loadingStyle;
 
 	// cars
+	private static GameObject displayCar1;
 	private static GameObject displayCar2;
 	private static GameObject displayCar3;
 	private static GameObject displayCar4;
 	private static GameObject displayCar5;
 	private static GameObject displayCar10;
 	private static GameObject displayCar11;
+
+	// puzzle boxes
+	private static GameObject puzzleBoxWorld1;
+	private static GameObject puzzleBoxWorld2;
+	private static GameObject puzzleBoxWorld3;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -103,6 +105,7 @@ public class WorldSelectScript : MonoBehaviour {
 		}
 
 		LoadCars ();
+		LoadPuzzleBoxes ();
 
 		loading = false;
 	}
@@ -156,7 +159,11 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	private static void LoadCars() {
-		GameObject.Find ("car1").transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		if (MenuScript.data.carsUnlocked [0]) {
+			GameObject clone = (GameObject)Instantiate (displayCar1);
+			clone.name = "car1";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
 		if (MenuScript.data.carsUnlocked [1]) {
 			GameObject clone = (GameObject)Instantiate (displayCar2);
 			clone.name = "car2";
@@ -186,6 +193,21 @@ public class WorldSelectScript : MonoBehaviour {
 			GameObject clone = (GameObject)Instantiate (displayCar11);
 			clone.name = "car11";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+	}
+
+	private static void LoadPuzzleBoxes() {
+		if (MenuScript.data.puzzleBoxesUnlocked [0]) {
+			GameObject clone = (GameObject)Instantiate (puzzleBoxWorld1);
+			clone.transform.GetComponent<puzzleBoxScript>().SetWorldNumber (1);
+		}
+		if (MenuScript.data.puzzleBoxesUnlocked [1]) {
+			GameObject clone = (GameObject)Instantiate (puzzleBoxWorld2);
+			clone.transform.GetComponent<puzzleBoxScript>().SetWorldNumber (2);
+		}
+		if (MenuScript.data.puzzleBoxesUnlocked [2]) {
+			GameObject clone = (GameObject)Instantiate (puzzleBoxWorld3);
+			clone.transform.GetComponent<puzzleBoxScript>().SetWorldNumber (3);
 		}
 	}
 
@@ -219,6 +241,7 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	public static void AddCars() {
+		displayCar1 = Resources.Load ("displayCar1") as GameObject;
 		displayCar2 = Resources.Load ("displayCar2") as GameObject;
 		displayCar3 = Resources.Load ("displayCar3") as GameObject;
 		displayCar4 = Resources.Load ("displayCar4") as GameObject;
@@ -228,7 +251,9 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	public static void AddPuzzleBoxes() {
-
+		puzzleBoxWorld1 = Resources.Load ("puzzleBoxWorld1") as GameObject;
+		puzzleBoxWorld2 = Resources.Load ("puzzleBoxWorld2") as GameObject;
+		puzzleBoxWorld3 = Resources.Load ("puzzleBoxWorld3") as GameObject;
 	}
 
 	public static void AddLevels() {
