@@ -85,6 +85,7 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject displayCar3;
 	private static GameObject displayCar4;
 	private static GameObject displayCar5;
+	private static GameObject displayCar6;
 	private static GameObject displayCar10;
 	private static GameObject displayCar11;
 
@@ -185,11 +186,16 @@ public class WorldSelectScript : MonoBehaviour {
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
 		if (MenuScript.data.carsUnlocked[5]) {
+			GameObject clone = (GameObject)Instantiate (displayCar6);
+			clone.name = "car6";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[6]) {
 			GameObject clone = (GameObject)Instantiate (displayCar10);
 			clone.name = "car10";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
-		if (MenuScript.data.carsUnlocked[6]) {
+		if (MenuScript.data.carsUnlocked[7]) {
 			GameObject clone = (GameObject)Instantiate (displayCar11);
 			clone.name = "car11";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
@@ -246,6 +252,7 @@ public class WorldSelectScript : MonoBehaviour {
 		displayCar3 = Resources.Load ("displayCar3") as GameObject;
 		displayCar4 = Resources.Load ("displayCar4") as GameObject;
 		displayCar5 = Resources.Load ("displayCar5") as GameObject;
+		displayCar6 = Resources.Load ("displayCar6") as GameObject;
 		displayCar10 = Resources.Load ("displayCar10") as GameObject;
 		displayCar11 = Resources.Load ("displayCar11") as GameObject;
 	}
