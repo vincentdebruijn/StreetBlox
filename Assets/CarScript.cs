@@ -87,6 +87,8 @@ public class CarScript : MonoBehaviour {
 		this.levelConfiguration = levelConfiguration;
 
 		currentPuzzlePiece = ClosestPuzzlePiece (null);
+		if (ExplorerLevel ())
+			currentPuzzlePiece = ClosestPuzzlePiece (currentPuzzlePiece);
 		Debug.Log (currentPuzzlePiece);
 		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
 		Debug.Log (currentPuzzlePieceConnections);

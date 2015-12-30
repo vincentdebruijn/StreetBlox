@@ -9,6 +9,8 @@ using System.Collections.Generic;
 
 public class GameScript : MonoBehaviour {
 
+	public const string explorerStartPiece = "puzzlePiece_straight_WE";
+
 	// The distance the bridge piece has to move to make the bridge completely open.
 	public const float BridgeOpenDistance = 0.145f;
 
@@ -129,6 +131,7 @@ public class GameScript : MonoBehaviour {
 				LoadFromSave();
 				MovePiecesToCorrectPosition();
 				SetCarToCorrectPosition();
+				SetCameraToCorrectPosition();
 				SetBridgePieces();
 				return;
 			}
@@ -209,11 +212,21 @@ public class GameScript : MonoBehaviour {
 			DisplayButtonBar();
 
 		if (!processedGameOver && carScript.GameOver ()) {
-			SetBackgroundColor();
 			processedGameOver = true;
+			if (chosenLevel == "explorer") {
+				gameStarted = false;
+				carScript.Reset ();
+				SetCarToCorrectPosition();
+				SetCameraToCorrectPosition();
+				return;
+			}
+			SetBackgroundColor();
 			if (carScript.ended)
 				UpdateProgress();
 		}
+
+		if (chosenLevel == "explorer")
+			return;
 
 		string text = null;
 		if (carScript.crashed || carScript.fell) {
@@ -344,10 +357,14 @@ public class GameScript : MonoBehaviour {
 			Application.LoadLevel ("world_select");
 		}
 
-		if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
-			MenuScript.PlayButtonSound ();
-			chosenGoStyle = goStyle4;
-			StartTheGame();
+		if (!gameStarted) {
+			if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
+				MenuScript.PlayButtonSound ();
+				chosenGoStyle = goStyle4;
+				StartTheGame ();
+			}
+		} else {
+			GUI.Label (explorerGoRect, "", chosenGoStyle);
 		}
 		
 		if (gameStarted) {
@@ -379,7 +396,11 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void SetCarOnStartPiece() {
-		GameObject startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
+		GameObject startPiece;
+		if (chosenLevel == "explorer")
+			startPiece = GameObject.Find (explorerStartPiece);
+		else
+			startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
 		Vector3 pos = startPiece.transform.position;
 		GameObject instantiatedCar = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
 		carScript = instantiatedCar.GetComponent<CarScript> ();
@@ -403,6 +424,11 @@ public class GameScript : MonoBehaviour {
 			carScript.previousPuzzlePiece = GameObject.Find (MenuScript.data.previousPuzzlePiece);
 		carScript.timeSinceOnLastPuzzlePiece = MenuScript.data.timeSinceOnLastPuzzlePiece;
 		carScript.time = MenuScript.data.time;
+	}
+
+	private void SetCameraToCorrectPosition() {
+		Vector3 position = new Vector3 (MenuScript.data.cameraPositionX, Camera.main.transform.position.y, MenuScript.data.cameraPositionZ);
+		Camera.main.transform.position = position;
 	}
 	
 	private void MovePiecesToCorrectPosition() {
@@ -735,7 +761,7 @@ public class GameScript : MonoBehaviour {
 			board[y] = new GameObject[savedBoard[y].Length];
 			for (int x = 0; x < savedBoard[y].Length; x++) {
 				GameObject result = null;
-				if (board [y] [x] != null)
+				if (savedBoard [y] [x] != null)
 					result = GameObject.Find (savedBoard [y] [x]);
 				board [y] [x] = result;
 			}
@@ -776,6 +802,9 @@ public class GameScript : MonoBehaviour {
 		MenuScript.data.carRotationX = carScript.gameObject.transform.rotation.x;
 		MenuScript.data.carRotationY = carScript.gameObject.transform.rotation.y;
 		MenuScript.data.carRotationZ = carScript.gameObject.transform.rotation.z;
+
+		MenuScript.data.cameraPositionX = Camera.main.transform.position.x;
+		MenuScript.data.cameraPositionZ = Camera.main.transform.position.z;
 
 		MenuScript.data.currentCoordinate = carScript.currentCoordinate;
 		MenuScript.data.currentCoordinateIndex = carScript.currentCoordinateIndex;

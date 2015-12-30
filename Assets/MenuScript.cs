@@ -276,6 +276,9 @@ public class MenuScript : MonoBehaviour {
 		public float carRotationY;
 		public float carRotationZ;
 
+		public float cameraPositionX;
+		public float cameraPositionZ;
+
 		public PuzzlePieceScript.Coordinate currentCoordinate;
 		public int currentCoordinateIndex;
 		public int currentDirection;
