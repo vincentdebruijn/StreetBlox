@@ -139,7 +139,6 @@ public class WorldSelectScript : MonoBehaviour {
 		if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
 			MenuScript.PlayButtonSound ();
 			endlessButtonChosenStyle = endlessButtonStyle;
-			MenuScript.canvas.GetComponent<Image>().color = GameScript.backgroundColor;
 			loading = true;
 			Application.LoadLevel ("explorer");
 		}

@@ -46,7 +46,7 @@ public class GameScript : MonoBehaviour {
 	private Boolean processedGameOver;
 
 	private List<GameObject> bridgePieces;
-	
+
 	public string chosenLevel;
 
 	// GUI stuff
@@ -103,6 +103,8 @@ public class GameScript : MonoBehaviour {
 	private static Rect boostRect;
 	private static Rect tutorialRect;
 
+	private GameObject canvas;
+
 	// explorer
 	private static Rect explorerQuitRect;
 	private static Rect explorerGoRect;
@@ -121,7 +123,6 @@ public class GameScript : MonoBehaviour {
 		chosenLevel = Application.loadedLevelName;
 		chosenGoStyle = goStyle1;
 		chosenBoostStyle = boostStyle1;
-		MenuScript.canvas.GetComponent<Image>().color = Color.clear;
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 
 		if (chosenLevel == "explorer") {
@@ -161,6 +162,8 @@ public class GameScript : MonoBehaviour {
 			SetVariables ();
 			staticVariablesSet = true;
 		}
+
+		canvas = (GameObject)Resources.Load ("canvas");
 	}
 
 	// Use this for initialization
@@ -220,7 +223,8 @@ public class GameScript : MonoBehaviour {
 				SetCameraToCorrectPosition();
 				return;
 			}
-			SetBackgroundColor();
+			GameObject obj = (GameObject)Instantiate(canvas, new Vector3(0, 2, -12f), Quaternion.Euler(277, 0, 180));
+			Debug.Log (obj.transform.rotation);
 			if (carScript.ended)
 				UpdateProgress();
 		}
@@ -330,7 +334,7 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 
-		GUI.Label (displayRect, "" + movesMade, displayStyle);
+		GUI.Label (displayRect, "" + movesMade + "/" + levelConfiguration.par, displayStyle);
 
 		if (gameStarted) {
 			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
@@ -402,7 +406,7 @@ public class GameScript : MonoBehaviour {
 		else
 			startPiece = GameObject.FindGameObjectWithTag ("StartPuzzlePiece");
 		Vector3 pos = startPiece.transform.position;
-		GameObject instantiatedCar = (GameObject)Instantiate (car, new Vector3 (pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
+		GameObject instantiatedCar = (GameObject)Instantiate (car, new Vector3(pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
 		carScript = instantiatedCar.GetComponent<CarScript> ();
 	}
 
@@ -442,11 +446,6 @@ public class GameScript : MonoBehaviour {
 		}
 	}
 
-	private void SetBackgroundColor() {
-		Image image = MenuScript.canvas.GetComponent<Image> ();
-		image.color = backgroundColor;
-	}
-	
 	public void Reset(string button) {
 		gameStarted = false;
 		carScript.Reset ();
@@ -454,7 +453,6 @@ public class GameScript : MonoBehaviour {
 			MenuScript.InTutorialPhase() == null && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
 		
 		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
-			MenuScript.canvas.GetComponent<Image> ().color = MenuScript.originalCanvasColor;
 			dontPlayAnimation = false;
 			MenuScript.data.worldSelectShown = true;
 			MenuScript.Save ();
@@ -472,7 +470,6 @@ public class GameScript : MonoBehaviour {
 			Application.LoadLevel (chosenLevel);
 			break;
 		case "Back":
-			MenuScript.canvas.GetComponent<Image>().color = MenuScript.originalCanvasColor;
 			dontPlayAnimation = false;
 			if (chosenLevel == "explorer")
 				Application.LoadLevel ("world_select");

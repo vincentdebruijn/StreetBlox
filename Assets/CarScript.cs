@@ -37,6 +37,8 @@ public class CarScript : MonoBehaviour {
 	// Can be set to make the car move faster
 	public float boost;
 
+	private Boolean cameraShakeDone;
+
 	private GameObject[] buttons;
 	
 	private Boolean clickedButtonWhileOnCurrentPuzzlePiece;
@@ -141,6 +143,7 @@ public class CarScript : MonoBehaviour {
 		portalEntryAnimationDone = true;
 		portalExitAnimationDone = true;
 		enteredPortalPiece = false;
+		cameraShakeDone = false;
 	}
 
 	Boolean GameEnding() {
@@ -179,6 +182,10 @@ public class CarScript : MonoBehaviour {
 		if (crashing) {
 			if (crashed)
 				return false;
+			if (!cameraShakeDone && startCrash >= 1.2) {
+				StartCoroutine(MenuScript.CameraShake(0.3f, 0.05f));
+				cameraShakeDone = true;
+			}
 			if (startCrash > 1.5) {
 				crashed = true;
 				return false;

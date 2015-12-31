@@ -51,6 +51,8 @@ public class LevelSelectScript : MonoBehaviour {
 	private Vector2 lastPosition;
 	Vector2 lastMousePosition;
 
+	private GameObject canvas;
+
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
 
@@ -65,6 +67,9 @@ public class LevelSelectScript : MonoBehaviour {
 
 		SetBackgroundTexture ();
 		SetLevelButtons ();
+
+		//canvas = (GameObject)Resources.Load ("canvas");
+		//Instantiate (canvas, new Vector3(0, 0, -6.2f), new Quaternion());
 	}
 
 	// Use this for initialization
@@ -132,7 +137,6 @@ public class LevelSelectScript : MonoBehaviour {
 
 	public void SelectedLevel(String level) {
 		MenuScript.PlayButtonSound ();
-		MenuScript.canvas.GetComponent<Image> ().color = GameScript.backgroundColor;
 		loading = true;
 		chosenLevel = level;
 		Application.LoadLevel (level);
@@ -144,7 +148,6 @@ public class LevelSelectScript : MonoBehaviour {
 			chosenLevel = levels [index + 1];
 			Application.LoadLevel (chosenLevel);
 		} else {
-			MenuScript.canvas.GetComponent<Image>().color = MenuScript.originalCanvasColor;
 			Application.LoadLevel ("level_select");
 		}
 	}

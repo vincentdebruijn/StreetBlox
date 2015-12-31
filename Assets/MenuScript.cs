@@ -10,9 +10,6 @@ using System.IO;
 using UnityEngine.UI;
 
 public class MenuScript : MonoBehaviour {
-	
-	public static GameObject canvas;
-	public static Color originalCanvasColor = new Color(0.220f, 0.2f, 0.157f, 0.25f);
 	public static PlayerData data;
 
 	// GUI stuff
@@ -181,12 +178,33 @@ public class MenuScript : MonoBehaviour {
 	public static void StopMenuMusic() {
 		soundMenu.GetComponent<AudioSource> ().Stop ();
 	}
+	
+	public static IEnumerator CameraShake(float duration, float magnitude) {
+		float elapsed = 0.0f;
+		
+		Vector3 originalCamPos = Camera.main.transform.position;
+		
+		while (elapsed < duration) {
+			elapsed += Time.deltaTime;          
+			
+			float percentComplete = elapsed / duration;         
+			float damper = 1.0f - Mathf.Clamp(4.0f * percentComplete - 3.0f, 0.0f, 1.0f);
+			
+			// map value to [-1, 1]
+			float x = UnityEngine.Random.value * 2.0f - 1.0f;
+			float z = UnityEngine.Random.value * 2.0f - 1.0f;
+			x *= magnitude * damper;
+			z *= magnitude * damper;
+			
+			Camera.main.transform.localPosition = new Vector3(originalCamPos.x + x, originalCamPos.y, originalCamPos.z + z);
+			
+			yield return null;
+		}
+		
+		Camera.main.transform.position = originalCamPos;
+	}
 
 	private static void SetVariables() {
-		canvas = GameObject.Find ("Canvas");
-		canvas.GetComponent<Image> ().color = originalCanvasColor;
-		DontDestroyOnLoad (canvas);
-		
 		soundButton = GameObject.Find ("sound_button_click");
 		DontDestroyOnLoad (soundButton);
 		soundPuzzlePiece = GameObject.Find ("sound_piece_click");
