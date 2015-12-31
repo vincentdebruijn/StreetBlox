@@ -15,6 +15,8 @@ public class GameScript : MonoBehaviour {
 	public const float BridgeOpenDistance = 0.145f;
 
 	public static Color backgroundColor = new Color (0, 0, 0, 0.75f);
+
+	public static Vector3 cameraCenter = new Vector3 (0.6f, 2.2f, -1.9f);
 	
 	// The time it takes for the car to completely move off the previous puzzle piece.
 	public float time_till_car_is_off_previous_puzzlepiece;
@@ -51,8 +53,6 @@ public class GameScript : MonoBehaviour {
 
 	// GUI stuff
 	private static Texture2D retryButtonTexture, retryButtonPressedTexture;
-	private static Texture2D nextButtonTexture, nextButtonPressedTexture;
-	private static Texture2D statTextTexture;
 	private static Texture2D quitTexture;
 	private static Texture2D resetTexture;
 	private static Texture2D goTexture1;
@@ -71,11 +71,9 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D explorerBoostTexture2;
 	
 	private static GUIStyle retryButtonStyle, retryButtonPressedStyle, retryButtonChosenStyle;
-	private static GUIStyle nextButtonStyle, nextButtonPressedStyle, nextButtonChosenStyle;
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle textAreaStyle;
 	private static GUIStyle statStyle;
-	private static GUIStyle statTextStyle;
 	private static GUIStyle timerStyle;
 	private static GUIStyle quitStyle;
 	private static GUIStyle resetStyle;
@@ -95,7 +93,6 @@ public class GameScript : MonoBehaviour {
 	private static Rect rightButtonRect;
 	private static Rect leftButtonRect;
 	private static Rect textArea;
-	private static Rect statTextRect;
 	private static Rect quitRect;
 	private static Rect resetRect;
 	private static Rect goRect;
@@ -104,6 +101,7 @@ public class GameScript : MonoBehaviour {
 	private static Rect tutorialRect;
 
 	private GameObject canvas;
+	private GameObject scoreScreen;
 
 	// explorer
 	private static Rect explorerQuitRect;
@@ -164,6 +162,7 @@ public class GameScript : MonoBehaviour {
 		}
 
 		canvas = (GameObject)Resources.Load ("canvas");
+		scoreScreen = (GameObject)Resources.Load ("scoreScreen");
 	}
 
 	// Use this for initialization
@@ -193,12 +192,17 @@ public class GameScript : MonoBehaviour {
 			else	
 				carScript.StartTheGame (levelConfiguration);
 		}
+
 		if (carScript.GameOver ()) {
+			if (!processedGameOver) {
+				ProcessGameOver();
+				processedGameOver = true;
+			}
+
 			if (Input.GetMouseButton(0)) {
 				Vector3 mousePosition = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, 0);
 				if (rightButtonRect.Contains (mousePosition)) {
 					retryButtonChosenStyle = retryButtonPressedStyle;
-					nextButtonChosenStyle = nextButtonPressedStyle;
 				} else if (leftButtonRect.Contains (mousePosition)) {
 					backButtonChosenStyle = MenuScript.backButtonPressedStyle;
 				}
@@ -214,46 +218,15 @@ public class GameScript : MonoBehaviour {
 		if (!carScript.ended && !carScript.crashed && !carScript.fell)
 			DisplayButtonBar();
 
-		if (!processedGameOver && carScript.GameOver ()) {
-			processedGameOver = true;
-			if (chosenLevel == "explorer") {
-				gameStarted = false;
-				carScript.Reset ();
-				SetCarToCorrectPosition();
-				SetCameraToCorrectPosition();
-				return;
-			}
-			GameObject obj = (GameObject)Instantiate(canvas, new Vector3(0, 2, -12f), Quaternion.Euler(277, 0, 180));
-			Debug.Log (obj.transform.rotation);
-			if (carScript.ended)
-				UpdateProgress();
-		}
-
 		if (chosenLevel == "explorer")
 			return;
 
-		string text = null;
 		if (carScript.crashed || carScript.fell) {
-			text = "The Car didn't make it!";
 			if (GUI.Button (rightButtonRect, "", retryButtonChosenStyle)) {
 				retryButtonChosenStyle = retryButtonStyle;
-				nextButtonChosenStyle = nextButtonStyle;
 				MenuScript.PlayButtonSound();
 				Reset("Retry");
 			}
-		}
-		if (carScript.ended) {
-			text = "Success!";
-			if (GUI.Button (rightButtonRect, "", nextButtonChosenStyle)) {
-				nextButtonChosenStyle = nextButtonStyle;
-				retryButtonChosenStyle = retryButtonStyle;
-				MenuScript.PlayButtonSound();
-				Reset("Next");
-			}
-			GUI.Label (statTextRect, "     Moves made: " + movesMade+"\n     Level par: " + levelConfiguration.par, statTextStyle);
-		}
-		if (text != null) {
-			GUI.Label (textArea, text, textAreaStyle);
 			if (GUI.Button (leftButtonRect, "", backButtonChosenStyle)) {
 				backButtonChosenStyle = MenuScript.backButtonStyle;
 				MenuScript.PlayButtonSound();
@@ -273,6 +246,33 @@ public class GameScript : MonoBehaviour {
 				tutorialMessageCounter += 1;
 			}
 		}
+	}
+
+	private void ProcessGameOver() {	
+		if (chosenLevel == "explorer") {
+			gameStarted = false;
+			carScript.Reset ();
+			SetCarToCorrectPosition ();
+			SetCameraToCorrectPosition ();
+			return;
+		}
+
+		Instantiate (canvas, new Vector3 (0, 1.3f, -8f), Quaternion.Euler (277, 0, 180));
+
+		if (carScript.ended)
+			UpdateProgress ();
+
+		Vector3 position = scoreScreen.transform.position;
+		position += (Camera.main.transform.position - cameraCenter);
+
+		Transform iScoreScreen = ((GameObject)Instantiate (scoreScreen, position, scoreScreen.transform.rotation)).transform;
+		iScoreScreen.Find ("levelVariable").GetComponentInChildren<TextMesh> ().text = "LEVEL " + WorldSelectScript.displayNames [chosenLevel];
+		iScoreScreen.Find ("movesVariable").GetComponentInChildren<TextMesh>().text = "" + movesMade;
+		iScoreScreen.Find ("parVariable").GetComponentInChildren<TextMesh> ().text = "" + levelConfiguration.par;
+		string marbleText = MenuScript.data.levelProgress[chosenLevel] + "/" + 5;
+		if (LevelSelectScript.TutorialLevel (chosenLevel))
+			marbleText = "0/0";
+		iScoreScreen.Find ("marblesVariable").GetComponentInChildren<TextMesh> ().text = marbleText;
 	}
 	
 	private void UpdateProgress() {
@@ -824,7 +824,6 @@ public class GameScript : MonoBehaviour {
 		rightButtonRect = new Rect (Screen.width / 5 * 4 - offset, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		leftButtonRect = new Rect (Screen.width / 5 + offset - buttonSize, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		textArea = new Rect (0, 10, Screen.width, buttonSize);
-		statTextRect = new Rect (Screen.width / 5 + offset, Screen.height / 2 + buttonSize / 2, Screen.width / 5 * 3 - 2 * offset, buttonSize * 1.5f);
 
 		float uiButtonSize = Screen.height / 10;
 		quitRect = new Rect (0, uiButtonSize, uiButtonSize * 2, uiButtonSize);
@@ -840,9 +839,6 @@ public class GameScript : MonoBehaviour {
 		
 		retryButtonTexture = (Texture2D)Resources.Load ("ui_button_retry");
 		retryButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_retry_pressed");
-		nextButtonTexture = (Texture2D)Resources.Load ("ui_button_next");
-		nextButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_next_pressed");
-		statTextTexture = (Texture2D)Resources.Load ("ui_border_levelname");
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
 		goTexture1 = (Texture2D)Resources.Load ("go1");
@@ -861,13 +857,7 @@ public class GameScript : MonoBehaviour {
 		retryButtonPressedStyle = new GUIStyle ();
 		retryButtonPressedStyle.normal.background = retryButtonPressedTexture;
 		retryButtonChosenStyle = retryButtonStyle;
-		
-		nextButtonStyle = new GUIStyle ();
-		nextButtonStyle.normal.background = nextButtonTexture;
-		nextButtonPressedStyle = new GUIStyle ();
-		nextButtonPressedStyle.normal.background = nextButtonPressedTexture;
-		nextButtonChosenStyle = nextButtonStyle;
-		
+
 		textAreaStyle = new GUIStyle ();
 		textAreaStyle.fontSize = 64;
 		textAreaStyle.normal.textColor = Color.white;
@@ -886,12 +876,6 @@ public class GameScript : MonoBehaviour {
 		statStyle.fontSize = 32;
 		statStyle.normal.textColor = Color.white;
 		statStyle.alignment = TextAnchor.MiddleLeft;
-		
-		statTextStyle = new GUIStyle ();
-		statTextStyle.normal.textColor = Color.white;
-		statTextStyle.fontSize = 24;
-		statTextStyle.alignment = TextAnchor.MiddleLeft;
-		statTextStyle.normal.background = statTextTexture;
 
 		timerStyle = new GUIStyle ();
 		timerStyle.fontSize = 32;
