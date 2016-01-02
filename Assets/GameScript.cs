@@ -278,12 +278,12 @@ public class GameScript : MonoBehaviour {
 	private void UpdateProgress() {
 		marbles = 0;
 		if (MenuScript.data.levelProgress.ContainsKey (chosenLevel)) {
-			if (MenuScript.data.levelProgress [chosenLevel] == 2 && movesMade < levelConfiguration.par) {
+			if (MenuScript.data.levelProgress [chosenLevel] == 2 && movesMade <= levelConfiguration.par) {
 				MenuScript.data.levelProgress [chosenLevel] = 5;
 				marbles = 3;
 			}
 		} else {
-			if (movesMade < levelConfiguration.par)
+			if (movesMade <= levelConfiguration.par)
 				marbles = 5;
 			else
 				marbles = 2;
