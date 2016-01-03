@@ -47,6 +47,8 @@ public class CarScript : MonoBehaviour {
 	private Boolean portalEntryAnimationDone;
 	private Boolean portalExitAnimationDone;
 
+	private Boolean enteredShopPiece;
+
 	private Transform camera;
 
 	void Awake() {
@@ -113,6 +115,7 @@ public class CarScript : MonoBehaviour {
 		this.levelConfiguration = levelConfiguration;
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		enteredPortalPiece = currentPuzzlePiece.name.Contains ("portal") && PuzzlePieceScript.GetSideOfPortal(currentPuzzlePiece) == currentDirection;
+		enteredShopPiece = false;
 		clickedButtonWhileOnCurrentPuzzlePiece = ButtonNearby ();
 		carStarted = true;
 		PlayEngineSound ();
@@ -143,6 +146,7 @@ public class CarScript : MonoBehaviour {
 		portalEntryAnimationDone = true;
 		portalExitAnimationDone = true;
 		enteredPortalPiece = false;
+		enteredShopPiece = false;
 		cameraShakeDone = false;
 	}
 
@@ -182,7 +186,7 @@ public class CarScript : MonoBehaviour {
 		if (crashing) {
 			if (crashed)
 				return false;
-			if (!cameraShakeDone && startCrash >= 1.2) {
+			if (!cameraShakeDone && startCrash >= 1.2 && !ExplorerLevel()) {
 				StartCoroutine(MenuScript.CameraShake(0.3f, 0.05f));
 				cameraShakeDone = true;
 			}
@@ -231,6 +235,8 @@ public class CarScript : MonoBehaviour {
 				}
 				Debug.Log ("New destination: " + currentPuzzlePiece.name);
 				Debug.Log ("Entering from: " + currentDirection);
+				if (ExplorerLevel() && gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
+				    enteredShopPiece = true;
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
 				    	OnOpenBridgePiece(currentPuzzlePiece)) {
 					crashing = true;
@@ -258,6 +264,13 @@ public class CarScript : MonoBehaviour {
 			}
 			currentCoordinate = currentConnection.coordinates [currentCoordinateIndex];
 			RotateTowardsTarget ();
+			if (enteredShopPiece) {
+				gameScript.Halt();
+				carStarted = false;
+				gameScript.ShowShop();
+				enteredShopPiece = false;
+				return;
+			}
 		}
 		CheckForNearbyButton();
 	}
@@ -358,10 +371,15 @@ public class CarScript : MonoBehaviour {
 		return atEnd;
 	}
 
+
+	// Explorer stuff
+	//
+
 	Boolean ExplorerLevel() {
 		return GameScript().chosenLevel == "explorer";
 	}
 
+	
 	// Animation stuff
 	//
 

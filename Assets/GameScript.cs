@@ -10,6 +10,9 @@ using System.Collections.Generic;
 public class GameScript : MonoBehaviour {
 
 	public const string explorerStartPiece = "puzzlePiece_straight_WE";
+	
+	// The names of the pieces in explorer mode that will trigger the shop
+	public static HashSet<String> shopTriggerPieces;
 
 	// The distance the bridge piece has to move to make the bridge completely open.
 	public const float BridgeOpenDistance = 0.145f;
@@ -46,13 +49,14 @@ public class GameScript : MonoBehaviour {
 	private int movesMade;
 	private int marbles;
 	private Boolean processedGameOver;
+	private Boolean halted;
+	private Boolean showingShop;
 
 	private List<GameObject> bridgePieces;
 
 	public string chosenLevel;
 
-	// GUI stuff
-	private static Texture2D retryButtonTexture, retryButtonPressedTexture;
+	// In game UI
 	private static Texture2D quitTexture;
 	private static Texture2D resetTexture;
 	private static Texture2D goTexture1;
@@ -69,9 +73,7 @@ public class GameScript : MonoBehaviour {
 	// explorer
 	private static Texture2D explorerBoostTexture1;
 	private static Texture2D explorerBoostTexture2;
-	
-	private static GUIStyle retryButtonStyle, retryButtonPressedStyle, retryButtonChosenStyle;
-	private static GUIStyle backButtonChosenStyle;
+
 	private static GUIStyle textAreaStyle;
 	private static GUIStyle statStyle;
 	private static GUIStyle timerStyle;
@@ -89,9 +91,7 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
 	private static GUIStyle tutorialStyle;
-	
-	private static Rect rightButtonRect;
-	private static Rect leftButtonRect;
+
 	private static Rect textArea;
 	private static Rect quitRect;
 	private static Rect resetRect;
@@ -102,6 +102,7 @@ public class GameScript : MonoBehaviour {
 
 	private GameObject canvas;
 	private GameObject scoreScreen;
+	private GameObject lossScreen;
 
 	// explorer
 	private static Rect explorerQuitRect;
@@ -113,6 +114,7 @@ public class GameScript : MonoBehaviour {
 	private static Dictionary<String, String[]> tutorialMessages;
 
 	private GameObject car;
+	private GameObject shop;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -122,6 +124,7 @@ public class GameScript : MonoBehaviour {
 		chosenGoStyle = goStyle1;
 		chosenBoostStyle = boostStyle1;
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
+		shop = Resources.Load ("shopScreen") as GameObject;
 
 		if (chosenLevel == "explorer") {
 			dontPlayAnimation = true;
@@ -163,6 +166,7 @@ public class GameScript : MonoBehaviour {
 
 		canvas = (GameObject)Resources.Load ("canvas");
 		scoreScreen = (GameObject)Resources.Load ("scoreScreen");
+		lossScreen = (GameObject)Resources.Load ("failScreen");
 	}
 
 	// Use this for initialization
@@ -183,7 +187,7 @@ public class GameScript : MonoBehaviour {
 		if (!gameStarted)
 			return;
 
-		if (!carScript.carStarted) {
+		if (!halted && !carScript.carStarted) {
 			time += Time.deltaTime;
 			if (chosenLevel != "explorer" && time < levelConfiguration.waitTimeAtStart)
 				return;
@@ -199,14 +203,6 @@ public class GameScript : MonoBehaviour {
 				processedGameOver = true;
 			}
 
-			if (Input.GetMouseButton(0)) {
-				Vector3 mousePosition = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, 0);
-				if (rightButtonRect.Contains (mousePosition)) {
-					retryButtonChosenStyle = retryButtonPressedStyle;
-				} else if (leftButtonRect.Contains (mousePosition)) {
-					backButtonChosenStyle = MenuScript.backButtonPressedStyle;
-				}
-			}
 			return;
 		}
 	}
@@ -220,19 +216,6 @@ public class GameScript : MonoBehaviour {
 
 		if (chosenLevel == "explorer")
 			return;
-
-		if (carScript.crashed || carScript.fell) {
-			if (GUI.Button (rightButtonRect, "", retryButtonChosenStyle)) {
-				retryButtonChosenStyle = retryButtonStyle;
-				MenuScript.PlayButtonSound();
-				Reset("Retry");
-			}
-			if (GUI.Button (leftButtonRect, "", backButtonChosenStyle)) {
-				backButtonChosenStyle = MenuScript.backButtonStyle;
-				MenuScript.PlayButtonSound();
-				Reset("Back");
-			}
-		}
 	}
 
 	private void DisplayTutorialMessages() {
@@ -252,27 +235,46 @@ public class GameScript : MonoBehaviour {
 		if (chosenLevel == "explorer") {
 			gameStarted = false;
 			carScript.Reset ();
-			SetCarToCorrectPosition ();
-			SetCameraToCorrectPosition ();
+			chosenGoStyle = goStyle1;
+			chosenBoostStyle = boostStyle1;
+			GameObject.Destroy(carScript.gameObject);
+			if (MenuScript.data.board != null) {
+				Debug.Log ("Setting back to saved position");
+				SetCarToCorrectPosition ();
+				SetCameraToCorrectPosition ();
+			} else {
+				Debug.Log ("Setting back to start location");
+				SetCarOnStartPiece();
+				SetCameraToStartPosition();
+			}
 			return;
 		}
 
 		Instantiate (canvas, new Vector3 (0, 1.3f, -8f), Quaternion.Euler (277, 0, 180));
 
-		if (carScript.ended)
-			UpdateProgress ();
-
+		Transform iScoreScreen;
 		Vector3 position = scoreScreen.transform.position;
 		position += (Camera.main.transform.position - cameraCenter);
 
-		Transform iScoreScreen = ((GameObject)Instantiate (scoreScreen, position, scoreScreen.transform.rotation)).transform;
+		if (carScript.ended) {
+			UpdateProgress ();
+
+			iScoreScreen = ((GameObject)Instantiate (scoreScreen, position, scoreScreen.transform.rotation)).transform;
+		} else {
+			iScoreScreen = ((GameObject)Instantiate (lossScreen, position, lossScreen.transform.rotation)).transform;
+		}
+
 		iScoreScreen.Find ("levelVariable").GetComponentInChildren<TextMesh> ().text = "LEVEL " + WorldSelectScript.displayNames [chosenLevel];
-		iScoreScreen.Find ("movesVariable").GetComponentInChildren<TextMesh>().text = "" + movesMade;
+		iScoreScreen.Find ("movesVariable").GetComponentInChildren<TextMesh> ().text = "" + movesMade;
 		iScoreScreen.Find ("parVariable").GetComponentInChildren<TextMesh> ().text = "" + levelConfiguration.par;
-		string marbleText = MenuScript.data.levelProgress[chosenLevel] + "/" + 5;
+		int marblesGained = 0;
+		if (MenuScript.data.levelProgress.ContainsKey (chosenLevel))
+			marblesGained = MenuScript.data.levelProgress [chosenLevel];
+		string marbleText = marblesGained + "/" + 5;
 		if (LevelSelectScript.TutorialLevel (chosenLevel))
 			marbleText = "0/0";
 		iScoreScreen.Find ("marblesVariable").GetComponentInChildren<TextMesh> ().text = marbleText;
+
 	}
 	
 	private void UpdateProgress() {
@@ -304,6 +306,7 @@ public class GameScript : MonoBehaviour {
 
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
+			StopGameMusicAndPlayMenuMusic();
 			if (MenuScript.InTutorialPhase() != null)
 				Application.LoadLevel ("menu");
 			else
@@ -355,6 +358,8 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayExplorerButtonBar() {
+		if (showingShop)
+			return;
 		if (carScript.Quittable () && GUI.Button (explorerQuitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
 			Save ();
@@ -365,7 +370,14 @@ public class GameScript : MonoBehaviour {
 			if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
 				MenuScript.PlayButtonSound ();
 				chosenGoStyle = goStyle4;
-				StartTheGame ();
+				if (halted) {
+					halted = false;
+					showingShop = false;
+					carScript.carStarted = true;
+					gameStarted = true;
+				} else {
+					StartTheGame ();
+				}
 			}
 		} else {
 			GUI.Label (explorerGoRect, "", chosenGoStyle);
@@ -434,6 +446,11 @@ public class GameScript : MonoBehaviour {
 		Vector3 position = new Vector3 (MenuScript.data.cameraPositionX, Camera.main.transform.position.y, MenuScript.data.cameraPositionZ);
 		Camera.main.transform.position = position;
 	}
+
+	private void SetCameraToStartPosition() {
+		Vector3 position = new Vector3 (10, 2.2f, -11);
+		Camera.main.transform.position = position;
+	}
 	
 	private void MovePiecesToCorrectPosition() {
 		float pieceSize = levelConfiguration.PieceSize;
@@ -448,6 +465,8 @@ public class GameScript : MonoBehaviour {
 
 	public void Reset(string button) {
 		gameStarted = false;
+		halted = false;
+		showingShop = false;
 		carScript.Reset ();
 		Boolean tutorialsFinished = 
 			MenuScript.InTutorialPhase() == null && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
@@ -470,6 +489,7 @@ public class GameScript : MonoBehaviour {
 			Application.LoadLevel (chosenLevel);
 			break;
 		case "Back":
+			StopGameMusicAndPlayMenuMusic();
 			dontPlayAnimation = false;
 			if (chosenLevel == "explorer")
 				Application.LoadLevel ("world_select");
@@ -479,6 +499,29 @@ public class GameScript : MonoBehaviour {
 				Application.LoadLevel("level_select");
 			break;
 		}
+	}
+
+	public void Halt() {
+		gameStarted = false;
+		halted = true;
+		chosenGoStyle = goStyle1;
+	}
+
+	public void ShowShop() {
+		showingShop = true;
+		Vector3 cameraPosition = Camera.main.transform.position;
+		Vector3 position = new Vector3 (cameraPosition.x, cameraPosition.y - 1.37f, cameraPosition.z + 0.15f);
+		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
+		iShop.name = "shopScreen";
+	}
+
+	public void CloseShop() {
+		GameObject.Destroy (GameObject.Find ("shopScreen"));
+		showingShop = false;
+	}
+
+	public Boolean ShopTriggerPiece(String name) {
+		return shopTriggerPieces.Contains (name);
 	}
 
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
@@ -677,6 +720,13 @@ public class GameScript : MonoBehaviour {
 		                    -y * levelConfiguration.PieceSize + levelConfiguration.TopZPosition);
 	}
 
+	private void StopGameMusicAndPlayMenuMusic() {
+		MenuScript.StopWorld1Music ();
+		MenuScript.StopWorld2Music ();
+		MenuScript.StopWorld3Music ();
+		MenuScript.PlayMenuMusic ();
+	}
+
 	// ANIMATION
 	//
 
@@ -821,8 +871,6 @@ public class GameScript : MonoBehaviour {
 	private static void SetVariables() {
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
-		rightButtonRect = new Rect (Screen.width / 5 * 4 - offset, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
-		leftButtonRect = new Rect (Screen.width / 5 + offset - buttonSize, Screen.height / 2 - (buttonSize / 2), buttonSize, buttonSize);
 		textArea = new Rect (0, 10, Screen.width, buttonSize);
 
 		float uiButtonSize = Screen.height / 10;
@@ -836,9 +884,7 @@ public class GameScript : MonoBehaviour {
 		explorerQuitRect = quitRect;
 		explorerGoRect = goRect;
 		explorerBoostRect = boostRect;
-		
-		retryButtonTexture = (Texture2D)Resources.Load ("ui_button_retry");
-		retryButtonPressedTexture = (Texture2D)Resources.Load ("ui_button_retry_pressed");
+
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
 		goTexture1 = (Texture2D)Resources.Load ("go1");
@@ -851,12 +897,6 @@ public class GameScript : MonoBehaviour {
 		boostTexture3 = (Texture2D)Resources.Load ("speed3");
 		boostTexture4 = (Texture2D)Resources.Load ("speed4");
 		tutorialTexture = displayTexture;
-		
-		retryButtonStyle = new GUIStyle ();
-		retryButtonStyle.normal.background = retryButtonTexture;
-		retryButtonPressedStyle = new GUIStyle ();
-		retryButtonPressedStyle.normal.background = retryButtonPressedTexture;
-		retryButtonChosenStyle = retryButtonStyle;
 
 		textAreaStyle = new GUIStyle ();
 		textAreaStyle.fontSize = 64;
@@ -926,8 +966,9 @@ public class GameScript : MonoBehaviour {
 		boostStyle3.normal.background = boostTexture3;
 		boostStyle4 = new GUIStyle ();
 		boostStyle4.normal.background = boostTexture4;
-		
-		backButtonChosenStyle = MenuScript.backButtonStyle;
+
+		shopTriggerPieces = new HashSet<String> ();
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W");
 	}
 
 	private static void AddTutorialMessages() {

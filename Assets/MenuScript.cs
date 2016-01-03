@@ -32,6 +32,9 @@ public class MenuScript : MonoBehaviour {
 	public static GameObject soundGearShift;
 	public static GameObject soundMenu;
 	public static GameObject soundBridgePiece;
+	public static GameObject soundWorld1;
+	public static GameObject soundWorld2;
+	public static GameObject soundWorld3;
 
 	private static Rect logoRect;
 	private static Rect leftButtonRect;
@@ -178,6 +181,33 @@ public class MenuScript : MonoBehaviour {
 	public static void StopMenuMusic() {
 		soundMenu.GetComponent<AudioSource> ().Stop ();
 	}
+
+	public static void PlayWorld1Music() {
+		if (data.playMusic)
+			soundWorld1.GetComponent<AudioSource> ().Play ();
+	}
+	
+	public static void StopWorld1Music() {
+		soundWorld1.GetComponent<AudioSource> ().Stop ();
+	}
+
+	public static void PlayWorld2Music() {
+		if (data.playMusic)
+			soundWorld2.GetComponent<AudioSource> ().Play ();
+	}
+	
+	public static void StopWorld2Music() {
+		soundWorld2.GetComponent<AudioSource> ().Stop ();
+	}
+
+	public static void PlayWorld3Music() {
+		if (data.playMusic)
+			soundWorld3.GetComponent<AudioSource> ().Play ();
+	}
+	
+	public static void StopWorld3Music() {
+		soundWorld3.GetComponent<AudioSource> ().Stop ();
+	}
 	
 	public static IEnumerator CameraShake(float duration, float magnitude) {
 		float elapsed = 0.0f;
@@ -215,7 +245,12 @@ public class MenuScript : MonoBehaviour {
 		DontDestroyOnLoad (soundMenu);
 		soundBridgePiece = GameObject.Find ("sound_bridge_piece");
 		DontDestroyOnLoad (soundBridgePiece);
-
+		soundWorld1 = GameObject.Find ("sound_world1");
+		DontDestroyOnLoad (soundWorld1);
+		soundWorld2 = GameObject.Find ("sound_world2");
+		DontDestroyOnLoad (soundWorld2);
+		soundWorld3 = GameObject.Find ("sound_world3");
+		DontDestroyOnLoad (soundWorld3);
 		
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;

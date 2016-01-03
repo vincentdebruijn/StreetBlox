@@ -139,6 +139,20 @@ public class LevelSelectScript : MonoBehaviour {
 		MenuScript.PlayButtonSound ();
 		loading = true;
 		chosenLevel = level;
+
+		if (WorldSelectScript.chosenWorldName == "Tutorial") {
+			// just keep playing menu music
+		} else if (WorldSelectScript.chosenWorldName == "Grass World") {
+			MenuScript.StopMenuMusic();
+			MenuScript.PlayWorld1Music();
+		} else if (WorldSelectScript.chosenWorldName == "Lava World") {
+			MenuScript.StopMenuMusic();
+			MenuScript.PlayWorld2Music();
+		} else if (WorldSelectScript.chosenWorldName == "Space World") {
+			MenuScript.StopMenuMusic();
+			MenuScript.PlayWorld3Music();
+		}
+
 		Application.LoadLevel (level);
 	}
 		
