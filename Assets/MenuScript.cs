@@ -134,7 +134,7 @@ public class MenuScript : MonoBehaviour {
 			data.chosenCar = "car1";
 			data.worldSelectShown = false;
 			data.marbles = 0;
-			data.carsUnlocked = new Boolean[8];
+			data.carsUnlocked = new Boolean[9];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
 				data.carsUnlocked[i] = true;
 			data.puzzleBoxesUnlocked = new Boolean[3];

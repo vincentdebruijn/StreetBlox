@@ -93,7 +93,7 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject displayCar5;
 	private static GameObject displayCar6;
 	private static GameObject displayCar7;
-	//private static GameObject displayCar10;
+	private static GameObject displayCar8;
 	private static GameObject displayCar11;
 
 	// puzzle boxes
@@ -201,12 +201,12 @@ public class WorldSelectScript : MonoBehaviour {
 			clone.name = "car7";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
-		//if (MenuScript.data.carsUnlocked[7]) {
-		//	GameObject clone = (GameObject)Instantiate (displayCar10);
-		//	clone.name = "car10";
-		//	clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
-		//}
 		if (MenuScript.data.carsUnlocked[7]) {
+			GameObject clone = (GameObject)Instantiate (displayCar8);
+			clone.name = "car8";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[8]) {
 			GameObject clone = (GameObject)Instantiate (displayCar11);
 			clone.name = "car11";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
@@ -265,7 +265,7 @@ public class WorldSelectScript : MonoBehaviour {
 		displayCar5 = Resources.Load ("displayCar5") as GameObject;
 		displayCar6 = Resources.Load ("displayCar6") as GameObject;
 		displayCar7 = Resources.Load ("displayCar7") as GameObject;
-		//displayCar10 = Resources.Load ("displayCar10") as GameObject;
+		displayCar8 = Resources.Load ("displayCar8") as GameObject;
 		displayCar11 = Resources.Load ("displayCar11") as GameObject;
 	}
 

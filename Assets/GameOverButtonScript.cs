@@ -5,8 +5,8 @@ public class GameOverButtonScript : MonoBehaviour {
 	private GameScript gameScript;
 
 	public string buttonText;
-	public Texture normalTexture;
-	public Texture pressedTexture;
+	//public Texture normalTexture;
+	//public Texture pressedTexture;
 
 	void Awake() {
 		gameScript = Camera.main.GetComponent<GameScript> ();
