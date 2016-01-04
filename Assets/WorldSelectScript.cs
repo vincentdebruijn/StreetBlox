@@ -58,7 +58,9 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_s02",
 		"level_s03",
 		"level_s04",
-		"level_s05"
+		"level_s05",
+		"level_s06",
+		"level_s07"
 	};
 	// Mapping of level names to the name that should be displayed in level select
 	public static Dictionary<string, string> displayNames;
@@ -90,7 +92,8 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject displayCar4;
 	private static GameObject displayCar5;
 	private static GameObject displayCar6;
-	private static GameObject displayCar10;
+	private static GameObject displayCar7;
+	//private static GameObject displayCar10;
 	private static GameObject displayCar11;
 
 	// puzzle boxes
@@ -194,10 +197,15 @@ public class WorldSelectScript : MonoBehaviour {
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
 		if (MenuScript.data.carsUnlocked[6]) {
-			GameObject clone = (GameObject)Instantiate (displayCar10);
-			clone.name = "car10";
+			GameObject clone = (GameObject)Instantiate (displayCar7);
+			clone.name = "car7";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
+		//if (MenuScript.data.carsUnlocked[7]) {
+		//	GameObject clone = (GameObject)Instantiate (displayCar10);
+		//	clone.name = "car10";
+		//	clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		//}
 		if (MenuScript.data.carsUnlocked[7]) {
 			GameObject clone = (GameObject)Instantiate (displayCar11);
 			clone.name = "car11";
@@ -256,7 +264,8 @@ public class WorldSelectScript : MonoBehaviour {
 		displayCar4 = Resources.Load ("displayCar4") as GameObject;
 		displayCar5 = Resources.Load ("displayCar5") as GameObject;
 		displayCar6 = Resources.Load ("displayCar6") as GameObject;
-		displayCar10 = Resources.Load ("displayCar10") as GameObject;
+		displayCar7 = Resources.Load ("displayCar7") as GameObject;
+		//displayCar10 = Resources.Load ("displayCar10") as GameObject;
 		displayCar11 = Resources.Load ("displayCar11") as GameObject;
 	}
 
@@ -315,6 +324,8 @@ public class WorldSelectScript : MonoBehaviour {
 		world3Configuration.Add ("level_s03", new LevelConfiguration (5, 5, 0f, 0f, 15));
 		world3Configuration.Add ("level_s04", new LevelConfiguration (5, 5, 0f, 0f, 15));
 		world3Configuration.Add ("level_s05", new LevelConfiguration (4, 5, 0f, 0f, 15));
+		world3Configuration.Add ("level_s06", new LevelConfiguration (9, 5, 0f, 0f, 25));
+		world3Configuration.Add ("level_s07", new LevelConfiguration (7, 4, 0f, 0f, 25));
 
 		displayNames = new Dictionary<string, string> ();
 		displayNames.Add ("tutorial_1", "0-1");
@@ -352,6 +363,8 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_s03", "3-3");
 		displayNames.Add ("level_s04", "3-4");
 		displayNames.Add ("level_s05", "3-5");
+		displayNames.Add ("level_s06", "3-6");
+		displayNames.Add ("level_s07", "3-7");
 	}
 }
 
