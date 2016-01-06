@@ -513,6 +513,7 @@ public class GameScript : MonoBehaviour {
 		Vector3 position = new Vector3 (cameraPosition.x, cameraPosition.y - 1.37f, cameraPosition.z + 0.15f);
 		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
 		iShop.name = "shopScreen";
+		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
 	}
 
 	public void CloseShop() {

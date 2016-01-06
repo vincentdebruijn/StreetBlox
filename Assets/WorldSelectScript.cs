@@ -41,7 +41,12 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_15",
 		"level_16",
 		"level_17",
-		"level_18"
+		"level_18",
+		"level_19",
+		"level_20",
+		"level_21",
+		"level_22",
+		"level_23"
 	};
 	// The world2 levels
 	private static readonly string[] levelsWorld2 = {
@@ -50,7 +55,8 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_l03",
 		"level_l04",
 		"level_l05",
-		"level_l06"
+		"level_l06",
+		"level_l07"
 	};
 	// The world3 levels
 	private static readonly string[] levelsWorld3 = {
@@ -305,6 +311,11 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_16", new LevelConfiguration (6, 5, 0f, 0f, 30));
 		world1Configuration.Add ("level_17", new LevelConfiguration (8, 4, 0f, 0f, 30));
 		world1Configuration.Add ("level_18", new LevelConfiguration (8, 7, 0f, 0f, 30));
+		world1Configuration.Add ("level_19", new LevelConfiguration (8, 7, 0f, 0f, 30));
+		world1Configuration.Add ("level_20", new LevelConfiguration (7, 7, 0f, 0f, 50));
+		world1Configuration.Add ("level_21", new LevelConfiguration (7, 5, 0f, 0f, 39));
+		world1Configuration.Add ("level_22", new LevelConfiguration (6, 4, 0f, 0f, 17));
+		world1Configuration.Add ("level_23", new LevelConfiguration (6, 5, 0f, 0f, 7));
 
 		Dictionary<string, LevelConfiguration> world2Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[2], world2Configuration);
@@ -315,6 +326,7 @@ public class WorldSelectScript : MonoBehaviour {
 		world2Configuration.Add ("level_l04", new LevelConfiguration (5, 5, 0f, 0f, 11));
 		world2Configuration.Add ("level_l05", new LevelConfiguration (6, 5, 0f, 0f, 11));
 		world2Configuration.Add ("level_l06", new LevelConfiguration (4, 5, 0f, 0f, 12));
+		world2Configuration.Add ("level_l07", new LevelConfiguration (6, 6, 0f, 0f, 12));
 
 		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[3], world3Configuration);
@@ -350,6 +362,10 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_17", "1-17");
 		displayNames.Add ("level_18", "1-18");
 		displayNames.Add ("level_19", "1-19");
+		displayNames.Add ("level_20", "1-20");
+		displayNames.Add ("level_21", "1-21");
+		displayNames.Add ("level_22", "1-22");
+		displayNames.Add ("level_23", "1-23");
 
 		displayNames.Add ("level_l01", "2-1");
 		displayNames.Add ("level_l02", "2-2");
@@ -357,6 +373,7 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_l04", "2-4");
 		displayNames.Add ("level_l05", "2-5");
 		displayNames.Add ("level_l06", "2-6");
+		displayNames.Add ("level_l07", "2-7");
 
 		displayNames.Add ("level_s01", "3-1");
 		displayNames.Add ("level_s02", "3-2");
