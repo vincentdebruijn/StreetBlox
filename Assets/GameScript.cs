@@ -518,7 +518,11 @@ public class GameScript : MonoBehaviour {
 		SetMarbleText ();
 		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
 		scripts [1].carIndex = 1;
+		if (MenuScript.data.carsUnlocked[1])
+			scripts [1].SetToBought ();
 		scripts [0].carIndex = 2;
+		if (MenuScript.data.carsUnlocked[2])
+			scripts [0].SetToBought ();
 
 		String[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
 		GameObject firstCar = Resources.Load (cars [0]) as GameObject;
