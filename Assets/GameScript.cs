@@ -12,7 +12,7 @@ public class GameScript : MonoBehaviour {
 	public const string explorerStartPiece = "puzzlePiece_straight_WE";
 	
 	// The names of the pieces in explorer mode that will trigger the shop
-	public static HashSet<String> shopTriggerPieces;
+	public static Dictionary<String, String[]> shopTriggerPieces;
 
 	// The distance the bridge piece has to move to make the bridge completely open.
 	public const float BridgeOpenDistance = 0.145f;
@@ -115,6 +115,8 @@ public class GameScript : MonoBehaviour {
 
 	private GameObject car;
 	private GameObject shop;
+	private GameObject iFirstCar;
+	private GameObject iSecondCar;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -513,16 +515,42 @@ public class GameScript : MonoBehaviour {
 		Vector3 position = new Vector3 (cameraPosition.x, cameraPosition.y - 1.37f, cameraPosition.z + 0.15f);
 		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
 		iShop.name = "shopScreen";
+		SetMarbleText ();
+		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
+		scripts [1].carIndex = 1;
+		scripts [0].carIndex = 2;
+
+		String[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
+		GameObject firstCar = Resources.Load (cars [0]) as GameObject;
+		GameObject secondCar = Resources.Load (cars [1]) as GameObject;
+
+		Vector3 firstCarPosition = new Vector3 (10.7f, 0.9f, -8.7f);
+		Vector3 secondCarPosition = new Vector3 (11.6f, 1, -8.7f);
+		Quaternion firstCarRotation = Quaternion.Euler (new Vector3 (335, 243, 329));
+		Quaternion secondCarRotation = Quaternion.Euler (new Vector3 (330, 233, 324));
+
+		iFirstCar = Instantiate (firstCar, firstCarPosition, firstCarRotation) as GameObject;
+		iSecondCar = Instantiate (secondCar, secondCarPosition, secondCarRotation) as GameObject;
+		iFirstCar.transform.localScale = iFirstCar.transform.localScale / 2.75f;
+		iSecondCar.transform.localScale = iSecondCar.transform.localScale / 2.75f;
+
+		iFirstCar.GetComponent<CarDisplayScript> ().shopCar = true;
+		iSecondCar.GetComponent<CarDisplayScript> ().shopCar = true;
+	}
+
+	public void SetMarbleText() {
 		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
 	}
 
 	public void CloseShop() {
 		GameObject.Destroy (GameObject.Find ("shopScreen"));
+		GameObject.Destroy (iFirstCar);
+		GameObject.Destroy (iSecondCar);
 		showingShop = false;
 	}
 
 	public Boolean ShopTriggerPiece(String name) {
-		return shopTriggerPieces.Contains (name);
+		return shopTriggerPieces.ContainsKey (name);
 	}
 
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
@@ -601,10 +629,17 @@ public class GameScript : MonoBehaviour {
 		foreach (GameObject bridgePiece in bridgePieces) {
 			// bridgePiece.transform.GetComponent<AudioSource>().Play();
 			Vector3 pos = bridgePiece.transform.position;
-			if (IsBridgeOpen(pos))
-				pos.x -= BridgeOpenDistance;
-			else
-				pos.x += BridgeOpenDistance;
+			if (bridgePiece.transform.parent.name.Contains("NS")) {
+				if (IsBridgeOpen(pos))
+					pos.z += BridgeOpenDistance;
+				else
+					pos.z -= BridgeOpenDistance;
+			} else {
+				if (IsBridgeOpen(pos))
+					pos.x -= BridgeOpenDistance;
+				else
+					pos.x += BridgeOpenDistance;
+			}
 			bridgePiece.transform.position = pos;
 		}
 	}
@@ -612,9 +647,12 @@ public class GameScript : MonoBehaviour {
 	// return true when  the bridge is open, false otherwise.
 	public Boolean IsBridgeOpen(Vector3 pos) {
 		float relativeX = pos.x % 0.5f;
+		float relativeZ = pos.z % 0.5f;
 		if (Math.Abs (relativeX - BridgeOpenDistance) < 0.01)
 			return true;
-		else if (relativeX < 0.01)
+		else if (Math.Abs (relativeZ + BridgeOpenDistance) < 0.01)
+			return true;
+		else if (relativeX < 0.01 && relativeZ < 0.01)
 			return false;
 		else
 			throw new System.InvalidOperationException ("Bridge is in invalid position: " + relativeX);
@@ -968,8 +1006,9 @@ public class GameScript : MonoBehaviour {
 		boostStyle4 = new GUIStyle ();
 		boostStyle4.normal.background = boostTexture4;
 
-		shopTriggerPieces = new HashSet<String> ();
-		shopTriggerPieces.Add ("puzzlePiece_turnabout_W");
+		shopTriggerPieces = new Dictionary<String, String[]> ();
+		String[] carsShop1 = {"displayCar2", "displayCar3"};
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
 	}
 
 	private static void AddTutorialMessages() {

@@ -1,19 +1,31 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 
 public class CarDisplayScript : MonoBehaviour {
 	private static GameObject carDisplaySelector;
 
+	public Boolean shopCar = false;
+
 	void Awake () {
-		if (carDisplaySelector == null)
+		if (carDisplaySelector == null && !shopCar)
 			carDisplaySelector = Resources.Load ("carDisplaySelector") as GameObject;
+	}
+
+	void Update () {
+		if (shopCar)
+			transform.RotateAround(transform.position, transform.up, Time.deltaTime * 45f);
 	}
 	
 	void OnMouseOver () {
 		if (Input.GetMouseButtonDown(0)) {
-			if (MenuScript.data.chosenCar != name)
-				ShowCarIsSelected();
-			MenuScript.data.chosenCar = name;
+			if (MenuScript.data.playSoundEffects)
+				GetComponent<AudioSource> ().Play ();
+			if (!shopCar) {
+				if (MenuScript.data.chosenCar != name)
+					ShowCarIsSelected();
+				MenuScript.data.chosenCar = name;
+			}
 		}
 	}
 

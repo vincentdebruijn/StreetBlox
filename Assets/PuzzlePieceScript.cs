@@ -62,6 +62,8 @@ public class PuzzlePieceScript : MonoBehaviour {
 		Connections.Add ("puzzlePiece_straight_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_trainCrossing_EW", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_bridge", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_bridge_EW", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_bridge_WE", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_portal_W", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_portal_E", puzzlePieceConnections);
 		
@@ -72,6 +74,7 @@ public class PuzzlePieceScript : MonoBehaviour {
 		connections = new Connection[] {connection};
 		puzzlePieceConnections = new PuzzlePieceConnections (connections);
 		Connections.Add ("puzzlePiece_straight_NS", puzzlePieceConnections);
+		Connections.Add ("puzzlePiece_bridge_NS", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_portal_N", puzzlePieceConnections);
 		Connections.Add ("puzzlePiece_portal_S", puzzlePieceConnections);
 		
