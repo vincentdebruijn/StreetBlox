@@ -238,7 +238,7 @@ public class CarScript : MonoBehaviour {
 				}
 				Debug.Log ("New destination: " + currentPuzzlePiece.name);
 				Debug.Log ("Entering from: " + currentDirection);
-				if (currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
+				if (ExplorerLevel() && currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
 					enteredSavePiece = true;
 				if (ExplorerLevel() && gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
 				    enteredShopPiece = true;
