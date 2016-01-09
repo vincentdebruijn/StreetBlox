@@ -19,9 +19,6 @@ public class LevelSelectScript : MonoBehaviour {
 
 	// Where the last level button cannot go above
 	private const float endY = 1f;
-	
-	// The first level the user has the focus on
-	private int focus;
 
 	private Boolean loading;
 
@@ -36,13 +33,11 @@ public class LevelSelectScript : MonoBehaviour {
 	private static Texture spaceWorldTexture;
 
 	private static Rect leftBottomRect;
-	private static Rect rightBottomRect;
 	private static Rect loadingRect;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle loadingStyle;
-	
-	private static float buttonHeight;
+
 	private static float offset;
 	private static int buttonSize;
 
@@ -74,7 +69,6 @@ public class LevelSelectScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		focus = 0;
 	}
 	
 	// Update is called once per frame
@@ -238,7 +232,6 @@ public class LevelSelectScript : MonoBehaviour {
 		buttonSize = (int)(Screen.width / 5 * 0.7);
 		offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
-		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
 
 		levelTextTexture = (Texture2D) Resources.Load ("ui_border_levelname");
@@ -253,8 +246,6 @@ public class LevelSelectScript : MonoBehaviour {
 		loadingStyle.fontSize = 28;
 		loadingStyle.alignment = TextAnchor.MiddleCenter;
 		loadingStyle.normal.background = levelTextTexture;
-		
-		buttonHeight =  Screen.height / 2 - buttonSize / 2;
 	}
 
 	public static void SetLevelInfo() {

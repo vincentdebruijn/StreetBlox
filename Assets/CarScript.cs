@@ -48,13 +48,14 @@ public class CarScript : MonoBehaviour {
 	private Boolean portalExitAnimationDone;
 
 	private Boolean enteredShopPiece;
+	private Boolean enteredSavePiece;
 
-	private Transform camera;
+	private Transform mainCamera;
 
 	void Awake() {
 		Reset ();
 		PlayCarHorn ();
-		camera = Camera.main.transform;
+		mainCamera = Camera.main.transform;
 	}
 
 	// Update is called once per frame
@@ -82,7 +83,7 @@ public class CarScript : MonoBehaviour {
 
 	private GameScript GameScript() {
 		if (gameScript == null) {
-			gameScript = camera.GetComponent<GameScript> ();
+			gameScript = mainCamera.GetComponent<GameScript> ();
 		}
 		return gameScript;
 	}
@@ -116,6 +117,7 @@ public class CarScript : MonoBehaviour {
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		enteredPortalPiece = currentPuzzlePiece.name.Contains ("portal") && PuzzlePieceScript.GetSideOfPortal(currentPuzzlePiece) == currentDirection;
 		enteredShopPiece = false;
+		enteredSavePiece = false;
 		clickedButtonWhileOnCurrentPuzzlePiece = ButtonNearby ();
 		carStarted = true;
 		PlayEngineSound ();
@@ -147,6 +149,7 @@ public class CarScript : MonoBehaviour {
 		portalExitAnimationDone = true;
 		enteredPortalPiece = false;
 		enteredShopPiece = false;
+		enteredSavePiece = false;
 		cameraShakeDone = false;
 	}
 
@@ -235,6 +238,8 @@ public class CarScript : MonoBehaviour {
 				}
 				Debug.Log ("New destination: " + currentPuzzlePiece.name);
 				Debug.Log ("Entering from: " + currentDirection);
+				if (currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
+					enteredSavePiece = true;
 				if (ExplorerLevel() && gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
 				    enteredShopPiece = true;
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
@@ -271,6 +276,10 @@ public class CarScript : MonoBehaviour {
 				enteredShopPiece = false;
 				return;
 			}
+			if (enteredSavePiece) {
+				gameScript.RecordCurrentState();
+				enteredSavePiece = false;
+			}
 		}
 		CheckForNearbyButton();
 	}
@@ -286,8 +295,8 @@ public class CarScript : MonoBehaviour {
 		Vector3 newPosition = Vector3.MoveTowards (point, new Vector3 (x, position.y, z), movement) + (position - point);
 		transform.position = newPosition;
 		if (ExplorerLevel ()) {
-			Vector3 cameraPosition = camera.position;
-			camera.position = cameraPosition + (newPosition - position);
+			Vector3 cameraPosition = mainCamera.position;
+			mainCamera.position = cameraPosition + (newPosition - position);
 		}
 	}
 

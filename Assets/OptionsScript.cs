@@ -62,10 +62,15 @@ public class OptionsScript : MonoBehaviour {
 		if (GUI.Button(option2Rect, "", optionButton2ChosenStyle)) {
 			MenuScript.PlayButtonSound();
 			MenuScript.data.playTutorials = !MenuScript.data.playTutorials;
-			if (MenuScript.data.playTutorials)
+			if (MenuScript.data.playTutorials) {
 				optionButton2ChosenStyle = optionSelectedButtonStyle;
-			else
+				MenuScript.data.carsUnlocked[0] = false;
+				MenuScript.data.puzzleBoxesUnlocked[0] = false;
+			} else {
 				optionButton2ChosenStyle = optionButtonStyle;
+				MenuScript.data.carsUnlocked[0] = true;
+				MenuScript.data.puzzleBoxesUnlocked[0] = true;
+			}
 		}
 		GUI.Label (option2TextRect, "Tutorials", optionTextStyle);
 

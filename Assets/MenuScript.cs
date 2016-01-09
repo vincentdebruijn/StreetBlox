@@ -87,8 +87,8 @@ public class MenuScript : MonoBehaviour {
 		if (GUI.Button (middleButtonRect, "", selectButtonChosenStyle)) {
 			selectButtonChosenStyle = selectButtonStyle;
 			PlayButtonSound();
-			String tutorialLevel = InTutorialPhase();
-			if (tutorialLevel != null && data.playTutorials) {
+			if (InTutorialPhase()) {
+				String tutorialLevel = TutorialPhase();
 				WorldSelectScript.AddLevels();
 				WorldSelectScript.SetLevelInfo(0);
 				LevelSelectScript.SetLevelInfo();
@@ -106,7 +106,8 @@ public class MenuScript : MonoBehaviour {
 		}
 	}
 
-	public static String InTutorialPhase() {
+	// In which level of the tutorials we are, if any.
+	public static String TutorialPhase() {
 		String tutorialLevel = null;
 		foreach (String levelName in WorldSelectScript.levelsTutorial) {
 			if (!data.levelProgress.ContainsKey (levelName)) {
@@ -115,6 +116,11 @@ public class MenuScript : MonoBehaviour {
 			}
 		}
 		return tutorialLevel;
+	}
+
+	// Whether we are in the tutorial phase
+	public static Boolean InTutorialPhase() {
+		return (!data.carsUnlocked[0] || !data.puzzleBoxesUnlocked[0]) && data.playTutorials;
 	}
 	
 	public static void Load() {
@@ -136,12 +142,25 @@ public class MenuScript : MonoBehaviour {
 			data.marbles = 0;
 			data.carsUnlocked = new Boolean[9];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
-				data.carsUnlocked[i] = true;
-			data.carsUnlocked[1] = false;
-			data.carsUnlocked[2] = false;
+				data.carsUnlocked[i] = false;
 			data.puzzleBoxesUnlocked = new Boolean[3];
 			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
-				data.puzzleBoxesUnlocked[i] = true;
+				data.puzzleBoxesUnlocked[i] = false;
+
+			data.animationQueue = new Queue<Pair<string, int>> ();
+			/* data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
+			data.animationQueue.Enqueue(new Pair<string, int>("car2", 1));
+			data.animationQueue.Enqueue(new Pair<string, int>("car3", 2));
+			data.animationQueue.Enqueue(new Pair<string, int>("car4", 3));
+			data.animationQueue.Enqueue(new Pair<string, int>("car5", 4));
+			data.animationQueue.Enqueue(new Pair<string, int>("car6", 5));
+			data.animationQueue.Enqueue(new Pair<string, int>("car7", 6));
+			data.animationQueue.Enqueue(new Pair<string, int>("car8", 7));
+			data.animationQueue.Enqueue(new Pair<string, int>("car11", 8));
+
+			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
+			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld2", 1));
+			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld3", 2));*/
 		}
 	}
 
@@ -316,6 +335,8 @@ public class MenuScript : MonoBehaviour {
 		
 		public String chosenCar;
 		public Boolean[] carsUnlocked;
+		// Animation queue for newly bought cars and found puzzle boxes
+		public Queue<Pair<string, int>> animationQueue;
 
 		public Boolean[] puzzleBoxesUnlocked;
 

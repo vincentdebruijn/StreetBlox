@@ -86,10 +86,14 @@ public class WorldSelectScript : MonoBehaviour {
 	private static Rect leftBottomRect;
 	private static Rect rightBottomRect;
 	private static Rect loadingRect;
+	private static Rect itemButtonRect;
+	private static Rect receivedItemTextRect;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
 	private static GUIStyle loadingStyle;
+	private static GUIStyle itemButtonStyle;
+	private static GUIStyle receivedItemTextStyle;
 
 	// cars
 	private static GameObject displayCar1;
@@ -102,15 +106,37 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject displayCar8;
 	private static GameObject displayCar11;
 
+	// Car display box
+	private static GameObject carBox;
+
 	// puzzle boxes
 	private static GameObject puzzleBoxWorld1;
 	private static GameObject puzzleBoxWorld2;
 	private static GameObject puzzleBoxWorld3;
 
-	// Dynamic one time loading of all static variables
-	private static Boolean staticVariablesSet = false;
+	// Animation stuff
+	private static Vector3 carPositionStartAnimation = new Vector3(-1.7f, 5f, -7f);
+	private static Quaternion carRotationStartAnimation = Quaternion.Euler(new Vector3(0, 270, 0));
+	private static Vector3 puzzleBoxPositionStartAnimation = new Vector3(-1.8f, 7.5f, -10f);
+	private static Quaternion puzzleBoxRotationStartAnimation = Quaternion.Euler (new Vector3(70, 180, 0));
+	public static Boolean showingAnimations;
+	private Boolean animationPlaying;
+	private Boolean showingItemButton;
+	private Boolean movingItemToPlace;
+	private GameObject animatedItem;
+	private Animator boxAnimator;
+	private Vector3 destination;
+	private Quaternion targetRotation;
+	private Vector3 targetScale;
+	private float movingSpeed;
+	private float rotationSpeed;
+	private float scalingSpeed;
+	private const float globalSpeed = 1f;
 	
 	private Boolean loading;
+
+	// Dynamic one time loading of all static variables
+	private static Boolean staticVariablesSet = false;
 	
 	void Awake() {
 		if (!staticVariablesSet) {
@@ -122,15 +148,48 @@ public class WorldSelectScript : MonoBehaviour {
 		LoadPuzzleBoxes ();
 
 		loading = false;
+		animationPlaying = false;
+		movingItemToPlace = false;
+		showingItemButton = false;
 	}
 	
 	// Use this for initialization
 	void Start () {
 		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
+		showingAnimations = MenuScript.data.animationQueue.Count > 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		if (showingAnimations) {
+			if (animationPlaying) {
+				Debug.Log ("state info");
+				Debug.Log (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("End"));
+				Debug.Log (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("Take 001"));
+				if (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("End")) {
+					Destroy(boxAnimator.gameObject);
+					animationPlaying = false;
+					animatedItem.GetComponent<CarDisplayScript>().turn = true;
+					showingItemButton = true;
+				}
+			} else if (movingItemToPlace) {
+				animatedItem.transform.position = Vector3.MoveTowards(animatedItem.transform.position, destination, Time.deltaTime * movingSpeed * globalSpeed);
+				animatedItem.transform.rotation = Quaternion.RotateTowards(animatedItem.transform.rotation, targetRotation, Time.deltaTime * rotationSpeed * globalSpeed);
+				animatedItem.transform.localScale = Vector3.MoveTowards(animatedItem.transform.localScale, targetScale, Time.deltaTime * scalingSpeed * globalSpeed);
+				if (Mathf.Abs (animatedItem.transform.position.z - destination.z) < 0.01) {
+					movingItemToPlace = false;
+					if (MenuScript.data.chosenCar == animatedItem.name)
+						animatedItem.GetComponent<CarDisplayScript>().ShowCarIsSelected();
+				}
+			} else if (!showingItemButton) {
+				showingAnimations = MenuScript.data.animationQueue.Count > 0;
+				if (showingAnimations)
+					StartItemAnimation();
+				else
+					MenuScript.Save ();
+			}
+			return;
+		}
 		if (Input.GetMouseButton(0)) {
 			Vector3 mousePosition = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, 0);
 			if (leftBottomRect.Contains (mousePosition))
@@ -157,6 +216,25 @@ public class WorldSelectScript : MonoBehaviour {
 			MenuScript.PlayButtonSound ();
 			Application.LoadLevel ("menu");
 		}
+
+		if (showingItemButton) {
+			String text = "";
+			if (animatedItem.name.Contains("car"))
+			    text = "You have unlocked a new car!";
+			else
+				text = "You have unlocked new levels!";
+
+			GUI.Label (receivedItemTextRect, text, receivedItemTextStyle);
+			if (GUI.Button (itemButtonRect, "Awesome!", itemButtonStyle)) {
+				showingItemButton = false;
+				if (animatedItem.name.Contains("car"))
+					animatedItem.GetComponent<CarDisplayScript>().turn = false;
+				movingSpeed = Vector3.Distance (animatedItem.transform.position, destination);
+				rotationSpeed = Vector3.Distance (animatedItem.transform.rotation.eulerAngles, targetRotation.eulerAngles);
+				scalingSpeed = Vector3.Distance (animatedItem.transform.localScale, targetScale);
+				movingItemToPlace = true;
+			}
+		}
 	}
 
 	public void SelectedWorld(int world) {
@@ -170,6 +248,54 @@ public class WorldSelectScript : MonoBehaviour {
 		levels = worlds [world];
 		levelConfigurations = worldConfigurations [WorldNames [world]];
 	}
+
+	// Animation stuff
+	//
+
+	private void StartItemAnimation() {
+		Pair<string, int> nextPair = MenuScript.data.animationQueue.Dequeue ();
+		String itemName = nextPair.First;
+		int itemIndex = nextPair.Second;
+		GameObject item = null;
+		switch(itemName) {
+		case "car1": item = displayCar1; break;
+		case "car2": item = displayCar2; break;
+		case "car3": item = displayCar3; break;
+		case "car4": item = displayCar4; break;
+		case "car5": item = displayCar5; break;
+		case "car6": item = displayCar6; break;
+		case "car7": item = displayCar7; break;
+		case "car8": item = displayCar8; break;
+		case "car11": item = displayCar11; break;
+		case "puzzleBoxWorld1": item = puzzleBoxWorld1; break;
+		case "puzzleBoxWorld2": item = puzzleBoxWorld2; break;
+		case "puzzleBoxWorld3": item = puzzleBoxWorld3; break;
+		default:
+			throw new ArgumentException("Unknown item name: " + itemName);
+		}
+		destination = item.transform.position;
+		targetRotation = item.transform.rotation;
+		if (itemName.Contains ("car")) {
+			MenuScript.data.carsUnlocked [itemIndex] = true;
+			GameObject box = (GameObject)Instantiate(carBox);
+			animatedItem = (GameObject)Instantiate (item, carPositionStartAnimation, carRotationStartAnimation);
+			targetScale = animatedItem.transform.localScale;
+			animatedItem.transform.localScale = targetScale * 2;
+			boxAnimator = box.GetComponent<Animator>();
+			boxAnimator.Play ("Take 001");
+			animationPlaying = true;
+		} else {
+			MenuScript.data.puzzleBoxesUnlocked [itemIndex] = true;
+			animatedItem = (GameObject)Instantiate (item, puzzleBoxPositionStartAnimation, puzzleBoxRotationStartAnimation);
+			targetScale = animatedItem.transform.localScale;
+			animatedItem.transform.localScale = targetScale * 4;
+			showingItemButton = true;
+		}
+		animatedItem.name = itemName;
+	}
+
+	// Resource loading stuff
+	//
 
 	private static void LoadCars() {
 		if (MenuScript.data.carsUnlocked [0]) {
@@ -240,6 +366,8 @@ public class WorldSelectScript : MonoBehaviour {
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
+		itemButtonRect = new Rect (Screen.width / 2 - 100, Screen.height - 50 - offset, 200, 50);
+		receivedItemTextRect = new Rect (Screen.width / 2 - 200, offset, 400, 50);
 		
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
@@ -257,6 +385,20 @@ public class WorldSelectScript : MonoBehaviour {
 		loadingStyle.fontSize = 28;
 		loadingStyle.alignment = TextAnchor.MiddleCenter;
 		loadingStyle.normal.background = levelTextTexture;
+
+		itemButtonStyle = new GUIStyle ();
+		itemButtonStyle.normal.textColor = Color.black;
+		itemButtonStyle.fontSize = 28;
+		itemButtonStyle.alignment = TextAnchor.MiddleCenter;
+		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
+		itemButtonStyle.normal.background = texture;
+
+		receivedItemTextStyle = new GUIStyle ();
+		receivedItemTextStyle.normal.textColor = Color.black;
+		receivedItemTextStyle.fontSize = 28;
+		receivedItemTextStyle.alignment = TextAnchor.MiddleCenter;
+		receivedItemTextStyle.normal.background = texture;
 	
 		AddCars ();
 		AddPuzzleBoxes ();
@@ -273,6 +415,7 @@ public class WorldSelectScript : MonoBehaviour {
 		displayCar7 = Resources.Load ("displayCar7") as GameObject;
 		displayCar8 = Resources.Load ("displayCar8") as GameObject;
 		displayCar11 = Resources.Load ("displayCar11") as GameObject;
+		carBox = Resources.Load ("carBox") as GameObject;
 	}
 
 	public static void AddPuzzleBoxes() {
@@ -431,6 +574,7 @@ public class LevelConfiguration {
 	}
 }
 
+[Serializable]
 public class Pair<T, U> {
 	public Pair() {
 	}

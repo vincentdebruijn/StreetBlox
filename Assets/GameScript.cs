@@ -65,8 +65,6 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D goTexture4;
 	private static Texture2D displayTexture;
 	private static Texture2D boostTexture1;
-	private static Texture2D boostTexture2;
-	private static Texture2D boostTexture3;
 	private static Texture2D boostTexture4;
 	private static Texture2D tutorialTexture;
 
@@ -86,8 +84,6 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle chosenGoStyle;
 	private static GUIStyle displayStyle;
 	private static GUIStyle boostStyle1;
-	private static GUIStyle boostStyle2;
-	private static GUIStyle boostStyle3;
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
 	private static GUIStyle tutorialStyle;
@@ -301,6 +297,22 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayButtonBar() {
+		if (gameStarted) {
+			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
+				if (carScript.boost == 0f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle4;
+					carScript.boost = 1f;
+				} else if (carScript.boost == 1f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle1;
+					carScript.boost = 0f;
+				}
+			}
+		} else {
+			GUI.Label (boostRect, "", chosenBoostStyle);
+		}
+
 		if (chosenLevel == "explorer") {
 			DisplayExplorerButtonBar ();
 			return;
@@ -309,7 +321,7 @@ public class GameScript : MonoBehaviour {
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
 			StopGameMusicAndPlayMenuMusic();
-			if (MenuScript.InTutorialPhase() != null)
+			if (MenuScript.InTutorialPhase())
 				Application.LoadLevel ("menu");
 			else
 				Application.LoadLevel ("level_select");
@@ -340,23 +352,6 @@ public class GameScript : MonoBehaviour {
 		}
 
 		GUI.Label (displayRect, "" + movesMade + "/" + levelConfiguration.par, displayStyle);
-
-		if (gameStarted) {
-			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
-				if (carScript.boost < 3f) {
-					MenuScript.PlayGearShiftSound ();
-					if (chosenBoostStyle == boostStyle1)
-						chosenBoostStyle = boostStyle2;
-					else if (chosenBoostStyle == boostStyle2)
-						chosenBoostStyle = boostStyle3;
-					else if (chosenBoostStyle == boostStyle3)
-						chosenBoostStyle = boostStyle4;
-					carScript.boost += 1f;
-				}
-			}
-		} else {
-			GUI.Label (boostRect, "", chosenBoostStyle);
-		}
 	}
 
 	private void DisplayExplorerButtonBar() {
@@ -364,7 +359,7 @@ public class GameScript : MonoBehaviour {
 			return;
 		if (carScript.Quittable () && GUI.Button (explorerQuitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
-			Save ();
+			MenuScript.Save ();
 			Application.LoadLevel ("world_select");
 		}
 
@@ -383,22 +378,6 @@ public class GameScript : MonoBehaviour {
 			}
 		} else {
 			GUI.Label (explorerGoRect, "", chosenGoStyle);
-		}
-		
-		if (gameStarted) {
-			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
-				if (carScript.boost == 0f) {
-					MenuScript.PlayGearShiftSound ();
-					chosenBoostStyle = boostStyle4;
-					carScript.boost = 1f;
-				} else if (carScript.boost == 1f) {
-					MenuScript.PlayGearShiftSound ();
-					chosenBoostStyle = boostStyle1;
-					carScript.boost = 0f;
-				}
-			}
-		} else {
-			GUI.Label (boostRect, "", chosenBoostStyle);
 		}
 	}
 
@@ -471,11 +450,13 @@ public class GameScript : MonoBehaviour {
 		showingShop = false;
 		carScript.Reset ();
 		Boolean tutorialsFinished = 
-			MenuScript.InTutorialPhase() == null && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
+			MenuScript.InTutorialPhase() && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
 		
 		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
 			dontPlayAnimation = false;
 			MenuScript.data.worldSelectShown = true;
+			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
+			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
 			MenuScript.Save ();
 			Application.LoadLevel ("world_select");
 			return;
@@ -495,7 +476,7 @@ public class GameScript : MonoBehaviour {
 			dontPlayAnimation = false;
 			if (chosenLevel == "explorer")
 				Application.LoadLevel ("world_select");
-			else if (MenuScript.InTutorialPhase() != null)
+			else if (MenuScript.InTutorialPhase())
 				Application.LoadLevel ("menu");
 			else
 				Application.LoadLevel("level_select");
@@ -864,7 +845,7 @@ public class GameScript : MonoBehaviour {
 		}
 	}
 
-	private void Save() {
+	public void RecordCurrentState() {
 		string[][] serializableBoard = new string[board.Length][];
 		for (int y = 0; y < board.Length; y++) {
 			serializableBoard[y] = new string[board[y].Length];
@@ -875,7 +856,7 @@ public class GameScript : MonoBehaviour {
 				serializableBoard [y] [x] = result;
 			}
 		}
-
+		
 		string[] serializablePuzzlePieces = new string[puzzlePieces.Length];
 		for (int i = 0; i < puzzlePieces.Length; i++) {
 			serializablePuzzlePieces [i] = puzzlePieces [i].name;
@@ -883,19 +864,19 @@ public class GameScript : MonoBehaviour {
 
 		MenuScript.data.board = serializableBoard;
 		MenuScript.data.puzzlePieces = serializablePuzzlePieces;
-
+		
 		MenuScript.data.carPositionX = carScript.gameObject.transform.position.x;
 		MenuScript.data.carPositionY = carScript.gameObject.transform.position.y;
 		MenuScript.data.carPositionZ = carScript.gameObject.transform.position.z;
-
+		
 		MenuScript.data.carRotationW = carScript.gameObject.transform.rotation.w;
 		MenuScript.data.carRotationX = carScript.gameObject.transform.rotation.x;
 		MenuScript.data.carRotationY = carScript.gameObject.transform.rotation.y;
 		MenuScript.data.carRotationZ = carScript.gameObject.transform.rotation.z;
-
+		
 		MenuScript.data.cameraPositionX = Camera.main.transform.position.x;
 		MenuScript.data.cameraPositionZ = Camera.main.transform.position.z;
-
+		
 		MenuScript.data.currentCoordinate = carScript.currentCoordinate;
 		MenuScript.data.currentCoordinateIndex = carScript.currentCoordinateIndex;
 		MenuScript.data.currentDirection = carScript.currentDirection;
@@ -908,12 +889,10 @@ public class GameScript : MonoBehaviour {
 			MenuScript.data.previousPuzzlePiece = carScript.previousPuzzlePiece.name;
 		MenuScript.data.timeSinceOnLastPuzzlePiece = carScript.timeSinceOnLastPuzzlePiece;
 		MenuScript.data.time = carScript.time;
-		MenuScript.Save ();
 	}
 	
 	private static void SetVariables() {
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
-		float offset = (Screen.width / 5 - buttonSize) / 2;
 		textArea = new Rect (0, 10, Screen.width, buttonSize);
 
 		float uiButtonSize = Screen.height / 10;
@@ -936,8 +915,6 @@ public class GameScript : MonoBehaviour {
 		goTexture4 = (Texture2D)Resources.Load ("go4");
 		displayTexture = (Texture2D)Resources.Load ("counter");
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
-		boostTexture2 = (Texture2D)Resources.Load ("speed2");
-		boostTexture3 = (Texture2D)Resources.Load ("speed3");
 		boostTexture4 = (Texture2D)Resources.Load ("speed4");
 		tutorialTexture = displayTexture;
 
@@ -1003,10 +980,6 @@ public class GameScript : MonoBehaviour {
 
 		boostStyle1 = new GUIStyle ();
 		boostStyle1.normal.background = boostTexture1;
-		boostStyle2 = new GUIStyle ();
-		boostStyle2.normal.background = boostTexture2;
-		boostStyle3 = new GUIStyle ();
-		boostStyle3.normal.background = boostTexture3;
 		boostStyle4 = new GUIStyle ();
 		boostStyle4.normal.background = boostTexture4;
 

@@ -22,6 +22,8 @@ public class puzzleBoxScript : MonoBehaviour {
 	void Awake () {
 		selectedWorld = false;
 		animationLock = false;
+		startedAnimation = false;
+		moving = false;
 		worldSelectScript = Camera.main.GetComponent<WorldSelectScript>();
 	}
 	
@@ -41,7 +43,7 @@ public class puzzleBoxScript : MonoBehaviour {
 			transform.localScale = newScale;
 		}
 		
-		if (!selectedWorld && !animationReallyStarted && !startedAnimation && Math.Abs (transform.position.z - cameraPosition.z) < 0.01f) {
+		if (animationLock && !selectedWorld && !animationReallyStarted && !startedAnimation && Math.Abs (transform.position.z - cameraPosition.z) < 0.01f) {
 			moving = false;
 			anim.Play ("open");
 			startedAnimation = true;
@@ -60,7 +62,7 @@ public class puzzleBoxScript : MonoBehaviour {
 	}
 
 	void OnMouseOver () {
-		if (Input.GetMouseButtonDown(0) && !animationLock) {
+		if (Input.GetMouseButtonDown(0) && !WorldSelectScript.showingAnimations && !animationLock) {
 			animationLock = true;
 			moving = true;
 			PlayBoxOpenSound();

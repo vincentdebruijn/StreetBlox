@@ -6,6 +6,7 @@ public class CarDisplayScript : MonoBehaviour {
 	private static GameObject carDisplaySelector;
 
 	public Boolean shopCar = false;
+	public Boolean turn = false;
 
 	void Awake () {
 		if (carDisplaySelector == null && !shopCar)
@@ -13,12 +14,12 @@ public class CarDisplayScript : MonoBehaviour {
 	}
 
 	void Update () {
-		if (shopCar)
+		if (shopCar || turn)
 			transform.RotateAround(transform.position, transform.up, Time.deltaTime * 45f);
 	}
 	
 	void OnMouseOver () {
-		if (Input.GetMouseButtonDown(0)) {
+		if (Input.GetMouseButtonDown(0) && !WorldSelectScript.showingAnimations) {
 			if (MenuScript.data.playSoundEffects)
 				GetComponent<AudioSource> ().Play ();
 			if (!shopCar) {
