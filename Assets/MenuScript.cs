@@ -142,10 +142,13 @@ public class MenuScript : MonoBehaviour {
 			data.marbles = 0;
 			data.carsUnlocked = new Boolean[9];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
-				data.carsUnlocked[i] = false;
+				data.carsUnlocked[i] = true;
 			data.puzzleBoxesUnlocked = new Boolean[3];
 			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
 				data.puzzleBoxesUnlocked[i] = false;
+
+			data.puzzleBoxesUnlocked[1] = true;
+			data.puzzleBoxesUnlocked[2] = true;
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
 			/* data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));

@@ -26,6 +26,7 @@ public class LevelSelectScript : MonoBehaviour {
 
 	// GUI stuff
 	public static GameObject levelButton;
+	private static GameObject checkMark;
 	
 	private static Texture2D levelTextTexture;
 	private static Texture tutorialTexture;
@@ -192,17 +193,28 @@ public class LevelSelectScript : MonoBehaviour {
 		Quaternion direction = Quaternion.Euler (0, 0, 0);
 		foreach (string level in levels) {
 			string marbleText = "0/0";
-			if (!TutorialLevel(level)) {
-				int marbles = 0;
-				if (MenuScript.data.levelProgress.ContainsKey(level))
-				    marbles = MenuScript.data.levelProgress[level];
+			int marbles = 0;
+			if (MenuScript.data.levelProgress.ContainsKey(level))
+				marbles = MenuScript.data.levelProgress[level];
+			if (!TutorialLevel(level))
 				marbleText = marbles + "/5";
-			}
+
 			Vector3 location = new Vector3(x, y, z);
 			GameObject clone = (GameObject)Instantiate (levelButton, location, direction);
 			clone.transform.FindChild("levelName").GetComponent<TextMesh>().text = WorldSelectScript.displayNames[level];
 			clone.transform.FindChild("marbles").GetComponent<TextMesh>().text = marbleText;
 			clone.GetComponent<LevelButtonScript> ().levelName = level;
+
+			if (marbles == 5) {
+				location.z -= 0.2f;
+				location.y += 1.5f;
+				GameObject iCheckMark = (GameObject)Instantiate (checkMark, location, direction);
+				iCheckMark.transform.parent = clone.transform;
+				Quaternion rotation = iCheckMark.transform.rotation;
+				rotation.y = -180;
+				iCheckMark.transform.rotation = rotation;
+			}
+
 			levelButtons[levelsDone] = clone;
 			x += 3.7f;
 			levelsDone += 1;
@@ -228,6 +240,7 @@ public class LevelSelectScript : MonoBehaviour {
 
 	private static void SetVariables() {
 		levelButton = Resources.Load ("levelButton") as GameObject;
+		checkMark = Resources.Load ("check_mark") as GameObject;
 
 		buttonSize = (int)(Screen.width / 5 * 0.7);
 		offset = (Screen.width / 5 - buttonSize) / 2;

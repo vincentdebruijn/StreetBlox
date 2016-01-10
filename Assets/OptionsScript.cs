@@ -15,6 +15,8 @@ public class OptionsScript : MonoBehaviour {
 	private static Rect option2TextRect;
 	private static Rect option3TextRect;
 	private static Rect option4TextRect;
+	private static Rect resetButtonRect;
+	private static Rect resetTextRect;
 	
 	private static Texture2D optionButtonTexture, optionSelectedButtonTexture;
 
@@ -22,6 +24,7 @@ public class OptionsScript : MonoBehaviour {
 	private static GUIStyle optionButtonStyle, optionSelectedButtonStyle;
 	private static GUIStyle optionButton1ChosenStyle, optionButton2ChosenStyle, optionButton3ChosenStyle, optionButton4ChosenStyle;
 	private static GUIStyle optionTextStyle;
+	private static GUIStyle resetButtonStyle;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -96,6 +99,13 @@ public class OptionsScript : MonoBehaviour {
 				optionButton4ChosenStyle = optionButtonStyle;
 		}
 		GUI.Label (option4TextRect, "Sound effects", optionTextStyle);
+
+		GUI.Label (resetTextRect, "Resets puzzle pieces and car position in explorer mode.\nDoes not reset acquired items.", optionTextStyle);
+		if (GUI.Button (resetButtonRect, "Reset now", resetButtonStyle)) {
+			MenuScript.PlayButtonSound();
+			MenuScript.data.board = null;
+			MenuScript.Save ();
+		}
 	}
 
 	private static void SetVariables() {
@@ -110,6 +120,8 @@ public class OptionsScript : MonoBehaviour {
 		option2TextRect = new Rect (buttonSize / 2 + 30, buttonSize / 2 + 20, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 		option3TextRect = new Rect (buttonSize / 2 + 30, buttonSize * 3 / 4 + 40, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 		option4TextRect = new Rect (buttonSize / 2 + 30, buttonSize + 60, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
+		resetTextRect = new Rect (Screen.width / 2, buttonSize / 4, Screen.width / 2, buttonSize / 3);
+		resetButtonRect = new Rect (Screen.width * 5 / 8, buttonSize / 2 + 20, Screen.width / 4, buttonSize / 3);
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");
@@ -139,6 +151,14 @@ public class OptionsScript : MonoBehaviour {
 		optionTextStyle.alignment = TextAnchor.MiddleLeft;
 		optionTextStyle.normal.textColor = Color.white;
 		optionTextStyle.fontSize = 32;
+
+		resetButtonStyle = new GUIStyle ();
+		resetButtonStyle.alignment = TextAnchor.MiddleCenter;
+		resetButtonStyle.normal.textColor = Color.black;
+		resetButtonStyle.fontSize = 32;
+		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
+		resetButtonStyle.normal.background = texture;
 
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 	}
