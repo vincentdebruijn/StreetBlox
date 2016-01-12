@@ -282,6 +282,8 @@ public class CarScript : MonoBehaviour {
 			}
 		}
 		CheckForNearbyButton();
+		if (ExplorerLevel ())
+			CheckForNearbyPuzzleBox ();
 	}
 
 	Boolean EnteredPortalPieceFromWrongSide() {
@@ -363,6 +365,27 @@ public class CarScript : MonoBehaviour {
 		return GameScript().IsBridgeOpen (pos);
 	}
 
+	void CheckForNearbyPuzzleBox() {
+		Vector3 carPos = transform.position;
+
+		if (gameScript.puzzleBoxWorld2 != null) {
+			Vector3 pos1 = gameScript.puzzleBoxWorld2.transform.position;
+			if (Math.Abs (carPos.x - pos1.x - 0.053f) < 0.1f && Math.Abs (carPos.z - pos1.z + 0.13f) < 0.1f) {
+				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld2", 1));
+				GameObject.Destroy (gameScript.puzzleBoxWorld2);
+				MenuScript.Save ();
+			}
+		}
+		if (gameScript.puzzleBoxWorld3 != null) {
+			Vector3 pos2 = gameScript.puzzleBoxWorld3.transform.position;
+			if (Math.Abs ((carPos.x - pos2.x) + 0.08f) < 0.1f && Math.Abs (carPos.z - pos2.z + 0.1f) < 0.1f) {
+				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld3", 2));
+				GameObject.Destroy (gameScript.puzzleBoxWorld3);
+				MenuScript.Save ();
+			}
+		}
+	}
+
 	Vector3 PointOfCar() {
 		Vector3 center = transform.position - (new Vector3 (levelConfiguration.CarXOffset, 0.0f, - levelConfiguration.CarZOffset));
 		float angle = (float) (Math.Round (transform.eulerAngles.y, 3) / 180 * Math.PI);
@@ -424,6 +447,9 @@ public class CarScript : MonoBehaviour {
 			newEulerAngles.y = 180f;
 		else if (currentDirection == PuzzlePieceScript.Coordinate.WEST)
 			newEulerAngles.y = -90f;
+		if (ExplorerLevel ())
+			mainCamera.position = new Vector3 (mainCamera.position.x + (newPosition.x - transform.position.x), mainCamera.position.y, 
+			                                   mainCamera.position.z + (newPosition.z - transform.position.z));
 		transform.position = newPosition;
 		transform.eulerAngles = newEulerAngles;
 		enteredPortalPiece = false;

@@ -12,7 +12,7 @@ public class GameScript : MonoBehaviour {
 	public const string explorerStartPiece = "puzzlePiece_straight_WE";
 	
 	// The names of the pieces in explorer mode that will trigger the shop
-	public static Dictionary<String, String[]> shopTriggerPieces;
+	public static Dictionary<String, Pair<String, int>[]> shopTriggerPieces;
 
 	// The distance the bridge piece has to move to make the bridge completely open.
 	public const float BridgeOpenDistance = 0.145f;
@@ -113,6 +113,8 @@ public class GameScript : MonoBehaviour {
 	private GameObject shop;
 	private GameObject iFirstCar;
 	private GameObject iSecondCar;
+	public GameObject puzzleBoxWorld2;
+	public GameObject puzzleBoxWorld3;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -133,6 +135,12 @@ public class GameScript : MonoBehaviour {
 				SetCarToCorrectPosition();
 				SetCameraToCorrectPosition();
 				SetBridgePieces();
+				puzzleBoxWorld2 = GameObject.Find ("puzzleBoxWorld2");
+				puzzleBoxWorld3 = GameObject.Find ("puzzleBoxWorld3");
+				if (MenuScript.data.puzzleBoxesUnlocked[1])
+					GameObject.Destroy (puzzleBoxWorld2);
+				if (MenuScript.data.puzzleBoxesUnlocked[2])
+					GameObject.Destroy (puzzleBoxWorld3);
 				return;
 			}
 		} else
@@ -379,6 +387,22 @@ public class GameScript : MonoBehaviour {
 		} else {
 			GUI.Label (explorerGoRect, "", chosenGoStyle);
 		}
+
+		if (gameStarted) {
+			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
+				if (carScript.boost == 0f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle4;
+					carScript.boost = 1f;
+				} else if (carScript.boost == 1f) {
+					MenuScript.PlayGearShiftSound ();
+					chosenBoostStyle = boostStyle1;
+					carScript.boost = 0f;
+				}
+			}
+		} else {
+			GUI.Label (boostRect, "", chosenBoostStyle);
+		}
 	}
 
 	// Start the counter!
@@ -429,7 +453,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void SetCameraToStartPosition() {
-		Vector3 position = new Vector3 (10, 2.2f, -11);
+		Vector3 position = new Vector3 (10.5f, 2.7f, -11);
 		Camera.main.transform.position = position;
 	}
 	
@@ -493,26 +517,28 @@ public class GameScript : MonoBehaviour {
 	public void ShowShop() {
 		showingShop = true;
 		Vector3 cameraPosition = Camera.main.transform.position;
-		Vector3 position = new Vector3 (cameraPosition.x, cameraPosition.y - 1.37f, cameraPosition.z + 0.15f);
+		Vector3 position = new Vector3 (cameraPosition.x - 0.011f, cameraPosition.y - 1.395f, cameraPosition.z - 0.15f);
 		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
 		iShop.name = "shopScreen";
 		SetMarbleText ();
+
+		Pair<String, int>[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
+
 		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
-		scripts [1].carIndex = 1;
-		if (MenuScript.data.carsUnlocked[1])
+		scripts [1].carIndex = cars[0].Second;
+		if (MenuScript.data.carsUnlocked[cars[0].Second])
 			scripts [1].SetToBought ();
-		scripts [0].carIndex = 2;
-		if (MenuScript.data.carsUnlocked[2])
+		scripts [0].carIndex = cars[1].Second;
+		if (MenuScript.data.carsUnlocked[cars[1].Second])
 			scripts [0].SetToBought ();
 
-		String[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
-		GameObject firstCar = Resources.Load (cars [0]) as GameObject;
-		GameObject secondCar = Resources.Load (cars [1]) as GameObject;
+		GameObject firstCar = Resources.Load (cars [0].First) as GameObject;
+		GameObject secondCar = Resources.Load (cars [1].First) as GameObject;
 
-		Vector3 firstCarPosition = new Vector3 (10.7f, 0.9f, -8.7f);
-		Vector3 secondCarPosition = new Vector3 (11.6f, 1, -8.7f);
-		Quaternion firstCarRotation = Quaternion.Euler (new Vector3 (335, 243, 329));
-		Quaternion secondCarRotation = Quaternion.Euler (new Vector3 (330, 233, 324));
+		Vector3 firstCarPosition = new Vector3 (position.x - 0.465f, position.y + 0.065f, position.z + 0.65f);
+		Vector3 secondCarPosition = new Vector3 (position.x + 0.393f, position.y + 0.12f, position.z + 0.65f);
+		Quaternion firstCarRotation = Quaternion.Euler (new Vector3 (317.585f, 211.129f, 340.11f));
+		Quaternion secondCarRotation = Quaternion.Euler (new Vector3 (324.33f, 229.77f,  323.61f));
 
 		iFirstCar = Instantiate (firstCar, firstCarPosition, firstCarRotation) as GameObject;
 		iSecondCar = Instantiate (secondCar, secondCarPosition, secondCarRotation) as GameObject;
@@ -983,9 +1009,15 @@ public class GameScript : MonoBehaviour {
 		boostStyle4 = new GUIStyle ();
 		boostStyle4.normal.background = boostTexture4;
 
-		shopTriggerPieces = new Dictionary<String, String[]> ();
-		String[] carsShop1 = {"displayCar2", "displayCar3"};
+		shopTriggerPieces = new Dictionary<String, Pair<String, int>[]> ();
+		Pair<String, int>[] carsShop1 = {new Pair<String, int>("displayCar2", 1), new Pair<String, int>("displayCar3", 2)};
+		Pair<String, int>[] carsShop2 = {new Pair<String, int>("displayCar4", 3), new Pair<String, int>("displayCar5", 4)};
+		Pair<String, int>[] carsShop3 = {new Pair<String, int>("displayCar6", 5), new Pair<String, int>("displayCar7", 6)};
+		Pair<String, int>[] carsShop4 = {new Pair<String, int>("displayCar8", 7), new Pair<String, int>("displayCar11", 8)};
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_S (1)", carsShop2);
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (2)", carsShop3);
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop4);
 	}
 
 	private static void AddTutorialMessages() {
