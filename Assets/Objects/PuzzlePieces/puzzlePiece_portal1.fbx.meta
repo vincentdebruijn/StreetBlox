@@ -1,37 +1,37 @@
 fileFormatVersion: 2
-guid: a39fe64831dfce449b674edd7463aa78
-timeCreated: 1449075114
+guid: 625ee41fbb491f345b6e344e7e2c4ffc
+timeCreated: 1452647623
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
   fileIDToRecycleName:
     100000: pPipe1
-    100002: pPipe2
-    100004: pPipe3
-    100006: pPipe4
+    100002: pPipe4
+    100004: pPipe5
+    100006: pPipe6
     100008: //RootNode
     100010: puzzlePiece_straight_NS:pCube8
     400000: pPipe1
-    400002: pPipe2
-    400004: pPipe3
-    400006: pPipe4
+    400002: pPipe4
+    400004: pPipe5
+    400006: pPipe6
     400008: //RootNode
     400010: puzzlePiece_straight_NS:pCube8
     2300000: pPipe1
-    2300002: pPipe2
-    2300004: pPipe3
-    2300006: pPipe4
+    2300002: pPipe4
+    2300004: pPipe5
+    2300006: pPipe6
     2300008: puzzlePiece_straight_NS:pCube8
     3300000: pPipe1
-    3300002: pPipe2
-    3300004: pPipe3
-    3300006: pPipe4
+    3300002: pPipe4
+    3300004: pPipe5
+    3300006: pPipe6
     3300008: puzzlePiece_straight_NS:pCube8
     4300000: pPipe1
-    4300002: pPipe2
-    4300004: pPipe3
-    4300006: pPipe4
-    4300008: puzzlePiece_straight_NS:pCube8
+    4300002: pPipe4
+    4300004: puzzlePiece_straight_NS:pCube8
+    4300006: pPipe5
+    4300008: pPipe6
     7400000: Take 001
     9500000: //RootNode
   materials:
@@ -82,11 +82,11 @@ ModelImporter:
         weight: 1
       - path: pPipe1
         weight: 1
-      - path: pPipe2
-        weight: 1
-      - path: pPipe3
-        weight: 1
       - path: pPipe4
+        weight: 1
+      - path: pPipe5
+        weight: 1
+      - path: pPipe6
         weight: 1
       - path: puzzlePiece_straight_NS:pCube8
         weight: 1
