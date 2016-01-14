@@ -130,8 +130,8 @@ public class MenuScript : MonoBehaviour {
 			FileStream file = File.Open (savePath, FileMode.Open);
 			data = (PlayerData)bf.Deserialize(file);
 			file.Close();
-			/*
-			data.carsUnlocked[2] = false;
+
+			/*data.carsUnlocked[2] = false;
 			data.carsUnlocked[3] = false;
 			data.carsUnlocked[4] = false;
 			data.carsUnlocked[5] = false;
@@ -142,6 +142,7 @@ public class MenuScript : MonoBehaviour {
 			data.puzzleBoxesUnlocked[1] = false;
 			data.puzzleBoxesUnlocked[2] = false;
 			data.marbles = 100;*/
+
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
@@ -154,13 +155,14 @@ public class MenuScript : MonoBehaviour {
 			data.marbles = 0;
 			data.carsUnlocked = new Boolean[9];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
-				data.carsUnlocked[i] = true;
+				data.carsUnlocked[i] = false;
 			data.puzzleBoxesUnlocked = new Boolean[3];
 			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
-				data.puzzleBoxesUnlocked[i] = true;
+				data.puzzleBoxesUnlocked[i] = false;
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
-			/* data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
+			/*
+			data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
 			data.animationQueue.Enqueue(new Pair<string, int>("car2", 1));
 			data.animationQueue.Enqueue(new Pair<string, int>("car3", 2));
 			data.animationQueue.Enqueue(new Pair<string, int>("car4", 3));

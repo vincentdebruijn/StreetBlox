@@ -370,7 +370,7 @@ public class CarScript : MonoBehaviour {
 
 		if (gameScript.puzzleBoxWorld2 != null) {
 			Vector3 pos1 = gameScript.puzzleBoxWorld2.transform.position;
-			if (Math.Abs (carPos.x - pos1.x - 0.053f) < 0.1f && Math.Abs (carPos.z - pos1.z + 0.13f) < 0.1f) {
+			if (Math.Abs (carPos.x - pos1.x - 0.053f) < 0.3f && Math.Abs (carPos.z - pos1.z + 0.13f) < 0.3f) {
 				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld2", 1));
 				GameObject.Destroy (gameScript.puzzleBoxWorld2);
 				MenuScript.Save ();
@@ -378,7 +378,7 @@ public class CarScript : MonoBehaviour {
 		}
 		if (gameScript.puzzleBoxWorld3 != null) {
 			Vector3 pos2 = gameScript.puzzleBoxWorld3.transform.position;
-			if (Math.Abs ((carPos.x - pos2.x) + 0.08f) < 0.1f && Math.Abs (carPos.z - pos2.z + 0.1f) < 0.1f) {
+			if (Math.Abs ((carPos.x - pos2.x) + 0.08f) < 0.3f && Math.Abs (carPos.z - pos2.z + 0.1f) < 0.3f) {
 				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld3", 2));
 				GameObject.Destroy (gameScript.puzzleBoxWorld3);
 				MenuScript.Save ();

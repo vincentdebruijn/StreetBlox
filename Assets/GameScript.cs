@@ -1025,15 +1025,27 @@ public class GameScript : MonoBehaviour {
 
 		// tutorial level 1
 		String[] messages1 = new String[3];
-		messages1 [0] = "The goal of this game is to let the car reach\nthe portal at the other end of the map.";
-		messages1 [1] = "You can start the game by pressing the 'GO' button\non the left. You cannot move the puzzle pieces\nuntil you pressed this button.";
-		messages1 [2] = "Move the puzzle pieces next to the empty spot by clicking on them.\nClick 'Reset' to restart or 'Quit' to go back to the menu.";
+		messages1 [0] = "Tap highlighted puzzlepieces to shuffle them around.\nCreate a road for your car to ride on, towards the Portal.\n [NEXT]";
+		messages1 [1] = "Moving puzzlepieces is only possible when you pressed [GO].\nTap the [GO] button to start your engine.\nAfter six seconds the car starts to move.\n [NEXT]";
+		messages1 [2] = "You can only move pieces next to the empty spot.\nYou cannot move pieces the car is currently on.";
 		tutorialMessages.Add ("tutorial_1", messages1);
 
 		// tutorial level 2
-		String[] messages2 = new String[1];
-		messages2 [0] = "The beacon piece always moves to the empty spot.\nIt does not have to be next to the empty spot.";
+		String[] messages2 = new String[2];
+		messages2 [0] = "The piece with the tower on it is the Beacon piece.\nThis piece will always move to the empty spot,\nregardless of its current position.\n [NEXT]";
+		messages2 [1] = "When you have studied the puzzle, tap [GO] to start up your car.";
 		tutorialMessages.Add ("tutorial_2", messages2);
+
+		// tutorial level 3
+		String[] messages3 = new String[1];
+		messages3 [0] = "Sometimes you will lack pieces to complete your road.\n It all comes down to timing and quick shuffling.";
+		tutorialMessages.Add ("tutorial_3", messages3);
+
+		// level 1-1
+		String[] messages4 = new String[2];
+		messages4 [0] = "Complete levels to gain Marbles.\nYou will use them later to unlock more cars and goodies.\n [NEXT]";
+		messages4 [1] = "Beating the PAR awards you even more Marbles.\nWhen you have studied the puzzle, tap [GO] to start up your car.";
+		tutorialMessages.Add ("level_01", messages4);
 	}
 
 	// Comparer to sort puzzle pieces
