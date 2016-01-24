@@ -50,6 +50,8 @@ public class CarScript : MonoBehaviour {
 	private Boolean enteredShopPiece;
 	private Boolean enteredSavePiece;
 
+	private Vector3 distanceMovedSinceStartPuzzlePiece;
+
 	private Transform mainCamera;
 
 	void Awake() {
@@ -151,6 +153,7 @@ public class CarScript : MonoBehaviour {
 		enteredShopPiece = false;
 		enteredSavePiece = false;
 		cameraShakeDone = false;
+		distanceMovedSinceStartPuzzlePiece = new Vector3 ();
 	}
 
 	Boolean GameEnding() {
@@ -217,6 +220,7 @@ public class CarScript : MonoBehaviour {
 			// Get the next coordinate
 			currentCoordinateIndex = currentConnection.getNextCoordinateIndex (currentCoordinateIndex, currentDirection);
 			Debug.Log ("New coordinate index: " + currentCoordinateIndex);
+			GameObject puzzleBoxObtained = null;
 			if (currentCoordinateIndex == currentConnection.coordinates.Length || currentCoordinateIndex == -1) {
 				timeSinceOnLastPuzzlePiece = 0f;
 				clickedButtonWhileOnCurrentPuzzlePiece = false;
@@ -238,10 +242,14 @@ public class CarScript : MonoBehaviour {
 				}
 				Debug.Log ("New destination: " + currentPuzzlePiece.name);
 				Debug.Log ("Entering from: " + currentDirection);
-				if (ExplorerLevel() && currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
-					enteredSavePiece = true;
-				if (ExplorerLevel() && gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
-				    enteredShopPiece = true;
+				distanceMovedSinceStartPuzzlePiece = new Vector3();
+				if (ExplorerLevel()) {
+					if (currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
+						enteredSavePiece = true;
+					if (gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
+				    	enteredShopPiece = true;
+					puzzleBoxObtained = gameScript.GetPuzzleBoxForPuzzlePiece(currentPuzzlePiece.name);
+				}
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
 				    	OnOpenBridgePiece(currentPuzzlePiece)) {
 					crashing = true;
@@ -276,14 +284,20 @@ public class CarScript : MonoBehaviour {
 				enteredShopPiece = false;
 				return;
 			}
+			if (puzzleBoxObtained != null) {
+				int index = 1;
+				if (puzzleBoxObtained.name == "puzzleBoxWorld3")
+					index = 2;
+				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>(puzzleBoxObtained.name, index));
+				GameObject.Destroy (puzzleBoxObtained);
+				MenuScript.Save ();
+			}
 			if (enteredSavePiece) {
 				gameScript.RecordCurrentState();
 				enteredSavePiece = false;
 			}
 		}
 		CheckForNearbyButton();
-		if (ExplorerLevel ())
-			CheckForNearbyPuzzleBox ();
 	}
 
 	Boolean EnteredPortalPieceFromWrongSide() {
@@ -300,6 +314,13 @@ public class CarScript : MonoBehaviour {
 			Vector3 cameraPosition = mainCamera.position;
 			mainCamera.position = cameraPosition + (newPosition - position);
 		}
+		float beforeX = Mathf.Abs (distanceMovedSinceStartPuzzlePiece.x);
+		float beforeZ = Mathf.Abs (distanceMovedSinceStartPuzzlePiece.z);
+		distanceMovedSinceStartPuzzlePiece += (newPosition - position);
+		float afterX = Mathf.Abs (distanceMovedSinceStartPuzzlePiece.x);
+		float afterZ = Mathf.Abs (distanceMovedSinceStartPuzzlePiece.z);
+		if (enteredPortalPiece && ((beforeX < 0.25f && afterX >= 0.25f) || (beforeZ < 0.25f && afterZ > 0.25f)))
+			MenuScript.PlayPortalInSound ();
 	}
 
 	void RotateTowardsTarget() {
@@ -363,27 +384,6 @@ public class CarScript : MonoBehaviour {
 			return false;
 		Vector3 pos = currentPuzzlePiece.transform.Find ("bridgePiece").position;
 		return GameScript().IsBridgeOpen (pos);
-	}
-
-	void CheckForNearbyPuzzleBox() {
-		Vector3 carPos = transform.position;
-
-		if (gameScript.puzzleBoxWorld2 != null) {
-			Vector3 pos1 = gameScript.puzzleBoxWorld2.transform.position;
-			if (Math.Abs (carPos.x - pos1.x - 0.053f) < 0.3f && Math.Abs (carPos.z - pos1.z + 0.13f) < 0.3f) {
-				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld2", 1));
-				GameObject.Destroy (gameScript.puzzleBoxWorld2);
-				MenuScript.Save ();
-			}
-		}
-		if (gameScript.puzzleBoxWorld3 != null) {
-			Vector3 pos2 = gameScript.puzzleBoxWorld3.transform.position;
-			if (Math.Abs ((carPos.x - pos2.x) + 0.08f) < 0.3f && Math.Abs (carPos.z - pos2.z + 0.1f) < 0.3f) {
-				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>("puzzleBoxWorld3", 2));
-				GameObject.Destroy (gameScript.puzzleBoxWorld3);
-				MenuScript.Save ();
-			}
-		}
 	}
 
 	Vector3 PointOfCar() {
@@ -453,6 +453,7 @@ public class CarScript : MonoBehaviour {
 		transform.position = newPosition;
 		transform.eulerAngles = newEulerAngles;
 		enteredPortalPiece = false;
+		MenuScript.PlayPortalOutSound ();
 	}
 
 	// Sound stuff

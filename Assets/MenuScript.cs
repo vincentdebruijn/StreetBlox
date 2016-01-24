@@ -35,6 +35,8 @@ public class MenuScript : MonoBehaviour {
 	public static GameObject soundWorld1;
 	public static GameObject soundWorld2;
 	public static GameObject soundWorld3;
+	public static GameObject soundPortalIn;
+	public static GameObject soundPortalOut;
 
 	private static Rect logoRect;
 	private static Rect leftButtonRect;
@@ -142,7 +144,7 @@ public class MenuScript : MonoBehaviour {
 			data.puzzleBoxesUnlocked[1] = false;
 			data.puzzleBoxesUnlocked[2] = false;
 			data.marbles = 100;*/
-
+			data.puzzleBoxesUnlocked[2] = true;
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
@@ -206,6 +208,16 @@ public class MenuScript : MonoBehaviour {
 	public static void PlayBridgeSound() {
 		if (data.playSoundEffects)
 			soundBridgePiece.GetComponent<AudioSource>().Play();
+	}
+
+	public static void PlayPortalInSound() {
+		if (data.playSoundEffects)
+			soundPortalIn.GetComponent<AudioSource> ().Play ();
+	}
+
+	public static void PlayPortalOutSound() {
+		if (data.playSoundEffects)
+			soundPortalOut.GetComponent<AudioSource> ().Play ();
 	}
 	
 	public static void PlayMenuMusic() {
@@ -286,6 +298,10 @@ public class MenuScript : MonoBehaviour {
 		DontDestroyOnLoad (soundWorld2);
 		soundWorld3 = GameObject.Find ("sound_world3");
 		DontDestroyOnLoad (soundWorld3);
+		soundPortalIn = GameObject.Find ("sound_portal_in");
+		DontDestroyOnLoad (soundPortalIn);
+		soundPortalOut = GameObject.Find ("sound_portal_out");
+		DontDestroyOnLoad (soundPortalOut);
 		
 		int buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
@@ -357,6 +373,7 @@ public class MenuScript : MonoBehaviour {
 		// Explorer save stuff
 		public string[] puzzlePieces;
 		public string[][] board;
+		public Boolean bridgesFlipped;
 
 		public float carPositionX;
 		public float carPositionY;

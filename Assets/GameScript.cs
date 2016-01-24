@@ -53,6 +53,7 @@ public class GameScript : MonoBehaviour {
 	private Boolean showingShop;
 
 	private List<GameObject> bridgePieces;
+	private Boolean bridgesFlipped;
 
 	public string chosenLevel;
 
@@ -126,25 +127,28 @@ public class GameScript : MonoBehaviour {
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		shop = Resources.Load ("shopScreen") as GameObject;
 
+		bridgesFlipped = false;
 		if (chosenLevel == "explorer") {
 			dontPlayAnimation = true;
 			levelConfiguration = new LevelConfiguration (61, 60, 0f, 0f, 0);
 			if (MenuScript.data.board != null) {
-				LoadFromSave();
-				MovePiecesToCorrectPosition();
-				SetCarToCorrectPosition();
-				SetCameraToCorrectPosition();
-				SetBridgePieces();
+				LoadFromSave ();
+				MovePiecesToCorrectPosition ();
+				SetCarToCorrectPosition ();
+				SetCameraToCorrectPosition ();
+				SetBridgePieces ();
+				if (MenuScript.data.bridgesFlipped)
+					FlipBridgePositions ();
 				puzzleBoxWorld2 = GameObject.Find ("puzzleBoxWorld2");
 				puzzleBoxWorld3 = GameObject.Find ("puzzleBoxWorld3");
-				if (MenuScript.data.puzzleBoxesUnlocked[1])
+				if (MenuScript.data.puzzleBoxesUnlocked [1])
 					GameObject.Destroy (puzzleBoxWorld2);
-				if (MenuScript.data.puzzleBoxesUnlocked[2])
+				if (MenuScript.data.puzzleBoxesUnlocked [2])
 					GameObject.Destroy (puzzleBoxWorld3);
 				return;
 			}
 		} else
-			levelConfiguration = LevelSelectScript.levelConfigurations[chosenLevel];
+			levelConfiguration = LevelSelectScript.levelConfigurations [chosenLevel];
 
 		SetCarOnStartPiece ();
 		GetPuzzlePieces ();
@@ -564,6 +568,15 @@ public class GameScript : MonoBehaviour {
 		return shopTriggerPieces.ContainsKey (name);
 	}
 
+	public GameObject GetPuzzleBoxForPuzzlePiece(String name) {
+		if (name == "puzzlePiece_turnabout_S (2)")
+			return puzzleBoxWorld2;
+		else if (name == "puzzlePiece_turnabout_W (3)")
+			return puzzleBoxWorld3;
+		else
+			return null;
+	}
+
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
 		Debug.Log("Clicked: " + puzzlePiece.name);
 		if (carScript.GameOver () || !gameStarted || carScript.falling || carScript.crashing)
@@ -653,6 +666,7 @@ public class GameScript : MonoBehaviour {
 			}
 			bridgePiece.transform.position = pos;
 		}
+		bridgesFlipped = !bridgesFlipped;
 	}
 
 	// return true when  the bridge is open, false otherwise.
@@ -890,6 +904,7 @@ public class GameScript : MonoBehaviour {
 
 		MenuScript.data.board = serializableBoard;
 		MenuScript.data.puzzlePieces = serializablePuzzlePieces;
+		MenuScript.data.bridgesFlipped = bridgesFlipped;
 		
 		MenuScript.data.carPositionX = carScript.gameObject.transform.position.x;
 		MenuScript.data.carPositionY = carScript.gameObject.transform.position.y;
