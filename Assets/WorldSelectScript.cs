@@ -82,6 +82,7 @@ public class WorldSelectScript : MonoBehaviour {
 	// GUI stuff
 	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
 	private static Texture2D levelTextTexture;
+	private static Texture2D itemButtonTexture;
 	
 	private static Rect leftBottomRect;
 	private static Rect rightBottomRect;
@@ -229,7 +230,7 @@ public class WorldSelectScript : MonoBehaviour {
 				text = "You have unlocked new levels!";
 
 			GUI.Label (receivedItemTextRect, text, receivedItemTextStyle);
-			if (GUI.Button (itemButtonRect, "Awesome!", itemButtonStyle)) {
+			if (GUI.Button (itemButtonRect, "", itemButtonStyle)) {
 				showingItemButton = false;
 				if (animatedItem.name.Contains("car"))
 					animatedItem.GetComponent<CarDisplayScript>().turn = false;
@@ -420,6 +421,7 @@ public class WorldSelectScript : MonoBehaviour {
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		levelTextTexture = (Texture2D) Resources.Load ("ui_border_levelname");
+		itemButtonTexture = (Texture2D)Resources.Load ("ui_button_awesome");
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 		
 		endlessButtonStyle = new GUIStyle ();
@@ -435,17 +437,14 @@ public class WorldSelectScript : MonoBehaviour {
 		loadingStyle.normal.background = levelTextTexture;
 
 		itemButtonStyle = new GUIStyle ();
-		itemButtonStyle.normal.textColor = Color.black;
-		itemButtonStyle.fontSize = 28;
-		itemButtonStyle.alignment = TextAnchor.MiddleCenter;
-		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
-		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
-		itemButtonStyle.normal.background = texture;
+		itemButtonStyle.normal.background = itemButtonTexture;
 
 		receivedItemTextStyle = new GUIStyle ();
 		receivedItemTextStyle.normal.textColor = Color.black;
 		receivedItemTextStyle.fontSize = 28;
 		receivedItemTextStyle.alignment = TextAnchor.MiddleCenter;
+		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
 		receivedItemTextStyle.normal.background = texture;
 	
 		AddCars ();

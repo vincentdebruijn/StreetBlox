@@ -19,6 +19,7 @@ public class OptionsScript : MonoBehaviour {
 	private static Rect resetTextRect;
 	
 	private static Texture2D optionButtonTexture, optionSelectedButtonTexture;
+	private static Texture2D resetButtonTexture;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle optionButtonStyle, optionSelectedButtonStyle;
@@ -101,7 +102,7 @@ public class OptionsScript : MonoBehaviour {
 		GUI.Label (option4TextRect, "Sound effects", optionTextStyle);
 
 		GUI.Label (resetTextRect, "Resets puzzle pieces and car position in explorer mode.\nDoes not reset acquired items.", optionTextStyle);
-		if (GUI.Button (resetButtonRect, "Reset now", resetButtonStyle)) {
+		if (GUI.Button (resetButtonRect, "", resetButtonStyle)) {
 			MenuScript.PlayButtonSound();
 			MenuScript.data.board = null;
 			MenuScript.Save ();
@@ -125,6 +126,7 @@ public class OptionsScript : MonoBehaviour {
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");
+		resetButtonTexture = (Texture2D)Resources.Load ("ui_button_reset");
 		
 		optionButtonStyle = new GUIStyle();
 		optionButtonStyle.normal.background = optionButtonTexture;
@@ -158,7 +160,7 @@ public class OptionsScript : MonoBehaviour {
 		resetButtonStyle.fontSize = 32;
 		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
 		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
-		resetButtonStyle.normal.background = texture;
+		resetButtonStyle.normal.background = resetButtonTexture;
 
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 	}
