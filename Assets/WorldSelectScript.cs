@@ -104,7 +104,14 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject displayCar6;
 	private static GameObject displayCar7;
 	private static GameObject displayCar8;
+	private static GameObject displayCar9;
+	private static GameObject displayCar10;
 	private static GameObject displayCar11;
+	private static GameObject displayCar12;
+	private static GameObject displayCar13;
+	private static GameObject displayCar14;
+	private static GameObject displayCar15;
+	private static GameObject displayCar16;
 
 	// Car display box
 	private static GameObject carBox;
@@ -264,7 +271,14 @@ public class WorldSelectScript : MonoBehaviour {
 		case "car6": item = displayCar6; break;
 		case "car7": item = displayCar7; break;
 		case "car8": item = displayCar8; break;
+		case "car9": item = displayCar9; break;
+		case "car10": item = displayCar10; break;
 		case "car11": item = displayCar11; break;
+		case "car12": item = displayCar12; break;
+		case "car13": item = displayCar13; break;
+		case "car14": item = displayCar14; break;
+		case "car15": item = displayCar15; break;
+		case "car16": item = displayCar16; break;
 		case "puzzleBoxWorld1": item = puzzleBoxWorld1; break;
 		case "puzzleBoxWorld2": item = puzzleBoxWorld2; break;
 		case "puzzleBoxWorld3": item = puzzleBoxWorld3; break;
@@ -338,8 +352,43 @@ public class WorldSelectScript : MonoBehaviour {
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
 		if (MenuScript.data.carsUnlocked[8]) {
+			GameObject clone = (GameObject)Instantiate (displayCar9);
+			clone.name = "car9";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[9]) {
+			GameObject clone = (GameObject)Instantiate (displayCar10);
+			clone.name = "car10";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[10]) {
 			GameObject clone = (GameObject)Instantiate (displayCar11);
 			clone.name = "car11";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[11]) {
+			GameObject clone = (GameObject)Instantiate (displayCar12);
+			clone.name = "car12";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[12]) {
+			GameObject clone = (GameObject)Instantiate (displayCar13);
+			clone.name = "car13";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[13]) {
+			GameObject clone = (GameObject)Instantiate (displayCar14);
+			clone.name = "car14";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[14]) {
+			GameObject clone = (GameObject)Instantiate (displayCar15);
+			clone.name = "car15";
+			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
+		}
+		if (MenuScript.data.carsUnlocked[15]) {
+			GameObject clone = (GameObject)Instantiate (displayCar16);
+			clone.name = "car16";
 			clone.transform.GetComponent<CarDisplayScript>().SelectCarIfItIsChosen();
 		}
 	}
@@ -413,7 +462,15 @@ public class WorldSelectScript : MonoBehaviour {
 		displayCar6 = Resources.Load ("displayCar6") as GameObject;
 		displayCar7 = Resources.Load ("displayCar7") as GameObject;
 		displayCar8 = Resources.Load ("displayCar8") as GameObject;
+		displayCar9 = Resources.Load ("displayCar9") as GameObject;
+		displayCar10 = Resources.Load ("displayCar10") as GameObject;
 		displayCar11 = Resources.Load ("displayCar11") as GameObject;
+		displayCar12 = Resources.Load ("displayCar12") as GameObject;
+		displayCar13 = Resources.Load ("displayCar13") as GameObject;
+		displayCar14 = Resources.Load ("displayCar14") as GameObject;
+		displayCar15 = Resources.Load ("displayCar15") as GameObject;
+		displayCar16 = Resources.Load ("displayCar16") as GameObject;
+
 		carBox = Resources.Load ("carBox") as GameObject;
 	}
 

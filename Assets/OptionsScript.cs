@@ -60,7 +60,7 @@ public class OptionsScript : MonoBehaviour {
 			else
 				optionButton1ChosenStyle = optionButtonStyle;
 		}
-		GUI.Label (option1TextRect, "Animations", optionTextStyle);
+		GUI.Label (option1TextRect, "<removed>", optionTextStyle);
 
 		if (GUI.Button(option2Rect, "", optionButton2ChosenStyle)) {
 			MenuScript.PlayButtonSound();

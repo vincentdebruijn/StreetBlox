@@ -156,7 +156,7 @@ public class MenuScript : MonoBehaviour {
 			data.chosenCar = "car1";
 			data.worldSelectShown = false;
 			data.marbles = 0;
-			data.carsUnlocked = new Boolean[9];
+			data.carsUnlocked = new Boolean[16];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
 				data.carsUnlocked[i] = false;
 			data.puzzleBoxesUnlocked = new Boolean[3];
@@ -165,7 +165,6 @@ public class MenuScript : MonoBehaviour {
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
 
-			data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
 			data.animationQueue.Enqueue(new Pair<string, int>("car2", 1));
 			data.animationQueue.Enqueue(new Pair<string, int>("car3", 2));
 			data.animationQueue.Enqueue(new Pair<string, int>("car4", 3));
@@ -173,7 +172,12 @@ public class MenuScript : MonoBehaviour {
 			data.animationQueue.Enqueue(new Pair<string, int>("car6", 5));
 			data.animationQueue.Enqueue(new Pair<string, int>("car7", 6));
 			data.animationQueue.Enqueue(new Pair<string, int>("car8", 7));
-			data.animationQueue.Enqueue(new Pair<string, int>("car11", 8));
+			data.animationQueue.Enqueue(new Pair<string, int>("car9", 8));
+			data.animationQueue.Enqueue(new Pair<string, int>("car10", 9));
+			data.animationQueue.Enqueue(new Pair<string, int>("car11", 10));
+			data.animationQueue.Enqueue(new Pair<string, int>("car12", 11));
+			data.animationQueue.Enqueue(new Pair<string, int>("car13", 12));
+			data.animationQueue.Enqueue(new Pair<string, int>("car14", 13));
 
 			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
 			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld2", 1));
@@ -199,7 +203,6 @@ public class MenuScript : MonoBehaviour {
 		if (data.playSoundEffects)
 			soundPuzzlePiece.GetComponent<AudioSource> ().Play ();
 	}
-	
 	
 	public static void PlayGearShiftSound() {
 		if (data.playSoundEffects)

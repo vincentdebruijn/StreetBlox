@@ -33,17 +33,7 @@ public class GameScript : MonoBehaviour {
 	private CarScript carScript;
 	
 	private LevelConfiguration levelConfiguration;
-	
-	// The animation at the start
-	private Boolean showingAnimation;
-	private float timeSinceStartAnimation = 0f;
-	// The puzzle pieces that are currently in the start animation
-	private GameObject[] currentPuzzlePiecesAnimation;
-	// The index of the last puzzle piece being animated.
-	private int puzzlePieceAnimationIndex;
-	// Where the puzzle pieces need to go.
-	private Vector3[] currentPuzzlePiecesDestination;
-	private static Boolean dontPlayAnimation;
+
 	// The time passed since the start of the game
 	private float time;	
 	private int movesMade;
@@ -127,8 +117,7 @@ public class GameScript : MonoBehaviour {
 
 		bridgesFlipped = false;
 		if (chosenLevel == "explorer") {
-			dontPlayAnimation = true;
-			levelConfiguration = new LevelConfiguration (61, 60, 0f, 0f, 0);
+			levelConfiguration = new LevelConfiguration (49, 31, 0f, 0f, 0);
 			if (MenuScript.data.board != null) {
 				LoadFromSave ();
 				MovePiecesToCorrectPosition ();
@@ -154,14 +143,7 @@ public class GameScript : MonoBehaviour {
 
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
 		tutorialMessageCounter = 0;
-		showingAnimation = false;
 		CreateBoard ();
-
-		if (!dontPlayAnimation && MenuScript.data.playAnimations) {
-			showingAnimation = true;
-			HidePuzzlePieces ();
-			StartPuzzlePieceAnimation ();
-		}
 	}
 
 	void Awake() {	
@@ -177,21 +159,8 @@ public class GameScript : MonoBehaviour {
 		lossScreen = (GameObject)Resources.Load ("failScreen");
 	}
 
-	// Use this for initialization
-	void Start () {
-		dontPlayAnimation = false;
-	}
-	
 	// Update is called once per frame
 	void Update () {
-		if (showingAnimation) {
-			timeSinceStartAnimation += Time.deltaTime;
-			if (timeSinceStartAnimation > 0.125f && puzzlePieceAnimationIndex == 0) {
-				StartSecondPuzzlePiece();
-			}
-			MoveCurrentPuzzlePiece();
-		}
-
 		if (!gameStarted)
 			return;
 
@@ -216,7 +185,7 @@ public class GameScript : MonoBehaviour {
 	}
 	
 	void OnGUI() {
-		if (!showingAnimation && !gameStarted && !carScript.carStarted)
+		if (!gameStarted && !carScript.carStarted)
 			DisplayTutorialMessages ();
 
 		if (!carScript.ended && !carScript.crashed && !carScript.fell)
@@ -410,7 +379,6 @@ public class GameScript : MonoBehaviour {
 
 	// Start the counter!
 	private void StartTheGame() {
-		EndAnimation ();
 		time = 0.0f;
 		movesMade = 0;
 		processedGameOver = false;
@@ -480,7 +448,6 @@ public class GameScript : MonoBehaviour {
 			MenuScript.InTutorialPhase() && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
 		
 		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
-			dontPlayAnimation = false;
 			MenuScript.data.worldSelectShown = true;
 			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
 			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
@@ -491,16 +458,13 @@ public class GameScript : MonoBehaviour {
 
 		switch(button) {
 		case "Next":
-			dontPlayAnimation = false;
 			LevelSelectScript.NextLevel();
 			break;
 		case "Retry":
-			dontPlayAnimation = true;
 			Application.LoadLevel (chosenLevel);
 			break;
 		case "Back":
 			StopGameMusicAndPlayMenuMusic();
-			dontPlayAnimation = false;
 			if (chosenLevel == "explorer")
 				Application.LoadLevel ("world_select");
 			else if (MenuScript.InTutorialPhase())
@@ -790,77 +754,6 @@ public class GameScript : MonoBehaviour {
 		MenuScript.PlayMenuMusic ();
 	}
 
-	// ANIMATION
-	//
-
-	private void HidePuzzlePieces() {
-		foreach (GameObject piece in puzzlePieces) {
-			piece.SetActive (false);
-		}
-	}
-
-	private void StartPuzzlePieceAnimation() {
-		currentPuzzlePiecesAnimation = new GameObject[2];
-		currentPuzzlePiecesAnimation[0] = puzzlePieces[0];
-		puzzlePieceAnimationIndex = 0;
-		currentPuzzlePiecesDestination = new Vector3[2];
-		currentPuzzlePiecesDestination[0]  = currentPuzzlePiecesAnimation[0].transform.position;
-		MovePuzzlePieceAnimationToStartPosition ();
-		timeSinceStartAnimation = 0f;
-	}
-
-	private void StartSecondPuzzlePiece() {
-		currentPuzzlePiecesAnimation[1] = puzzlePieces[1];
-		puzzlePieceAnimationIndex = 1;
-		currentPuzzlePiecesDestination[1]  = currentPuzzlePiecesAnimation[1].transform.position;
-		MovePuzzlePieceAnimationToStartPosition ();
-	}
-
-	private void EndAnimation() {
-		showingAnimation = false;
-	}
-
-	private void MovePuzzlePieceAnimationToStartPosition() {
-		GameObject puzzlePiece = puzzlePieces [puzzlePieceAnimationIndex];
-		puzzlePiece.transform.position = puzzlePiece.transform.position - new Vector3 (1f, -1f, -1f);
-		puzzlePiece.SetActive (true);
-	}
-
-	private void MoveCurrentPuzzlePiece() {
-		for (int i = 0; i < currentPuzzlePiecesAnimation.Length; i++) {
-			GameObject puzzlePiece = currentPuzzlePiecesAnimation [i];
-			if (puzzlePiece == null) {
-				break;
-			}
-			puzzlePiece.transform.position = Vector3.MoveTowards (puzzlePiece.transform.position, 
-		                                                            currentPuzzlePiecesDestination [i],
-		                                                            6f * Time.deltaTime);
-		}
-		if (currentPuzzlePiecesAnimation[0].transform.position == currentPuzzlePiecesDestination[0]) {
-			puzzlePieceAnimationIndex += 1;
-			if (puzzlePieceAnimationIndex >= puzzlePieces.Length && currentPuzzlePiecesAnimation[1] == null) {
-				EndAnimation();
-				return;
-			}
-			if (puzzlePieceAnimationIndex < puzzlePieces.Length && puzzlePieces[puzzlePieceAnimationIndex] == null) {
-				puzzlePieceAnimationIndex += 1;
-			}
-			if (puzzlePieceAnimationIndex >= puzzlePieces.Length && currentPuzzlePiecesAnimation[1] == null) {
-				EndAnimation();
-				return;
-			}
-			currentPuzzlePiecesAnimation[0] = currentPuzzlePiecesAnimation[1];
-			currentPuzzlePiecesDestination[0] = currentPuzzlePiecesDestination[1];
-			if (puzzlePieceAnimationIndex < puzzlePieces.Length) {
-				currentPuzzlePiecesAnimation[1] = puzzlePieces [puzzlePieceAnimationIndex];
-				currentPuzzlePiecesDestination[1] = currentPuzzlePiecesAnimation[1].transform.position;
-				MovePuzzlePieceAnimationToStartPosition ();
-			} else {
-				currentPuzzlePiecesAnimation[1] = null;
-			}
-		}
-	}
-
 	// VARIABLE STUFF
 	//
 
@@ -1030,11 +923,17 @@ public class GameScript : MonoBehaviour {
 		Pair<String, int>[] carsShop1 = {new Pair<String, int>("displayCar2", 1), new Pair<String, int>("displayCar3", 2)};
 		Pair<String, int>[] carsShop2 = {new Pair<String, int>("displayCar4", 3), new Pair<String, int>("displayCar5", 4)};
 		Pair<String, int>[] carsShop3 = {new Pair<String, int>("displayCar6", 5), new Pair<String, int>("displayCar7", 6)};
-		Pair<String, int>[] carsShop4 = {new Pair<String, int>("displayCar8", 7), new Pair<String, int>("displayCar11", 8)};
+		Pair<String, int>[] carsShop4 = {new Pair<String, int>("displayCar8", 7), new Pair<String, int>("displayCar9", 8)};
+		Pair<String, int>[] carsShop5 = {new Pair<String, int>("displayCar10", 9), new Pair<String, int>("displayCar11", 10)};
+		Pair<String, int>[] carsShop6 = {new Pair<String, int>("displayCar12", 11), new Pair<String, int>("displayCar13", 12)};
+		Pair<String, int>[] carsShop7 = {new Pair<String, int>("displayCar14", 13), new Pair<String, int>("displayCar15", 14)};
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_S (1)", carsShop2);
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (2)", carsShop3);
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop4);
+		shopTriggerPieces.Add ("puzzlePiece_oneBend_NE (40)", carsShop5);
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_E (4)", carsShop6);
+		//shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop7);
 	}
 
 	private static void AddTutorialMessages() {
