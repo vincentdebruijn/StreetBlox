@@ -132,8 +132,10 @@ public class MenuScript : MonoBehaviour {
 			FileStream file = File.Open (savePath, FileMode.Open);
 			data = (PlayerData)bf.Deserialize(file);
 			file.Close();
-
-			/*data.carsUnlocked[2] = false;
+			/*
+			data.carsUnlocked[0] = false;
+			data.carsUnlocked[1] = false;
+			data.carsUnlocked[2] = false;
 			data.carsUnlocked[3] = false;
 			data.carsUnlocked[4] = false;
 			data.carsUnlocked[5] = false;
@@ -143,8 +145,7 @@ public class MenuScript : MonoBehaviour {
 
 			data.puzzleBoxesUnlocked[1] = false;
 			data.puzzleBoxesUnlocked[2] = false;
-			data.marbles = 100;*/
-			data.puzzleBoxesUnlocked[2] = true;
+			*/
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();

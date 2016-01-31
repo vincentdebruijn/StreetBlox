@@ -68,10 +68,7 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D boostTexture1;
 	private static Texture2D boostTexture4;
 	private static Texture2D tutorialTexture;
-
-	// explorer
-	private static Texture2D explorerBoostTexture1;
-	private static Texture2D explorerBoostTexture2;
+	private static Texture2D explorerStopTexture;
 
 	private static GUIStyle textAreaStyle;
 	private static GUIStyle statStyle;
@@ -88,6 +85,7 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
 	private static GUIStyle tutorialStyle;
+	private static GUIStyle stopStyle;
 
 	private static Rect textArea;
 	private static Rect quitRect;
@@ -375,21 +373,22 @@ public class GameScript : MonoBehaviour {
 			Application.LoadLevel ("world_select");
 		}
 
-		if (!gameStarted) {
-			if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
-				MenuScript.PlayButtonSound ();
-				chosenGoStyle = goStyle4;
-				if (halted) {
-					halted = false;
-					showingShop = false;
-					carScript.carStarted = true;
-					gameStarted = true;
-				} else {
-					StartTheGame ();
-				}
+		if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
+			MenuScript.PlayButtonSound ();
+			if (gameStarted && !halted) {
+				chosenGoStyle = goStyle1;
+				halted = true;
+				carScript.carStarted = false;
+			} else if (gameStarted && halted) {
+				chosenGoStyle = stopStyle;
+				halted = false;
+				showingShop = false;
+				carScript.carStarted = true;
+				gameStarted = true;
+			} else {
+				chosenGoStyle = stopStyle;
+				StartTheGame ();
 			}
-		} else {
-			GUI.Label (explorerGoRect, "", chosenGoStyle);
 		}
 
 		if (gameStarted) {
@@ -579,7 +578,7 @@ public class GameScript : MonoBehaviour {
 
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
 		Debug.Log("Clicked: " + puzzlePiece.name);
-		if (carScript.GameOver () || !gameStarted || carScript.falling || carScript.crashing)
+		if (carScript.GameOver () || (!gameStarted && chosenLevel != "explorer") || carScript.falling || carScript.crashing)
 			return;
 		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
 		    	carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost))) {
@@ -958,6 +957,7 @@ public class GameScript : MonoBehaviour {
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
 		boostTexture4 = (Texture2D)Resources.Load ("speed4");
 		tutorialTexture = displayTexture;
+		explorerStopTexture = (Texture2D)Resources.Load ("go4");
 
 		textAreaStyle = new GUIStyle ();
 		textAreaStyle.fontSize = 64;
@@ -1012,6 +1012,8 @@ public class GameScript : MonoBehaviour {
 		goStyle4.normal.textColor = Color.black;
 		goStyle4.fontStyle = FontStyle.Bold;
 		goStyle4.alignment = TextAnchor.MiddleRight;
+		stopStyle = new GUIStyle ();
+		stopStyle.normal.background = explorerStopTexture;
 
 		displayStyle = new GUIStyle ();
 		displayStyle.normal.background = displayTexture;

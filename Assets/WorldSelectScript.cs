@@ -163,9 +163,6 @@ public class WorldSelectScript : MonoBehaviour {
 	void Update () {
 		if (showingAnimations) {
 			if (animationPlaying) {
-				Debug.Log ("state info");
-				Debug.Log (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("End"));
-				Debug.Log (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("Take 001"));
 				if (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("End")) {
 					Destroy(boxAnimator.gameObject);
 					animationPlaying = false;
@@ -238,6 +235,7 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	public void SelectedWorld(int world) {
+		Debug.Log (world);
 		MenuScript.PlayButtonSound ();
 		SetLevelInfo (world);
 		chosenWorldName = WorldNames [world];
@@ -289,6 +287,7 @@ public class WorldSelectScript : MonoBehaviour {
 			animatedItem = (GameObject)Instantiate (item, puzzleBoxPositionStartAnimation, puzzleBoxRotationStartAnimation);
 			targetScale = animatedItem.transform.localScale;
 			animatedItem.transform.localScale = targetScale * 4;
+			animatedItem.GetComponent<puzzleBoxScript>().SetWorldNumber(itemIndex + 1);
 			showingItemButton = true;
 		}
 		animatedItem.name = itemName;
