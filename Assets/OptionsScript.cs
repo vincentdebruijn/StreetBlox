@@ -56,10 +56,29 @@ public class OptionsScript : MonoBehaviour {
 		if (GUI.Button(option1Rect, "", optionButton1ChosenStyle)) {
 			MenuScript.PlayButtonSound();
 			MenuScript.data.playAnimations = !MenuScript.data.playAnimations;
-			if (MenuScript.data.playAnimations)
+			if (MenuScript.data.playAnimations) {
 				optionButton1ChosenStyle = optionSelectedButtonStyle;
-			else
+
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car5", 4));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car6", 5));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car7", 6));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car8", 7));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car9", 8));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car10", 9));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car11", 10));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car12", 11));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car13", 12));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car14", 13));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car15", 14));
+
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+			} else {
 				optionButton1ChosenStyle = optionButtonStyle;
+			}
 		}
 		GUI.Label (option1TextRect, "<removed>", optionTextStyle);
 
