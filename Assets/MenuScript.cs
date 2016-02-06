@@ -131,22 +131,7 @@ public class MenuScript : MonoBehaviour {
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open (savePath, FileMode.Open);
 			data = (PlayerData)bf.Deserialize(file);
-			file.Close();
-
-			data.carsUnlocked[0] = true;
-			data.carsUnlocked[1] = true;
-			data.carsUnlocked[2] = true;
-			data.carsUnlocked[3] = true;
-			data.carsUnlocked[4] = true;
-			data.carsUnlocked[5] = true;
-			data.carsUnlocked[6] = true;
-			data.carsUnlocked[7] = true;
-			data.carsUnlocked[8] = true;
-			data.carsUnlocked[9] = true;
-
-			data.puzzleBoxesUnlocked[1] = true;
-			data.puzzleBoxesUnlocked[2] = true;
-
+			file.Close ();
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
