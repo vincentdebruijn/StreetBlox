@@ -131,22 +131,7 @@ public class MenuScript : MonoBehaviour {
 			BinaryFormatter bf = new BinaryFormatter ();
 			FileStream file = File.Open (savePath, FileMode.Open);
 			data = (PlayerData)bf.Deserialize(file);
-			file.Close();
-
-			data.carsUnlocked[0] = true;
-			data.carsUnlocked[1] = true;
-			data.carsUnlocked[2] = true;
-			data.carsUnlocked[3] = true;
-			data.carsUnlocked[4] = true;
-			data.carsUnlocked[5] = true;
-			data.carsUnlocked[6] = true;
-			data.carsUnlocked[7] = true;
-			data.carsUnlocked[8] = true;
-			data.carsUnlocked[9] = true;
-
-			data.puzzleBoxesUnlocked[1] = true;
-			data.puzzleBoxesUnlocked[2] = true;
-
+			file.Close ();
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
@@ -165,25 +150,6 @@ public class MenuScript : MonoBehaviour {
 				data.puzzleBoxesUnlocked[i] = false;
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
-
-			data.animationQueue.Enqueue(new Pair<string, int>("car2", 1));
-			data.animationQueue.Enqueue(new Pair<string, int>("car3", 2));
-			data.animationQueue.Enqueue(new Pair<string, int>("car4", 3));
-			data.animationQueue.Enqueue(new Pair<string, int>("car5", 4));
-			data.animationQueue.Enqueue(new Pair<string, int>("car6", 5));
-			data.animationQueue.Enqueue(new Pair<string, int>("car7", 6));
-			data.animationQueue.Enqueue(new Pair<string, int>("car8", 7));
-			data.animationQueue.Enqueue(new Pair<string, int>("car9", 8));
-			data.animationQueue.Enqueue(new Pair<string, int>("car10", 9));
-			data.animationQueue.Enqueue(new Pair<string, int>("car11", 10));
-			data.animationQueue.Enqueue(new Pair<string, int>("car12", 11));
-			data.animationQueue.Enqueue(new Pair<string, int>("car13", 12));
-			data.animationQueue.Enqueue(new Pair<string, int>("car14", 13));
-			data.animationQueue.Enqueue(new Pair<string, int>("car15", 14));
-
-			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
-			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld2", 1));
-			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld3", 2));
 		}
 	}
 
