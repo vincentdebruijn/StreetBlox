@@ -142,6 +142,7 @@ public class MenuScript : MonoBehaviour {
 			data.carsUnlocked[6] = true;
 			data.carsUnlocked[7] = true;
 			data.carsUnlocked[8] = true;
+			data.carsUnlocked[9] = true;
 
 			data.puzzleBoxesUnlocked[1] = true;
 			data.puzzleBoxesUnlocked[2] = true;
@@ -178,6 +179,7 @@ public class MenuScript : MonoBehaviour {
 			data.animationQueue.Enqueue(new Pair<string, int>("car12", 11));
 			data.animationQueue.Enqueue(new Pair<string, int>("car13", 12));
 			data.animationQueue.Enqueue(new Pair<string, int>("car14", 13));
+			data.animationQueue.Enqueue(new Pair<string, int>("car15", 14));
 
 			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
 			data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld2", 1));
