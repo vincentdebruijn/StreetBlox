@@ -542,7 +542,7 @@ public class GameScript : MonoBehaviour {
 
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
 		Debug.Log("Clicked: " + puzzlePiece.name);
-		if (carScript.GameOver () || (!gameStarted && chosenLevel != "explorer") || carScript.falling || carScript.crashing)
+		if (carScript.GameOver () || carScript.falling || carScript.crashing)
 			return;
 		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
 		    	carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost))) {
@@ -606,6 +606,10 @@ public class GameScript : MonoBehaviour {
 				
 				MenuScript.PlayPuzzlePieceSound();
 				movesMade += 1;
+				if (!gameStarted && chosenLevel != "explorer") {
+					chosenGoStyle = goStyle2;
+					StartTheGame ();
+				}
 			}
 		}
 	}

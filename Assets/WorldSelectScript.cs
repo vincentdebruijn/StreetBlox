@@ -210,30 +210,34 @@ public class WorldSelectScript : MonoBehaviour {
 
 		if (puzzleBoxScript.animationLock)
 			return;
-		if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
-			MenuScript.PlayButtonSound ();
-			endlessButtonChosenStyle = endlessButtonStyle;
-			loading = true;
-			Application.LoadLevel ("explorer");
-		}
-		if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
-			backButtonChosenStyle = MenuScript.backButtonStyle;
-			MenuScript.PlayButtonSound ();
-			Application.LoadLevel ("menu");
+
+		if (!showingAnimations) {
+			if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
+				MenuScript.PlayButtonSound ();
+				endlessButtonChosenStyle = endlessButtonStyle;
+				loading = true;
+				Application.LoadLevel ("explorer");
+			}
+			if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
+				backButtonChosenStyle = MenuScript.backButtonStyle;
+				MenuScript.PlayButtonSound ();
+				Application.LoadLevel ("menu");
+			}
 		}
 
 		if (showingItemButton) {
 			String text = "";
-			if (animatedItem.name.Contains("car"))
-			    text = "You have unlocked a new car!";
+			if (animatedItem.name.Contains ("car"))
+				text = "You have unlocked a new car!";
 			else
 				text = "You have unlocked new levels!";
 
 			GUI.Label (receivedItemTextRect, text, receivedItemTextStyle);
 			if (GUI.Button (itemButtonRect, "", itemButtonStyle)) {
+				MenuScript.PlayButtonSound ();
 				showingItemButton = false;
-				if (animatedItem.name.Contains("car"))
-					animatedItem.GetComponent<CarDisplayScript>().turn = false;
+				if (animatedItem.name.Contains ("car"))
+					animatedItem.GetComponent<CarDisplayScript> ().turn = false;
 				movingSpeed = Vector3.Distance (animatedItem.transform.position, destination);
 				rotationSpeed = Vector3.Distance (animatedItem.transform.rotation.eulerAngles, targetRotation.eulerAngles);
 				scalingSpeed = Vector3.Distance (animatedItem.transform.localScale, targetScale);
@@ -415,8 +419,8 @@ public class WorldSelectScript : MonoBehaviour {
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
-		itemButtonRect = new Rect (Screen.width / 2 - 100, Screen.height - 50 - offset, 200, 50);
-		receivedItemTextRect = new Rect (Screen.width / 2 - 200, offset, 400, 50);
+		itemButtonRect = new Rect (Screen.width * 0.4f, Screen.height - (Screen.width / 10) - offset, Screen.width / 5, Screen.width / 10);
+		receivedItemTextRect = new Rect (Screen.width * 0.375f, offset, Screen.width / 4, Screen.width / 16);
 		
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
@@ -441,7 +445,7 @@ public class WorldSelectScript : MonoBehaviour {
 
 		receivedItemTextStyle = new GUIStyle ();
 		receivedItemTextStyle.normal.textColor = Color.black;
-		receivedItemTextStyle.fontSize = 28;
+		receivedItemTextStyle.fontSize = 32;
 		receivedItemTextStyle.alignment = TextAnchor.MiddleCenter;
 		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
 		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));

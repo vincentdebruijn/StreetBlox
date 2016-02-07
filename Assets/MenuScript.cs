@@ -150,6 +150,10 @@ public class MenuScript : MonoBehaviour {
 				data.puzzleBoxesUnlocked[i] = false;
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
+
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
 		}
 	}
 
