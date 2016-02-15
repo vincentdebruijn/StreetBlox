@@ -73,6 +73,7 @@ public class OptionsScript : MonoBehaviour {
 				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car13", 12));
 				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car14", 13));
 				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car15", 14));
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car16", 15));
 
 				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
 				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
