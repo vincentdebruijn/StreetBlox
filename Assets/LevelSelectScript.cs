@@ -139,10 +139,10 @@ public class LevelSelectScript : MonoBehaviour {
 			// just keep playing menu music
 		} else if (WorldSelectScript.chosenWorldName == "Grass World") {
 			MenuScript.StopMenuMusic();
-			MenuScript.PlayWorld1Music();
+			// MenuScript.PlayWorld1Music();
 		} else if (WorldSelectScript.chosenWorldName == "Lava World") {
 			MenuScript.StopMenuMusic();
-			MenuScript.PlayWorld2Music();
+			// MenuScript.PlayWorld2Music();
 		} else if (WorldSelectScript.chosenWorldName == "Space World") {
 			MenuScript.StopMenuMusic();
 			MenuScript.PlayWorld3Music();
@@ -173,15 +173,19 @@ public class LevelSelectScript : MonoBehaviour {
 		float yDiff = (position2.y - position1.y);
 		GameObject first = levelButtons [0];
 		GameObject last = levelButtons [levelButtons.Length - 1];
-		if (first.transform.position.y < startY && yDiff < 0)
+		if (yDiff < 0 && CalculateNewLevelButtonPosition(first, yDiff).y < startY)
 			return;
-		else if (last.transform.position.y > endY && yDiff > 0)
+		else if (yDiff > 0 && CalculateNewLevelButtonPosition(last, yDiff).y > startY)
 			return;
 		foreach (GameObject levelButton in levelButtons) {
-			Vector3 position = levelButton.transform.position;
-			Vector3 target = new Vector3(position.x, position.y + yDiff, position.z);
-			levelButton.transform.position = Vector3.MoveTowards(position, target, 1 * Mathf.Abs(yDiff) * Time.deltaTime);
+			levelButton.transform.position = CalculateNewLevelButtonPosition (levelButton, yDiff);
 		}
+	}
+
+	private static Vector3 CalculateNewLevelButtonPosition(GameObject levelButton, float yDiff) {
+		Vector3 position = levelButton.transform.position;
+		Vector3 target = new Vector3(position.x, position.y + yDiff / 2, position.z);
+		return Vector3.MoveTowards(position, target, 1 * Mathf.Abs(yDiff) * Time.deltaTime);
 	}
 
 	private static void SetLevelButtons() {

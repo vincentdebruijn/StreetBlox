@@ -354,7 +354,11 @@ public class GameScript : MonoBehaviour {
 				showingShop = false;
 				carScript.carStarted = true;
 				gameStarted = true;
-			} else {
+			} else if (halted) {
+				gameStarted = true;
+				halted = false;
+				chosenGoStyle = stopStyle;
+			} else { 
 				chosenGoStyle = stopStyle;
 				StartTheGame ();
 			}
@@ -752,8 +756,8 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void StopGameMusicAndPlayMenuMusic() {
-		MenuScript.StopWorld1Music ();
-		MenuScript.StopWorld2Music ();
+		// MenuScript.StopWorld1Music ();
+		// MenuScript.StopWorld2Music ();
 		MenuScript.StopWorld3Music ();
 		MenuScript.PlayMenuMusic ();
 	}
