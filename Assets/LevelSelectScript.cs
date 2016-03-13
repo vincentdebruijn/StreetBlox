@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -43,7 +44,6 @@ public class LevelSelectScript : MonoBehaviour {
 	private static int buttonSize;
 
 	private bool swiping = false;
-	private bool eventSent = false;
 	private Vector2 lastPosition;
 	Vector2 lastMousePosition;
 
@@ -126,7 +126,7 @@ public class LevelSelectScript : MonoBehaviour {
 		if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
 			backButtonChosenStyle = MenuScript.backButtonStyle;
 			MenuScript.PlayButtonSound();
-			Application.LoadLevel ("world_select");
+			SceneManager.LoadScene ("world_select");
 		}
 	}
 
@@ -139,25 +139,25 @@ public class LevelSelectScript : MonoBehaviour {
 			// just keep playing menu music
 		} else if (WorldSelectScript.chosenWorldName == "Grass World") {
 			MenuScript.StopMenuMusic();
-			// MenuScript.PlayWorld1Music();
+			MenuScript.PlayWorld1Music();
 		} else if (WorldSelectScript.chosenWorldName == "Lava World") {
 			MenuScript.StopMenuMusic();
-			// MenuScript.PlayWorld2Music();
+			MenuScript.PlayWorld2Music();
 		} else if (WorldSelectScript.chosenWorldName == "Space World") {
 			MenuScript.StopMenuMusic();
 			MenuScript.PlayWorld3Music();
 		}
 
-		Application.LoadLevel (level);
+		SceneManager.LoadScene (level);
 	}
 		
 	public static void NextLevel() {
 		int index = Array.IndexOf (levels, chosenLevel);
 		if (index + 1 < levels.Length) {
 			chosenLevel = levels [index + 1];
-			Application.LoadLevel (chosenLevel);
+			SceneManager.LoadScene (chosenLevel);
 		} else {
-			Application.LoadLevel ("level_select");
+			SceneManager.LoadScene ("level_select");
 		}
 	}
 

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -57,10 +58,8 @@ public class GameScript : MonoBehaviour {
 	private static Texture2D displayTexture;
 	private static Texture2D boostTexture1;
 	private static Texture2D boostTexture4;
-	private static Texture2D tutorialTexture;
 	private static Texture2D explorerStopTexture;
 
-	private static GUIStyle textAreaStyle;
 	private static GUIStyle statStyle;
 	private static GUIStyle timerStyle;
 	private static GUIStyle quitStyle;
@@ -74,27 +73,22 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle boostStyle1;
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
-	private static GUIStyle tutorialStyle;
 	private static GUIStyle stopStyle;
 
-	private static Rect textArea;
 	private static Rect quitRect;
 	private static Rect resetRect;
 	private static Rect goRect;
 	private static Rect displayRect;
 	private static Rect boostRect;
-	private static Rect tutorialRect;
 
 	private GameObject canvas;
 	private GameObject scoreScreen;
 	private GameObject lossScreen;
+	private GameObject tutorialBox;
 
 	// explorer
 	private static Rect explorerQuitRect;
 	private static Rect explorerGoRect;
-	private static Rect explorerBoostRect;
-
-	private int tutorialMessageCounter;
 	
 	private static Dictionary<String, String[]> tutorialMessages;
 
@@ -109,11 +103,12 @@ public class GameScript : MonoBehaviour {
 	private static Boolean staticVariablesSet = false;
 
 	private void OnLevelWasLoaded(int iLevel) {
-		chosenLevel = Application.loadedLevelName;
+		chosenLevel = SceneManager.GetActiveScene().name;
 		chosenGoStyle = goStyle1;
 		chosenBoostStyle = boostStyle1;
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		shop = Resources.Load ("shopScreen") as GameObject;
+		tutorialBox = Resources.Load ("TutorialBox") as GameObject;
 
 		bridgesFlipped = false;
 		if (chosenLevel == "explorer") {
@@ -142,8 +137,9 @@ public class GameScript : MonoBehaviour {
 		SetBridgePieces ();
 
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
-		tutorialMessageCounter = 0;
 		CreateBoard ();
+
+		DisplayTutorialMessages ();
 	}
 
 	void Awake() {	
@@ -160,7 +156,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update () {		
 		if (!gameStarted)
 			return;
 
@@ -185,9 +181,6 @@ public class GameScript : MonoBehaviour {
 	}
 	
 	void OnGUI() {
-		if (!gameStarted && !carScript.carStarted)
-			DisplayTutorialMessages ();
-
 		if (!carScript.ended && !carScript.crashed && !carScript.fell)
 			DisplayButtonBar();
 
@@ -199,13 +192,14 @@ public class GameScript : MonoBehaviour {
 		if (!MenuScript.data.playTutorials || !tutorialMessages.ContainsKey(chosenLevel))
 			return;
 
-		String[] messagesForCurrentLevel = tutorialMessages [chosenLevel];
-		if (tutorialMessageCounter < messagesForCurrentLevel.Length) {
-			if (GUI.Button (tutorialRect, messagesForCurrentLevel[tutorialMessageCounter], tutorialStyle)) {
-				MenuScript.PlayButtonSound();
-				tutorialMessageCounter += 1;
-			}
-		}
+		Vector3 position = Camera.main.transform.position + new Vector3 (-0.08f, -0.7f, 0.5f);
+		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, tutorialBox.transform.rotation);
+		iTutorialBox.name = "TutorialBox";
+		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(tutorialMessages [chosenLevel]);
+	}
+
+	private void DestroyTutorialMessageBox() {
+		Destroy (GameObject.Find ("TutorialBox"));
 	}
 
 	private void ProcessGameOver() {	
@@ -272,6 +266,14 @@ public class GameScript : MonoBehaviour {
 		if (LevelSelectScript.TutorialLevel (chosenLevel))
 			marbles = 0;
 		MenuScript.data.marbles += marbles;
+
+		// Give the Tardis when a space level was completed
+		if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0 && !MenuScript.data.carsUnlocked [10] && !MenuScript.data.animationQueue.Contains (new Pair<String, int> ("car11", 10))) {
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car11", 10));
+			GameObject obj = (GameObject)GameObject.Instantiate (((GameObject)Resources.Load ("displayCar11")), new Vector3 (-100, -100, -100), new Quaternion ());
+			obj.GetComponent<AudioSource> ().Play ();
+		}
+			
 		MenuScript.Save ();
 	}
 
@@ -300,10 +302,10 @@ public class GameScript : MonoBehaviour {
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
 			StopGameMusicAndPlayMenuMusic();
-			if (MenuScript.InTutorialPhase())
-				Application.LoadLevel ("menu");
+			if (MenuScript.InTutorialPhase ())
+				SceneManager.LoadScene ("menu");
 			else
-				Application.LoadLevel ("level_select");
+				SceneManager.LoadScene ("level_select");
 		}
 
 		if (GUI.Button (resetRect, "", resetStyle)) {
@@ -339,7 +341,7 @@ public class GameScript : MonoBehaviour {
 		if (carScript.Quittable () && GUI.Button (explorerQuitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
 			MenuScript.Save ();
-			Application.LoadLevel ("world_select");
+			SceneManager.LoadScene ("world_select");
 		}
 
 		if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
@@ -388,6 +390,7 @@ public class GameScript : MonoBehaviour {
 		processedGameOver = false;
 		carScript.carStarted = false;
 		carScript.boost = 0f;
+		DestroyTutorialMessageBox ();
 		gameStarted = true;
 	}
 
@@ -456,7 +459,7 @@ public class GameScript : MonoBehaviour {
 			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
 			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
 			MenuScript.Save ();
-			Application.LoadLevel ("world_select");
+			SceneManager.LoadScene ("world_select");
 			return;
 		}
 
@@ -465,16 +468,16 @@ public class GameScript : MonoBehaviour {
 			LevelSelectScript.NextLevel();
 			break;
 		case "Retry":
-			Application.LoadLevel (chosenLevel);
+			SceneManager.LoadScene (chosenLevel);
 			break;
 		case "Back":
 			StopGameMusicAndPlayMenuMusic();
 			if (chosenLevel == "explorer")
-				Application.LoadLevel ("world_select");
+				SceneManager.LoadScene ("world_select");
 			else if (MenuScript.InTutorialPhase())
-				Application.LoadLevel ("menu");
+				SceneManager.LoadScene ("menu");
 			else
-				Application.LoadLevel("level_select");
+				SceneManager.LoadScene("level_select");
 			break;
 		}
 	}
@@ -756,10 +759,16 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void StopGameMusicAndPlayMenuMusic() {
-		// MenuScript.StopWorld1Music ();
-		// MenuScript.StopWorld2Music ();
-		MenuScript.StopWorld3Music ();
-		MenuScript.PlayMenuMusic ();
+		if (Array.IndexOf (WorldSelectScript.levelsWorld1, chosenLevel) >= 0) {
+			MenuScript.StopWorld1Music ();
+			MenuScript.PlayMenuMusic ();
+		} else if (Array.IndexOf (WorldSelectScript.levelsWorld2, chosenLevel) >= 0) {
+			MenuScript.StopWorld2Music ();
+			MenuScript.PlayMenuMusic ();
+		} else if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0) {
+			MenuScript.StopWorld3Music ();
+			MenuScript.PlayMenuMusic ();
+		}
 	}
 
 	// VARIABLE STUFF
@@ -833,20 +842,15 @@ public class GameScript : MonoBehaviour {
 	}
 	
 	private static void SetVariables() {
-		int buttonSize = (int)(Screen.width / 5 * 0.7);
-		textArea = new Rect (0, 10, Screen.width, buttonSize);
-
 		float uiButtonSize = Screen.height / 10;
 		quitRect = new Rect (0, uiButtonSize, uiButtonSize * 2, uiButtonSize);
 		resetRect = new Rect (0, uiButtonSize * 2, uiButtonSize * 2, 2 * uiButtonSize);
 		goRect = new Rect (0, uiButtonSize * 4, uiButtonSize * 2, 2 * uiButtonSize);
 		displayRect = new Rect (0, uiButtonSize * 6, uiButtonSize * 2, uiButtonSize);
 		boostRect = new Rect (0, uiButtonSize * 7, uiButtonSize * 2, 2 * uiButtonSize);
-		tutorialRect = new Rect (Screen.width / 2 - 450, 50, 900, 100);
 
 		explorerQuitRect = quitRect;
 		explorerGoRect = goRect;
-		explorerBoostRect = boostRect;
 
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
@@ -857,23 +861,8 @@ public class GameScript : MonoBehaviour {
 		displayTexture = (Texture2D)Resources.Load ("counter");
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
 		boostTexture4 = (Texture2D)Resources.Load ("speed4");
-		tutorialTexture = displayTexture;
 		explorerStopTexture = (Texture2D)Resources.Load ("go4");
 
-		textAreaStyle = new GUIStyle ();
-		textAreaStyle.fontSize = 64;
-		textAreaStyle.normal.textColor = Color.white;
-		textAreaStyle.alignment = TextAnchor.MiddleCenter;
-
-		tutorialStyle = new GUIStyle ();
-		tutorialStyle.fontSize = 32;
-		tutorialStyle.normal.textColor = Color.white;
-		tutorialStyle.alignment = TextAnchor.MiddleCenter;
-		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
-		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
-		texture.Apply ();
-		tutorialStyle.normal.background = texture;
-		
 		statStyle = new GUIStyle ();
 		statStyle.fontSize = 32;
 		statStyle.normal.textColor = Color.white;
@@ -882,6 +871,9 @@ public class GameScript : MonoBehaviour {
 		timerStyle = new GUIStyle ();
 		timerStyle.fontSize = 32;
 		timerStyle.normal.textColor = Color.white;
+		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
+		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
+		texture.Apply ();
 		texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
 		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
 		texture.Apply ();
@@ -932,16 +924,23 @@ public class GameScript : MonoBehaviour {
 		Pair<String, int>[] carsShop2 = {new Pair<String, int>("displayCar4", 3), new Pair<String, int>("displayCar5", 4)};
 		Pair<String, int>[] carsShop3 = {new Pair<String, int>("displayCar6", 5), new Pair<String, int>("displayCar7", 6)};
 		Pair<String, int>[] carsShop4 = {new Pair<String, int>("displayCar8", 7), new Pair<String, int>("displayCar9", 8)};
-		Pair<String, int>[] carsShop5 = {new Pair<String, int>("displayCar10", 9), new Pair<String, int>("displayCar11", 10)};
-		Pair<String, int>[] carsShop6 = {new Pair<String, int>("displayCar12", 11), new Pair<String, int>("displayCar13", 12)};
-		Pair<String, int>[] carsShop7 = {new Pair<String, int>("displayCar14", 13), new Pair<String, int>("displayCar15", 14)};
+		Pair<String, int>[] carsShop5 = {new Pair<String, int>("displayCar10", 9), new Pair<String, int>("displayCar12", 10)};
+		Pair<String, int>[] carsShop6 = {new Pair<String, int>("displayCar13", 11), new Pair<String, int>("displayCar14", 12)};
+		Pair<String, int>[] carsShop7 = {new Pair<String, int>("displayCar15", 13), new Pair<String, int>("displayCar16", 14)};
+		// Center (start)
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
-		shopTriggerPieces.Add ("puzzlePiece_turnabout_S (1)", carsShop2);
-		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (2)", carsShop3);
-		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop4);
-		shopTriggerPieces.Add ("puzzlePiece_oneBend_NE (40)", carsShop5);
-		shopTriggerPieces.Add ("puzzlePiece_turnabout_E (4)", carsShop6);
-		//shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop7);
+		// Center
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_E (4)", carsShop2);
+		// Top left (lava)
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_S (1)", carsShop3);
+		// Bottom left
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (2)", carsShop4);
+		// Right
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (1)", carsShop5);
+		// Bottom right
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (10)", carsShop6);
+		// Top right
+		shopTriggerPieces.Add ("puzzlePiece_turnabout_W (5)", carsShop7);
 	}
 
 	private static void AddTutorialMessages() {
@@ -949,27 +948,37 @@ public class GameScript : MonoBehaviour {
 
 		// tutorial level 1
 		String[] messages1 = new String[3];
-		messages1 [0] = "Tap highlighted puzzlepieces to shuffle them around.\nCreate a road for your car to ride on, towards the Portal.\n [NEXT]";
-		messages1 [1] = "Moving puzzlepieces is only possible when you pressed [GO].\nTap the [GO] button to start your engine.\nAfter six seconds the car starts to move.\n [NEXT]";
-		messages1 [2] = "You can only move pieces next to the empty spot.\nYou cannot move pieces the car is currently on.";
+		messages1 [0] = "Tap highlighted puzzlepieces\nto shuffle them around.\nCreate a road for your car to ride on,\ntowards the Portal.";
+		messages1 [1] = "Moving puzzlepieces is only\npossible when you pressed [GO].\nTap the [GO] button to start your\nengine. After six seconds the car\nstarts to move.";
+		messages1 [2] = "You can only move pieces next\nto the empty spot. You cannot move\npieces the car is currently on.";
 		tutorialMessages.Add ("tutorial_1", messages1);
 
 		// tutorial level 2
 		String[] messages2 = new String[2];
-		messages2 [0] = "The piece with the tower on it is the Beacon piece.\nThis piece will always move to the empty spot,\nregardless of its current position.\n [NEXT]";
-		messages2 [1] = "When you have studied the puzzle, tap [GO] to start up your car.";
+		messages2 [0] = "The piece with the tower on it is the\nBeacon piece. This piece will\nalways move to the empty spot,\nregardless of its current position.";
+		messages2 [1] = "When you have studied the puzzle,\ntap [GO] to start up your car.";
 		tutorialMessages.Add ("tutorial_2", messages2);
 
 		// tutorial level 3
 		String[] messages3 = new String[1];
-		messages3 [0] = "Sometimes you will lack pieces to complete your road.\n It all comes down to timing and quick shuffling.";
+		messages3 [0] = "Sometimes you will lack pieces\nto complete your road. It all comes\ndown to timing and quick shuffling.";
 		tutorialMessages.Add ("tutorial_3", messages3);
 
 		// level 1-1
 		String[] messages4 = new String[2];
-		messages4 [0] = "Complete levels to gain Marbles.\nYou will use them later to unlock more cars and goodies.\n [NEXT]";
-		messages4 [1] = "Beating the PAR awards you even more Marbles.\nWhen you have studied the puzzle, tap [GO] to start up your car.";
+		messages4 [0] = "Complete levels to gain Marbles.\nYou will use them later to unlock\nmore cars and goodies.";
+		messages4 [1] = "Beating the PAR awards you\neven more Marbles.When you\nhave studied the puzzle,\ntap [GO] to start up your car.";
 		tutorialMessages.Add ("level_01", messages4);
+
+		// level 2-1
+		String[] messages5 = new String[1];
+		messages5 [0] = "Drive over buttons to close/open bridges";
+		tutorialMessages.Add ("level_l01", messages5);
+
+		// level 3-1
+		String[] messages6 = new String[1];
+		messages6 [0] = "Driving through portals from the\ncorrect side will move you\nto the other portal with the same color.";
+		tutorialMessages.Add ("level_s01", messages6);
 	}
 
 	// Comparer to sort puzzle pieces

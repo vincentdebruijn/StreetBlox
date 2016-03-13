@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -23,7 +24,7 @@ public class WorldSelectScript : MonoBehaviour {
 	};
 
 	// The world 1 levels
-	private static readonly string[] levelsWorld1 = {
+	public static readonly string[] levelsWorld1 = {
 		"level_01",
 		"level_02",
 		"level_03",
@@ -49,24 +50,27 @@ public class WorldSelectScript : MonoBehaviour {
 		"level_23"
 	};
 	// The world2 levels
-	private static readonly string[] levelsWorld2 = {
+	public static readonly string[] levelsWorld2 = {
 		"level_l01",
 		"level_l02",
 		"level_l03",
 		"level_l04",
 		"level_l05",
 		"level_l06",
-		"level_l07"
+		"level_l07",
+		"level_l08",
+		"level_l09"
 	};
 	// The world3 levels
-	private static readonly string[] levelsWorld3 = {
+	public static readonly string[] levelsWorld3 = {
 		"level_s01",
 		"level_s02",
 		"level_s03",
 		"level_s04",
 		"level_s05",
 		"level_s06",
-		"level_s07"
+		"level_s07",
+		"level_s08"
 	};
 	// Mapping of level names to the name that should be displayed in level select
 	public static Dictionary<string, string> displayNames;
@@ -88,13 +92,11 @@ public class WorldSelectScript : MonoBehaviour {
 	private static Rect rightBottomRect;
 	private static Rect loadingRect;
 	private static Rect itemButtonRect;
-	private static Rect receivedItemTextRect;
 
 	private static GUIStyle backButtonChosenStyle;
 	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
 	private static GUIStyle loadingStyle;
 	private static GUIStyle itemButtonStyle;
-	private static GUIStyle receivedItemTextStyle;
 
 	// cars
 	private static GameObject displayCar1;
@@ -175,6 +177,7 @@ public class WorldSelectScript : MonoBehaviour {
 					Destroy(boxAnimator.gameObject);
 					animationPlaying = false;
 					animatedItem.GetComponent<CarDisplayScript>().turn = true;
+					ShowTextBox ();
 					showingItemButton = true;
 				}
 			} else if (movingItemToPlace) {
@@ -216,26 +219,20 @@ public class WorldSelectScript : MonoBehaviour {
 				MenuScript.PlayButtonSound ();
 				endlessButtonChosenStyle = endlessButtonStyle;
 				loading = true;
-				Application.LoadLevel ("explorer");
+				SceneManager.LoadScene ("explorer");
 			}
 			if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
 				backButtonChosenStyle = MenuScript.backButtonStyle;
 				MenuScript.PlayButtonSound ();
-				Application.LoadLevel ("menu");
+				SceneManager.LoadScene ("menu");
 			}
 		}
 
 		if (showingItemButton) {
-			String text = "";
-			if (animatedItem.name.Contains ("car"))
-				text = "You have unlocked a new car!";
-			else
-				text = "You have unlocked new levels!";
-
-			GUI.Label (receivedItemTextRect, text, receivedItemTextStyle);
 			if (GUI.Button (itemButtonRect, "", itemButtonStyle)) {
 				MenuScript.PlayButtonSound ();
 				showingItemButton = false;
+				DestroyTutorialMessageBox ();
 				if (animatedItem.name.Contains ("car"))
 					animatedItem.GetComponent<CarDisplayScript> ().turn = false;
 				movingSpeed = Vector3.Distance (animatedItem.transform.position, destination);
@@ -251,12 +248,34 @@ public class WorldSelectScript : MonoBehaviour {
 		MenuScript.PlayButtonSound ();
 		SetLevelInfo (world);
 		chosenWorldName = WorldNames [world];
-		Application.LoadLevel ("level_select");
+		SceneManager.LoadScene ("level_select");
 	}
 
 	public static void SetLevelInfo(int world) {
 		levels = worlds [world];
 		levelConfigurations = worldConfigurations [WorldNames [world]];
+	}
+
+	private void ShowTextBox() {
+		String text = "";
+		if (animatedItem.name.Contains ("car"))
+			text = "You have unlocked a new car!";
+		else
+			text = "You have unlocked new levels!";
+		String[] messages = new String[1];
+		messages [0] = text;
+
+		GameObject tutorialBox = Resources.Load ("TutorialBox") as GameObject;
+		Vector3 position = new Vector3 (-2.4f, 9.56f, -8.2f);
+		Quaternion rotation = Quaternion.Euler(new Vector3(60, 180, 0));
+		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, rotation);
+		iTutorialBox.transform.localScale = new Vector3 (12, 4, 4);
+		iTutorialBox.name = "TutorialBox";
+		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(messages);
+	}
+
+	private void DestroyTutorialMessageBox() {
+		Destroy (GameObject.Find ("TutorialBox"));
 	}
 
 	// Animation stuff
@@ -420,7 +439,6 @@ public class WorldSelectScript : MonoBehaviour {
 		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
 		itemButtonRect = new Rect (Screen.width * 0.4f, Screen.height - (Screen.width / 10) - offset, Screen.width / 5, Screen.width / 10);
-		receivedItemTextRect = new Rect (Screen.width * 0.375f, offset, Screen.width / 4, Screen.width / 16);
 		
 		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
 		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
@@ -442,14 +460,6 @@ public class WorldSelectScript : MonoBehaviour {
 
 		itemButtonStyle = new GUIStyle ();
 		itemButtonStyle.normal.background = itemButtonTexture;
-
-		receivedItemTextStyle = new GUIStyle ();
-		receivedItemTextStyle.normal.textColor = Color.black;
-		receivedItemTextStyle.fontSize = 32;
-		receivedItemTextStyle.alignment = TextAnchor.MiddleCenter;
-		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
-		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
-		receivedItemTextStyle.normal.background = texture;
 	
 		AddCars ();
 		AddPuzzleBoxes ();
@@ -529,6 +539,8 @@ public class WorldSelectScript : MonoBehaviour {
 		world2Configuration.Add ("level_l05", new LevelConfiguration (6, 5, 0f, 0f, 11));
 		world2Configuration.Add ("level_l06", new LevelConfiguration (4, 5, 0f, 0f, 12));
 		world2Configuration.Add ("level_l07", new LevelConfiguration (6, 6, 0f, 0f, 12));
+		world2Configuration.Add ("level_l08", new LevelConfiguration (6, 6, 0f, 0f, 38));
+		world2Configuration.Add ("level_l09", new LevelConfiguration (5, 4, 0f, 0f, 15));
 
 		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[3], world3Configuration);
@@ -540,6 +552,7 @@ public class WorldSelectScript : MonoBehaviour {
 		world3Configuration.Add ("level_s05", new LevelConfiguration (4, 5, 0f, 0f, 15));
 		world3Configuration.Add ("level_s06", new LevelConfiguration (9, 5, 0f, 0f, 25));
 		world3Configuration.Add ("level_s07", new LevelConfiguration (7, 4, 0f, 0f, 25));
+		world3Configuration.Add ("level_s08", new LevelConfiguration (7, 6, 0f, 0f, 25));
 
 		displayNames = new Dictionary<string, string> ();
 		displayNames.Add ("tutorial_1", "0-1");
@@ -576,6 +589,8 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_l05", "2-5");
 		displayNames.Add ("level_l06", "2-6");
 		displayNames.Add ("level_l07", "2-7");
+		displayNames.Add ("level_l08", "2-8");
+		displayNames.Add ("level_l09", "2-9");
 
 		displayNames.Add ("level_s01", "3-1");
 		displayNames.Add ("level_s02", "3-2");
@@ -584,6 +599,7 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_s05", "3-5");
 		displayNames.Add ("level_s06", "3-6");
 		displayNames.Add ("level_s07", "3-7");
+		displayNames.Add ("level_s08", "3-8");
 	}
 }
 

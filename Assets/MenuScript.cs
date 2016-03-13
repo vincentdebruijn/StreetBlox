@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -10,6 +11,7 @@ using System.IO;
 using UnityEngine.UI;
 
 public class MenuScript : MonoBehaviour {
+	private const string VINLIAGAMESURL = "https://www.facebook.com/vinliagames";
 	public static PlayerData data;
 
 	// GUI stuff
@@ -76,15 +78,15 @@ public class MenuScript : MonoBehaviour {
 
 	void OnGUI() {
 		if (GUI.Button(logoRect, "", logoStyle)) {
-			Application.OpenURL("https://www.facebook.com/vinliagames");
+			Application.OpenURL(VINLIAGAMESURL);
 		}
 		if (GUI.Button (vinliaRect, "", vinliaStyle)) {
-			Application.OpenURL("https://www.facebook.com/vinliagames");
+			Application.OpenURL(VINLIAGAMESURL);
 		}
 		if (GUI.Button (leftButtonRect, "", optionButtonChosenStyle)) {
 			optionButtonChosenStyle = optionButtonStyle;
 			PlayButtonSound();
-			Application.LoadLevel ("options");
+			SceneManager.LoadScene ("options");
 		}
 		if (GUI.Button (middleButtonRect, "", selectButtonChosenStyle)) {
 			selectButtonChosenStyle = selectButtonStyle;
@@ -95,9 +97,9 @@ public class MenuScript : MonoBehaviour {
 				WorldSelectScript.SetLevelInfo(0);
 				LevelSelectScript.SetLevelInfo();
 				LevelSelectScript.chosenLevel = tutorialLevel;
-				Application.LoadLevel(tutorialLevel);
+				SceneManager.LoadScene(tutorialLevel);
 			} else {
-				Application.LoadLevel ("world_select");
+				SceneManager.LoadScene ("world_select");
 			}
 		}
 		if (GUI.Button (rightButtonRect, "", exitButtonChosenStyle)) {
@@ -132,6 +134,11 @@ public class MenuScript : MonoBehaviour {
 			FileStream file = File.Open (savePath, FileMode.Open);
 			data = (PlayerData)bf.Deserialize(file);
 			file.Close ();
+
+
+
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
@@ -151,9 +158,9 @@ public class MenuScript : MonoBehaviour {
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
 
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
+			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
+			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
+			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
 		}
 	}
 
