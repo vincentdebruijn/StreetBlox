@@ -135,8 +135,6 @@ public class MenuScript : MonoBehaviour {
 			data = (PlayerData)bf.Deserialize(file);
 			file.Close ();
 
-
-
 			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
 			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
 		} else {
@@ -152,15 +150,11 @@ public class MenuScript : MonoBehaviour {
 			data.carsUnlocked = new Boolean[16];
 			for(int i = 0; i < data.carsUnlocked.Length; i++)
 				data.carsUnlocked[i] = false;
-			data.puzzleBoxesUnlocked = new Boolean[3];
+			data.puzzleBoxesUnlocked = new Boolean[4];
 			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
 				data.puzzleBoxesUnlocked[i] = false;
 
 			data.animationQueue = new Queue<Pair<string, int>> ();
-
-			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
-			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
-			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
 		}
 	}
 

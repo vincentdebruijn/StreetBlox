@@ -267,6 +267,9 @@ public class GameScript : MonoBehaviour {
 			marbles = 0;
 		MenuScript.data.marbles += marbles;
 
+		if (MenuScript.data.marbles >= UnlockButtonScript.COST && !MenuScript.data.puzzleBoxesUnlocked[3] && !MenuScript.data.animationQueue.Contains (new Pair<String, int> ("puzzleBoxWorld4", 3))) {
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld4", 3));
+		}
 		// Give the Tardis when a space level was completed
 		if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0 && !MenuScript.data.carsUnlocked [10] && !MenuScript.data.animationQueue.Contains (new Pair<String, int> ("car11", 10))) {
 			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car11", 10));

@@ -83,18 +83,14 @@ public class WorldSelectScript : MonoBehaviour {
 	//  The configurations for the selected levels that LevelSelect should use
 	public static Dictionary<string, LevelConfiguration> levelConfigurations;
 
-	// GUI stuff
-	private static Texture2D endlessButtonTexture, endlessButtonPressedTexture;
 	private static Texture2D levelTextTexture;
 	private static Texture2D itemButtonTexture;
 	
 	private static Rect leftBottomRect;
-	private static Rect rightBottomRect;
 	private static Rect loadingRect;
 	private static Rect itemButtonRect;
 
 	private static GUIStyle backButtonChosenStyle;
-	private static GUIStyle endlessButtonStyle, endlessButtonPressedStyle, endlessButtonChosenStyle;
 	private static GUIStyle loadingStyle;
 	private static GUIStyle itemButtonStyle;
 
@@ -123,6 +119,7 @@ public class WorldSelectScript : MonoBehaviour {
 	private static GameObject puzzleBoxWorld1;
 	private static GameObject puzzleBoxWorld2;
 	private static GameObject puzzleBoxWorld3;
+	private static GameObject puzzleBoxWorld4;
 
 	// Animation stuff
 	private static Vector3 carPositionStartAnimation = new Vector3(-1.7f, 5f, -7f);
@@ -202,8 +199,6 @@ public class WorldSelectScript : MonoBehaviour {
 			Vector3 mousePosition = new Vector3(Input.mousePosition.x, Screen.height - Input.mousePosition.y, 0);
 			if (leftBottomRect.Contains (mousePosition))
 				backButtonChosenStyle = MenuScript.backButtonPressedStyle;
-			else if (rightBottomRect.Contains(mousePosition))
-				endlessButtonChosenStyle = endlessButtonPressedStyle;
 		}
 	}
 	
@@ -215,12 +210,6 @@ public class WorldSelectScript : MonoBehaviour {
 			return;
 
 		if (!showingAnimations) {
-			if (GUI.Button (rightBottomRect, "", endlessButtonChosenStyle)) {
-				MenuScript.PlayButtonSound ();
-				endlessButtonChosenStyle = endlessButtonStyle;
-				loading = true;
-				SceneManager.LoadScene ("explorer");
-			}
 			if (GUI.Button (leftBottomRect, "", backButtonChosenStyle)) {
 				backButtonChosenStyle = MenuScript.backButtonStyle;
 				MenuScript.PlayButtonSound ();
@@ -244,11 +233,15 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	public void SelectedWorld(int world) {
-		Debug.Log (world);
 		MenuScript.PlayButtonSound ();
-		SetLevelInfo (world);
-		chosenWorldName = WorldNames [world];
-		SceneManager.LoadScene ("level_select");
+		if (world == 4) {
+			loading = true;
+			SceneManager.LoadScene ("explorer");
+		} else {
+			SetLevelInfo (world);
+			chosenWorldName = WorldNames [world];
+			SceneManager.LoadScene ("level_select");
+		}
 	}
 
 	public static void SetLevelInfo(int world) {
@@ -258,7 +251,15 @@ public class WorldSelectScript : MonoBehaviour {
 
 	private void ShowTextBox() {
 		String text = "";
-		if (animatedItem.name.Contains ("car"))
+		Debug.Log ("HIER");
+		Debug.Log (animatedItem.name);
+		if (animatedItem.name.Contains("puzzleBoxWorld4"))
+			text = "You have unlocked Explorer mode!\nYou can find more cars/levels here.";
+		else if (animatedItem.name.Contains ("car1"))
+			text = "You have unlocked your first car!";
+		else if (animatedItem.name.Contains("puzzleBoxWorld1"))
+			text = "You have unlocked a puzzle Box!\nThis contains the first levels to play.";
+		else if (animatedItem.name.Contains ("car"))
 			text = "You have unlocked a new car!";
 		else
 			text = "You have unlocked new levels!";
@@ -306,6 +307,7 @@ public class WorldSelectScript : MonoBehaviour {
 		case "puzzleBoxWorld1": item = puzzleBoxWorld1; break;
 		case "puzzleBoxWorld2": item = puzzleBoxWorld2; break;
 		case "puzzleBoxWorld3": item = puzzleBoxWorld3; break;
+		case "puzzleBoxWorld4": item = puzzleBoxWorld4; break;
 		default:
 			throw new ArgumentException("Unknown item name: " + itemName);
 		}
@@ -326,6 +328,7 @@ public class WorldSelectScript : MonoBehaviour {
 			targetScale = animatedItem.transform.localScale;
 			animatedItem.transform.localScale = targetScale * 4;
 			animatedItem.GetComponent<puzzleBoxScript>().SetWorldNumber(itemIndex + 1);
+			ShowTextBox ();
 			showingItemButton = true;
 		}
 		animatedItem.name = itemName;
@@ -430,27 +433,22 @@ public class WorldSelectScript : MonoBehaviour {
 			GameObject clone = (GameObject)Instantiate (puzzleBoxWorld3);
 			clone.transform.GetComponent<puzzleBoxScript>().SetWorldNumber (3);
 		}
+		if (MenuScript.data.puzzleBoxesUnlocked [3]) {
+			GameObject clone = (GameObject)Instantiate (puzzleBoxWorld4);
+			clone.transform.GetComponent<puzzleBoxScript>().SetWorldNumber (4);
+		}
 	}
 
 	private static void SetVariables() {
 		float buttonSize = (int)(Screen.width / 5 * 0.7);
 		float offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
-		rightBottomRect = new Rect (Screen.width - offset - buttonSize, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
 		itemButtonRect = new Rect (Screen.width * 0.4f, Screen.height - (Screen.width / 10) - offset, Screen.width / 5, Screen.width / 10);
-		
-		endlessButtonTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
-		endlessButtonPressedTexture = (Texture2D)Resources.Load("ui_button_endless_cs");
+
 		levelTextTexture = (Texture2D) Resources.Load ("ui_border_levelname");
 		itemButtonTexture = (Texture2D)Resources.Load ("ui_button_awesome");
 		backButtonChosenStyle = MenuScript.backButtonStyle;
-		
-		endlessButtonStyle = new GUIStyle ();
-		endlessButtonStyle.normal.background = endlessButtonTexture;
-		endlessButtonPressedStyle = new GUIStyle ();
-		endlessButtonPressedStyle.normal.background = endlessButtonPressedTexture;
-		endlessButtonChosenStyle = endlessButtonStyle;
 
 		loadingStyle = new GUIStyle ();
 		loadingStyle.normal.textColor = Color.white;
@@ -491,6 +489,7 @@ public class WorldSelectScript : MonoBehaviour {
 		puzzleBoxWorld1 = Resources.Load ("puzzleBoxWorld1") as GameObject;
 		puzzleBoxWorld2 = Resources.Load ("puzzleBoxWorld2") as GameObject;
 		puzzleBoxWorld3 = Resources.Load ("puzzleBoxWorld3") as GameObject;
+		puzzleBoxWorld4 = Resources.Load ("puzzleBoxWorld4") as GameObject;
 	}
 
 	public static void AddLevels() {
