@@ -30,6 +30,7 @@ public class MenuScript : MonoBehaviour {
 	public static GUIStyle logoStyle;
 
 	public static GameObject soundButton;
+	public static GameObject soundItemReceived;
 	public static GameObject soundPuzzlePiece;
 	public static GameObject soundGearShift;
 	public static GameObject soundMenu;
@@ -124,7 +125,7 @@ public class MenuScript : MonoBehaviour {
 
 	// Whether we are in the tutorial phase
 	public static Boolean InTutorialPhase() {
-		return (!data.carsUnlocked[0] || !data.puzzleBoxesUnlocked[0]) && data.playTutorials;
+		return (!data.carsUnlocked[0]) && data.playTutorials;
 	}
 	
 	public static void Load() {
@@ -140,7 +141,6 @@ public class MenuScript : MonoBehaviour {
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();
-			data.playAnimations = false;
 			data.playTutorials = true;
 			data.playMusic = true;
 			data.playSoundEffects = true;
@@ -170,6 +170,11 @@ public class MenuScript : MonoBehaviour {
 	public static void PlayButtonSound() {
 		if (data.playSoundEffects)
 			soundButton.GetComponent<AudioSource> ().Play ();
+	}
+
+	public static void PlayItemReceivedSound() {
+		if (data.playSoundEffects)
+			soundItemReceived.GetComponent<AudioSource> ().Play ();
 	}
 
 	public static void PlayPuzzlePieceSound() {
@@ -261,6 +266,8 @@ public class MenuScript : MonoBehaviour {
 	private static void SetVariables() {
 		soundButton = GameObject.Find ("sound_button_click");
 		DontDestroyOnLoad (soundButton);
+		soundItemReceived = GameObject.Find ("sound_item_received");
+		DontDestroyOnLoad (soundItemReceived);
 		soundPuzzlePiece = GameObject.Find ("sound_piece_click");
 		DontDestroyOnLoad (soundPuzzlePiece);
 		soundGearShift = GameObject.Find ("sound_gear_shift");
@@ -332,7 +339,6 @@ public class MenuScript : MonoBehaviour {
 	[Serializable]
 	public class PlayerData {
 		public Dictionary<string, int> levelProgress;
-		public Boolean playAnimations;
 		public Boolean playTutorials;
 		public Boolean playMusic;
 		public Boolean playSoundEffects;

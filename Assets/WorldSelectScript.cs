@@ -171,6 +171,7 @@ public class WorldSelectScript : MonoBehaviour {
 		if (showingAnimations) {
 			if (animationPlaying) {
 				if (boxAnimator.GetCurrentAnimatorStateInfo (0).IsName ("End")) {
+					MenuScript.PlayItemReceivedSound ();
 					Destroy(boxAnimator.gameObject);
 					animationPlaying = false;
 					animatedItem.GetComponent<CarDisplayScript>().turn = true;
@@ -251,8 +252,6 @@ public class WorldSelectScript : MonoBehaviour {
 
 	private void ShowTextBox() {
 		String text = "";
-		Debug.Log ("HIER");
-		Debug.Log (animatedItem.name);
 		if (animatedItem.name.Contains("puzzleBoxWorld4"))
 			text = "You have unlocked Explorer mode!\nYou can find more cars/levels here.";
 		else if (animatedItem.name.Contains ("car1"))
@@ -267,9 +266,10 @@ public class WorldSelectScript : MonoBehaviour {
 		messages [0] = text;
 
 		GameObject tutorialBox = Resources.Load ("TutorialBox") as GameObject;
-		Vector3 position = new Vector3 (-2.4f, 9.56f, -8.2f);
+		Vector3 position = new Vector3 (-2.66f, 10.69f, -8.2f);
 		Quaternion rotation = Quaternion.Euler(new Vector3(60, 180, 0));
 		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, rotation);
+		iTutorialBox.transform.GetComponentInChildren<TextMesh> ().fontSize = 18;
 		iTutorialBox.transform.localScale = new Vector3 (12, 4, 4);
 		iTutorialBox.name = "TutorialBox";
 		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(messages);
@@ -323,6 +323,7 @@ public class WorldSelectScript : MonoBehaviour {
 			boxAnimator.Play ("Take 001");
 			animationPlaying = true;
 		} else {
+			MenuScript.PlayItemReceivedSound ();
 			MenuScript.data.puzzleBoxesUnlocked [itemIndex] = true;
 			animatedItem = (GameObject)Instantiate (item, puzzleBoxPositionStartAnimation, puzzleBoxRotationStartAnimation);
 			targetScale = animatedItem.transform.localScale;
@@ -444,7 +445,7 @@ public class WorldSelectScript : MonoBehaviour {
 		float offset = (Screen.width / 5 - buttonSize) / 2;
 		leftBottomRect = new Rect (offset, Screen.height - 10 - buttonSize, buttonSize, buttonSize);
 		loadingRect = new Rect (Screen.width / 2 - buttonSize / 2, Screen.height / 5 - buttonSize / 6, buttonSize, buttonSize / 3);
-		itemButtonRect = new Rect (Screen.width * 0.4f, Screen.height - (Screen.width / 10) - offset, Screen.width / 5, Screen.width / 10);
+		itemButtonRect = new Rect ((Screen.width - (Screen.height / 5)) / 2, Screen.height / 9 * 8 - 15, Screen.height / 4.5f, Screen.height / 9f);
 
 		levelTextTexture = (Texture2D) Resources.Load ("ui_border_levelname");
 		itemButtonTexture = (Texture2D)Resources.Load ("ui_button_awesome");

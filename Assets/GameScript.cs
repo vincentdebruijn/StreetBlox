@@ -863,7 +863,7 @@ public class GameScript : MonoBehaviour {
 		goTexture4 = (Texture2D)Resources.Load ("go4");
 		displayTexture = (Texture2D)Resources.Load ("counter");
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
-		boostTexture4 = (Texture2D)Resources.Load ("speed4");
+		boostTexture4 = (Texture2D)Resources.Load ("speed2");
 		explorerStopTexture = (Texture2D)Resources.Load ("go4");
 
 		statStyle = new GUIStyle ();
