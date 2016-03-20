@@ -136,8 +136,8 @@ public class MenuScript : MonoBehaviour {
 			data = (PlayerData)bf.Deserialize(file);
 			file.Close ();
 
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+			//MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
 		} else {
 			data = new PlayerData ();
 			data.levelProgress = new Dictionary<string, int>();

@@ -48,32 +48,26 @@ public class GameScript : MonoBehaviour {
 
 	public string chosenLevel;
 
+	private static Pair<string, int> explorerPair = new Pair<string, int> ("puzzleBoxWorld4", 3);
+	private static Pair<string, int> tardisPair = new Pair<String, int> ("car11", 10);
+
 	// In game UI
 	private static Texture2D quitTexture;
 	private static Texture2D resetTexture;
-	private static Texture2D goTexture1;
-	private static Texture2D goTexture2;
-	private static Texture2D goTexture3;
-	private static Texture2D goTexture4;
+	private static Texture2D goTexture0, goTexture1, goTexture2, goTexture3, goTexture4, goTexture5, goTexture6, goTexture7;
 	private static Texture2D displayTexture;
 	private static Texture2D boostTexture1;
 	private static Texture2D boostTexture4;
-	private static Texture2D explorerStopTexture;
 
 	private static GUIStyle statStyle;
 	private static GUIStyle timerStyle;
 	private static GUIStyle quitStyle;
 	private static GUIStyle resetStyle;
-	private static GUIStyle goStyle1;
-	private static GUIStyle goStyle2;
-	private static GUIStyle goStyle3;
-	private static GUIStyle goStyle4;
-	private static GUIStyle chosenGoStyle;
+	private static GUIStyle goStyle;
 	private static GUIStyle displayStyle;
 	private static GUIStyle boostStyle1;
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
-	private static GUIStyle stopStyle;
 
 	private static Rect quitRect;
 	private static Rect resetRect;
@@ -104,11 +98,10 @@ public class GameScript : MonoBehaviour {
 
 	private void OnLevelWasLoaded(int iLevel) {
 		chosenLevel = SceneManager.GetActiveScene().name;
-		chosenGoStyle = goStyle1;
-		chosenBoostStyle = boostStyle1;
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		shop = Resources.Load ("shopScreen") as GameObject;
 		tutorialBox = Resources.Load ("TutorialBox") as GameObject;
+		movesMade = 0;
 
 		bridgesFlipped = false;
 		if (chosenLevel == "explorer") {
@@ -150,6 +143,8 @@ public class GameScript : MonoBehaviour {
 			staticVariablesSet = true;
 		}
 
+		goStyle.normal.background = goTexture0;
+		chosenBoostStyle = boostStyle1;
 		canvas = (GameObject)Resources.Load ("canvas");
 		scoreScreen = (GameObject)Resources.Load ("scoreScreen");
 		lossScreen = (GameObject)Resources.Load ("failScreen");
@@ -164,10 +159,12 @@ public class GameScript : MonoBehaviour {
 			time += Time.deltaTime;
 			if (chosenLevel != "explorer" && time < levelConfiguration.waitTimeAtStart)
 				return;
-			if (chosenLevel == "explorer" && MenuScript.data.board != null)
+			goStyle.normal.background = goTexture7;
+			if (chosenLevel == "explorer" && MenuScript.data.board != null) {
 				carScript.Resume (levelConfiguration);
-			else	
+			} else {
 				carScript.StartTheGame (levelConfiguration);
+			}
 		}
 
 		if (carScript.GameOver ()) {
@@ -206,7 +203,7 @@ public class GameScript : MonoBehaviour {
 		if (chosenLevel == "explorer") {
 			gameStarted = false;
 			carScript.Reset ();
-			chosenGoStyle = goStyle1;
+			goStyle.normal.background = goTexture0;
 			chosenBoostStyle = boostStyle1;
 			GameObject.Destroy(carScript.gameObject);
 			if (MenuScript.data.board != null) {
@@ -267,12 +264,12 @@ public class GameScript : MonoBehaviour {
 			marbles = 0;
 		MenuScript.data.marbles += marbles;
 
-		if (MenuScript.data.marbles >= UnlockButtonScript.COST && !MenuScript.data.puzzleBoxesUnlocked[3] && !MenuScript.data.animationQueue.Contains (new Pair<String, int> ("puzzleBoxWorld4", 3))) {
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld4", 3));
+		if (MenuScript.data.marbles >= UnlockButtonScript.COST && !MenuScript.data.puzzleBoxesUnlocked[3] && !MenuScript.data.animationQueue.Contains (explorerPair)) {
+			MenuScript.data.animationQueue.Enqueue (explorerPair);
 		}
 		// Give the Tardis when a space level was completed
-		if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0 && !MenuScript.data.carsUnlocked [10] && !MenuScript.data.animationQueue.Contains (new Pair<String, int> ("car11", 10))) {
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car11", 10));
+		if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0 && !MenuScript.data.carsUnlocked [10] && !MenuScript.data.animationQueue.Contains (tardisPair)) {
+			MenuScript.data.animationQueue.Enqueue (tardisPair);
 			GameObject obj = (GameObject)GameObject.Instantiate (((GameObject)Resources.Load ("displayCar11")), new Vector3 (-100, -100, -100), new Quaternion ());
 			obj.GetComponent<AudioSource> ().Play ();
 		}
@@ -281,7 +278,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayButtonBar() {
-		if (gameStarted) {
+		if (gameStarted || halted) {
 			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
 				if (carScript.boost == 0f) {
 					MenuScript.PlayGearShiftSound ();
@@ -318,19 +315,24 @@ public class GameScript : MonoBehaviour {
 		
 		if (gameStarted && time < levelConfiguration.waitTimeAtStart) {
 			double restTime = Math.Ceiling (levelConfiguration.waitTimeAtStart - time);
+			if (restTime == 5)
+				goStyle.normal.background = goTexture2;
+			else if (restTime == 4)
+				goStyle.normal.background = goTexture3;
 			if (restTime == 3)
-				chosenGoStyle = goStyle3;
+				goStyle.normal.background = goTexture4;
+			else if (restTime == 2)
+				goStyle.normal.background = goTexture5;
 			else if (restTime == 1)
-				chosenGoStyle = goStyle4;
-			if (GUI.Button (goRect, restTime + "   ", chosenGoStyle)) {
+				goStyle.normal.background = goTexture6;
+			if (GUI.Button (goRect,"", goStyle)) {
 				time += (float)restTime;
 			}
 		} else if (gameStarted) {
-			GUI.Label (goRect, "", chosenGoStyle);
+			GUI.Label (goRect, "", goStyle);
 		} else {
-			if (GUI.Button (goRect, "", chosenGoStyle)) {
+			if (GUI.Button (goRect, "", goStyle)) {
 				MenuScript.PlayButtonSound ();
-				chosenGoStyle = goStyle2;
 				StartTheGame();
 			}
 		}
@@ -347,14 +349,14 @@ public class GameScript : MonoBehaviour {
 			SceneManager.LoadScene ("world_select");
 		}
 
-		if (GUI.Button (explorerGoRect, "", chosenGoStyle)) {
+		if (GUI.Button (explorerGoRect, "", goStyle)) {
 			MenuScript.PlayButtonSound ();
 			if (gameStarted && !halted) {
-				chosenGoStyle = goStyle1;
+				goStyle.normal.background = goTexture0;
 				halted = true;
 				carScript.carStarted = false;
 			} else if (gameStarted && halted) {
-				chosenGoStyle = stopStyle;
+				goStyle.normal.background = goTexture7;
 				halted = false;
 				showingShop = false;
 				carScript.carStarted = true;
@@ -362,9 +364,9 @@ public class GameScript : MonoBehaviour {
 			} else if (halted) {
 				gameStarted = true;
 				halted = false;
-				chosenGoStyle = stopStyle;
+				goStyle.normal.background = goTexture7;
 			} else { 
-				chosenGoStyle = stopStyle;
+				goStyle.normal.background = goTexture7;
 				StartTheGame ();
 			}
 		}
@@ -389,7 +391,6 @@ public class GameScript : MonoBehaviour {
 	// Start the counter!
 	private void StartTheGame() {
 		time = 0.0f;
-		movesMade = 0;
 		processedGameOver = false;
 		carScript.carStarted = false;
 		carScript.boost = 0f;
@@ -488,7 +489,7 @@ public class GameScript : MonoBehaviour {
 	public void Halt() {
 		gameStarted = false;
 		halted = true;
-		chosenGoStyle = goStyle1;
+		goStyle.normal.background = goTexture0;
 	}
 
 	public void ShowShop() {
@@ -569,11 +570,10 @@ public class GameScript : MonoBehaviour {
 		float topZPosition = levelConfiguration.TopZPosition;
 
 		Vector3 temp = puzzlePiece.transform.position;
-		Debug.Log (temp);
 		int x = (int)((temp.x - leftXPosition) / pieceSize);
 		int y = (int)(-(temp.z - topZPosition) / pieceSize);
-		if (board [y] [x] != puzzlePiece)
-			throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
+		//if (board [y] [x] != puzzlePiece)
+		//		throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
 		int new_x = -1;
 		int new_y = -1;
 		if (puzzlePiece.name.Contains ("beacon")) {
@@ -617,7 +617,7 @@ public class GameScript : MonoBehaviour {
 				MenuScript.PlayPuzzlePieceSound();
 				movesMade += 1;
 				if (!gameStarted && chosenLevel != "explorer") {
-					chosenGoStyle = goStyle2;
+					goStyle.normal.background = goTexture1;
 					StartTheGame ();
 				}
 			}
@@ -857,14 +857,19 @@ public class GameScript : MonoBehaviour {
 
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
+		goTexture0 = (Texture2D)Resources.Load ("go0");
 		goTexture1 = (Texture2D)Resources.Load ("go1");
 		goTexture2 = (Texture2D)Resources.Load ("go2");
 		goTexture3 = (Texture2D)Resources.Load ("go3");
 		goTexture4 = (Texture2D)Resources.Load ("go4");
+		goTexture5 = (Texture2D)Resources.Load ("go5");
+		goTexture6 = (Texture2D)Resources.Load ("go6");
+		goTexture7 = (Texture2D)Resources.Load ("go7");
 		displayTexture = (Texture2D)Resources.Load ("counter");
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
 		boostTexture4 = (Texture2D)Resources.Load ("speed2");
-		explorerStopTexture = (Texture2D)Resources.Load ("go4");
+
+		goStyle = new GUIStyle ();
 
 		statStyle = new GUIStyle ();
 		statStyle.fontSize = 32;
@@ -887,29 +892,6 @@ public class GameScript : MonoBehaviour {
 
 		resetStyle = new GUIStyle ();
 		resetStyle.normal.background = resetTexture;
-
-		goStyle1 = new GUIStyle ();
-		goStyle1.normal.background = goTexture1;
-		goStyle2 = new GUIStyle ();
-		goStyle2.normal.background = goTexture2;
-		goStyle2.fontSize = 36;
-		goStyle2.normal.textColor = Color.black;
-		goStyle2.fontStyle = FontStyle.Bold;
-		goStyle2.alignment = TextAnchor.MiddleRight;
-		goStyle3 = new GUIStyle ();
-		goStyle3.normal.background = goTexture3;
-		goStyle3.fontSize = 36;
-		goStyle3.normal.textColor = Color.black;
-		goStyle3.fontStyle = FontStyle.Bold;
-		goStyle3.alignment = TextAnchor.MiddleRight;
-		goStyle4 = new GUIStyle ();
-		goStyle4.normal.background = goTexture4;
-		goStyle4.fontSize = 36;
-		goStyle4.normal.textColor = Color.black;
-		goStyle4.fontStyle = FontStyle.Bold;
-		goStyle4.alignment = TextAnchor.MiddleRight;
-		stopStyle = new GUIStyle ();
-		stopStyle.normal.background = explorerStopTexture;
 
 		displayStyle = new GUIStyle ();
 		displayStyle.normal.background = displayTexture;
