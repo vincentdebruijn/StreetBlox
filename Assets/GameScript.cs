@@ -933,15 +933,15 @@ public class GameScript : MonoBehaviour {
 
 		// tutorial level 1
 		String[] messages1 = new String[3];
-		messages1 [0] = "Tap highlighted puzzlepieces\nto shuffle them around.\nCreate a road for your car to ride on,\ntowards the Portal.";
-		messages1 [1] = "Moving puzzlepieces is only\npossible when you pressed [GO].\nTap the [GO] button to start your\nengine. After six seconds the car\nstarts to move.";
-		messages1 [2] = "You can only move pieces next\nto the empty spot. You cannot move\npieces the car is currently on.";
+		messages1 [0] = "Tap highlighted puzzlepieces\nto shuffle them around.\nCreate a road for your car to ride on,\ntowards the Portal. [1/3]";
+		messages1 [1] = "When you touched the puzzle\nthe car will start its engine\nand after a few seconds it will start moving. [2/3]";
+		messages1 [2] = "You can only move pieces next\nto the empty spot. You cannot move\npieces the car is currently on. [3/3]";
 		tutorialMessages.Add ("tutorial_1", messages1);
 
 		// tutorial level 2
 		String[] messages2 = new String[2];
-		messages2 [0] = "The piece with the tower on it is the\nBeacon piece. This piece will\nalways move to the empty spot,\nregardless of its current position.";
-		messages2 [1] = "When you have studied the puzzle,\ntap [GO] to start up your car.";
+		messages2 [0] = "The piece with the tower on it is the\nBeacon piece. This piece will\nalways move to the empty spot,\nregardless of its current position. [1/2]";
+		messages2 [1] = "Tired of waiting for your\ncar to start driving? Tap the\narea of the steering wheel to\nskip the startup time. [2/2]";
 		tutorialMessages.Add ("tutorial_2", messages2);
 
 		// tutorial level 3
@@ -951,19 +951,52 @@ public class GameScript : MonoBehaviour {
 
 		// level 1-1
 		String[] messages4 = new String[2];
-		messages4 [0] = "Complete levels to gain Marbles.\nYou will use them later to unlock\nmore cars and goodies.";
-		messages4 [1] = "Beating the PAR awards you\neven more Marbles.When you\nhave studied the puzzle,\ntap [GO] to start up your car.";
+		messages4 [0] = "Complete levels to gain Marbles.\nYou can obtain a collection\nof cars with them! [1/2]";
+		messages4 [1] = "Beating the PAR awards you\nwith even more Marbles! [2/2]";
 		tutorialMessages.Add ("level_01", messages4);
 
 		// level 2-1
 		String[] messages5 = new String[1];
-		messages5 [0] = "Drive over buttons to close/open bridges";
+		messages5 [0] = "Drive over buttons to open and close bridges.";
 		tutorialMessages.Add ("level_l01", messages5);
 
 		// level 3-1
-		String[] messages6 = new String[1];
-		messages6 [0] = "Driving through portals from the\ncorrect side will move you\nto the other portal with the same color.";
+		String[] messages6 = new String[2];
+		messages6 [0] = "Driving through portals from the\ncolored side in will move you\nto the other portal with the same color. [1/2]";
+		messages6 [1] = "Driving through the grey circle first\nmakes the portal ignore you. [2/2]";
 		tutorialMessages.Add ("level_s01", messages6);
+
+		// Explorer Mode - first entry
+		String[] messages7 = new String[3];
+		messages7 [0] = "Welcome to Streettopia! This world\ncomes with its own rules.\nYou can shuffle puzzlepieces\nwhile standing still! [1/3]";
+		messages7 [1] = "You can also stop and start your car\nwhenever it pleases you! Use the\nred button in your interface for that. [2/3]";
+		messages7 [2] = "How about you try and reach\nthat shop northeast of you?\nSpend your acquired marbles\non cool new cars! [3/3]";
+
+		// Explorer Mode - after first obtained item
+		String[] messages8 = new String[2];
+		messages8 [0] = "Nice one! Remember, everything you\nunlock will be queued and waiting\nfor you back at your bookcase. [1/2]";
+		messages8 [1] = "If you leave Explorer Mode,\nyour location will be saved to\nthe last unmovable piece you\nhave driven over. [2/2]";
+
+		// Explorer Mode - World 2 puzzlebox
+		String[] messages9 = new String[1];
+		messages9 [0] = "Oh my, the bridge crossing the lava\nis opened! Maybe you can find something\nbehind the fort to close the bridge?";
+
+		// Explorer Mode - World 3 puzzlebox
+		String[] messages10 = new String[1];
+		messages10 [0] = "Hrm, there seems to be no\nphysical road towards that puzzlebox...";
+
+		// 12 marbles - enabling Explorer Mode
+		String[] messages11 = new String[1];
+		messages11 [0] = "All those shiny marbles you\nhave collected! How about you check back\nat the bookcase, and I'll give you\nExplorer Mode!"; 
+
+		// Collection - game completion
+		String[] messages12 = new String[1];
+		messages12 [0] = "Wow, you unlocked everything! You are winner!\n \nThank you for playing our little game.\nVinLia Games";
+
+		// Collection - credits
+		String[] messages13 = new String[2];
+		messages13 [0] = "A game by VinLia\n'A small learning project,\nMade with Unity and Maya. [1/2]";
+		messages13 [1] = "Music and sfx thanks to FreeSFX\nSome altered imagery from DeviantArt and others\nInspired by Street Shuffle (1994)\n [2/2]";
 	}
 
 	// Comparer to sort puzzle pieces
