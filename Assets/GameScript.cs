@@ -54,8 +54,10 @@ public class GameScript : MonoBehaviour {
 	// In game UI
 	private static Texture2D quitTexture;
 	private static Texture2D resetTexture;
+	private static Texture2D emptyResetTexture;
 	private static Texture2D goTexture0, goTexture1, goTexture2, goTexture3, goTexture4, goTexture5, goTexture6, goTexture7;
 	private static Texture2D displayTexture;
+	private static Texture2D emptyDisplayTexture;
 	private static Texture2D boostTexture1;
 	private static Texture2D boostTexture4;
 
@@ -63,8 +65,10 @@ public class GameScript : MonoBehaviour {
 	private static GUIStyle timerStyle;
 	private static GUIStyle quitStyle;
 	private static GUIStyle resetStyle;
+	private static GUIStyle emptyResetStyle;
 	private static GUIStyle goStyle;
 	private static GUIStyle displayStyle;
+	private static GUIStyle emptyDisplayStyle;
 	private static GUIStyle boostStyle1;
 	private static GUIStyle boostStyle4;
 	private static GUIStyle chosenBoostStyle;
@@ -278,7 +282,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	private void DisplayButtonBar() {
-		if (gameStarted || halted) {
+		if (!showingShop) {
 			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
 				if (carScript.boost == 0f) {
 					MenuScript.PlayGearShiftSound ();
@@ -290,8 +294,6 @@ public class GameScript : MonoBehaviour {
 					carScript.boost = 0f;
 				}
 			}
-		} else {
-			GUI.Label (boostRect, "", chosenBoostStyle);
 		}
 
 		if (chosenLevel == "explorer") {
@@ -337,7 +339,7 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 
-		GUI.Label (displayRect, "" + movesMade + "/" + levelConfiguration.par, displayStyle);
+		GUI.Label (displayRect, "" + movesMade + "             " + levelConfiguration.par + "\n             ", displayStyle);
 	}
 
 	private void DisplayExplorerButtonBar() {
@@ -348,6 +350,8 @@ public class GameScript : MonoBehaviour {
 			MenuScript.Save ();
 			SceneManager.LoadScene ("world_select");
 		}
+
+		GUI.Label (resetRect, "", emptyResetStyle);
 
 		if (GUI.Button (explorerGoRect, "", goStyle)) {
 			MenuScript.PlayButtonSound ();
@@ -371,6 +375,9 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 
+		GUI.Label (displayRect, "", emptyDisplayStyle);
+
+
 		if (gameStarted) {
 			if (GUI.Button (boostRect, "", chosenBoostStyle)) {
 				if (carScript.boost == 0f) {
@@ -393,7 +400,6 @@ public class GameScript : MonoBehaviour {
 		time = 0.0f;
 		processedGameOver = false;
 		carScript.carStarted = false;
-		carScript.boost = 0f;
 		DestroyTutorialMessageBox ();
 		gameStarted = true;
 	}
@@ -407,6 +413,7 @@ public class GameScript : MonoBehaviour {
 		Vector3 pos = startPiece.transform.position;
 		GameObject instantiatedCar = (GameObject)Instantiate (car, new Vector3(pos.x, 0.105f, pos.z), Quaternion.Euler (0, 90, 0));
 		carScript = instantiatedCar.GetComponent<CarScript> ();
+		carScript.boost = 0f;
 	}
 
 	private void SetCarToCorrectPosition() {
@@ -857,6 +864,7 @@ public class GameScript : MonoBehaviour {
 
 		quitTexture = (Texture2D)Resources.Load ("quit");
 		resetTexture = (Texture2D)Resources.Load ("reset");
+		emptyResetTexture = (Texture2D)Resources.Load ("resetempty");
 		goTexture0 = (Texture2D)Resources.Load ("go0");
 		goTexture1 = (Texture2D)Resources.Load ("go1");
 		goTexture2 = (Texture2D)Resources.Load ("go2");
@@ -866,6 +874,7 @@ public class GameScript : MonoBehaviour {
 		goTexture6 = (Texture2D)Resources.Load ("go6");
 		goTexture7 = (Texture2D)Resources.Load ("go7");
 		displayTexture = (Texture2D)Resources.Load ("counter");
+		emptyDisplayTexture = (Texture2D)Resources.Load ("counterempty");
 		boostTexture1 = (Texture2D)Resources.Load ("speed1");
 		boostTexture4 = (Texture2D)Resources.Load ("speed2");
 
@@ -893,11 +902,17 @@ public class GameScript : MonoBehaviour {
 		resetStyle = new GUIStyle ();
 		resetStyle.normal.background = resetTexture;
 
+		emptyResetStyle = new GUIStyle ();
+		emptyResetStyle.normal.background = emptyResetTexture;
+
 		displayStyle = new GUIStyle ();
 		displayStyle.normal.background = displayTexture;
-		displayStyle.fontSize = 16;
+		displayStyle.fontSize = 24;
 		displayStyle.normal.textColor = Color.green;
-		displayStyle.alignment = TextAnchor.MiddleCenter;
+		displayStyle.alignment = TextAnchor.LowerCenter;
+
+		emptyDisplayStyle = new GUIStyle ();
+		emptyDisplayStyle.normal.background = emptyDisplayTexture;
 
 		boostStyle1 = new GUIStyle ();
 		boostStyle1.normal.background = boostTexture1;
@@ -934,7 +949,7 @@ public class GameScript : MonoBehaviour {
 		// tutorial level 1
 		String[] messages1 = new String[3];
 		messages1 [0] = "Tap highlighted puzzlepieces\nto shuffle them around.\nCreate a road for your car to ride on,\ntowards the Portal. [1/3]";
-		messages1 [1] = "When you touched the puzzle\nthe car will start its engine\nand after a few seconds it will start moving. [2/3]";
+		messages1 [1] = "When you touch the puzzle the car\nwill start its engine and after a few \nseconds it will start moving. [2/3]";
 		messages1 [2] = "You can only move pieces next\nto the empty spot. You cannot move\npieces the car is currently on. [3/3]";
 		tutorialMessages.Add ("tutorial_1", messages1);
 
@@ -969,8 +984,9 @@ public class GameScript : MonoBehaviour {
 		// Explorer Mode - first entry
 		String[] messages7 = new String[3];
 		messages7 [0] = "Welcome to Streettopia! This world\ncomes with its own rules.\nYou can shuffle puzzlepieces\nwhile standing still! [1/3]";
-		messages7 [1] = "You can also stop and start your car\nwhenever it pleases you! Use the\nred button in your interface for that. [2/3]";
+		messages7 [1] = "You can also stop and start your car\nwhenever it pleases you! Tap the\nsteering wheel in your interface for that.\n[2/3]";
 		messages7 [2] = "How about you try and reach\nthat shop northeast of you?\nSpend your acquired marbles\non cool new cars! [3/3]";
+		tutorialMessages.Add ("explorer", messages7);
 
 		// Explorer Mode - after first obtained item
 		String[] messages8 = new String[2];
@@ -988,15 +1004,6 @@ public class GameScript : MonoBehaviour {
 		// 12 marbles - enabling Explorer Mode
 		String[] messages11 = new String[1];
 		messages11 [0] = "All those shiny marbles you\nhave collected! How about you check back\nat the bookcase, and I'll give you\nExplorer Mode!"; 
-
-		// Collection - game completion
-		String[] messages12 = new String[1];
-		messages12 [0] = "Wow, you unlocked everything! You are winner!\n \nThank you for playing our little game.\nVinLia Games";
-
-		// Collection - credits
-		String[] messages13 = new String[2];
-		messages13 [0] = "A game by VinLia\n'A small learning project,\nMade with Unity and Maya. [1/2]";
-		messages13 [1] = "Music and sfx thanks to FreeSFX\nSome altered imagery from DeviantArt and others\nInspired by Street Shuffle (1994)\n [2/2]";
 	}
 
 	// Comparer to sort puzzle pieces

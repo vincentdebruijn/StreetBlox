@@ -144,6 +144,7 @@ public class MenuScript : MonoBehaviour {
 			data.playTutorials = true;
 			data.playMusic = true;
 			data.playSoundEffects = true;
+			data.showedEndText = false;
 			data.chosenCar = "car1";
 			data.worldSelectShown = false;
 			data.marbles = 0;
@@ -342,6 +343,8 @@ public class MenuScript : MonoBehaviour {
 		public Boolean playTutorials;
 		public Boolean playMusic;
 		public Boolean playSoundEffects;
+
+		public Boolean showedEndText;
 
 		public Boolean worldSelectShown;
 		public int marbles;

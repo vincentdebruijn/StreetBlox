@@ -37,6 +37,8 @@ public class OptionsScript : MonoBehaviour {
 	private static Rect option3TextRect;
 	private static Rect resetButtonRect;
 	private static Rect resetTextRect;
+	private static Rect creditsRect;
+	private static Rect secretRect;
 	
 	private static Texture2D optionButtonTexture, optionSelectedButtonTexture;
 	private static Texture2D resetButtonTexture;
@@ -46,6 +48,7 @@ public class OptionsScript : MonoBehaviour {
 	private static GUIStyle optionButton1ChosenStyle, optionButton2ChosenStyle, optionButton3ChosenStyle;
 	private static GUIStyle optionTextStyle;
 	private static GUIStyle resetButtonStyle;
+	private static GUIStyle creditsStyle;
 
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
@@ -116,6 +119,13 @@ public class OptionsScript : MonoBehaviour {
 			MenuScript.data.board = null;
 			MenuScript.Save ();
 		}
+
+		GUI.Label (creditsRect, "Credits:\nA small learning project,\nMade with Unity and Maya.\nMusic and sfx thanks to FreeSFX\nSome altered imagery from DeviantArt and others\nInspired by Street Shuffle (1994)", optionTextStyle);
+
+		if (GUI.Button(secretRect, "", optionTextStyle)) {
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+		}
 	}
 
 	private static void SetVariables() {
@@ -130,6 +140,8 @@ public class OptionsScript : MonoBehaviour {
 		option3TextRect = new Rect (buttonSize / 2 + 30, buttonSize * 3 / 4 + 40, Screen.width - buttonSize / 2 - 20, buttonSize / 3);
 		resetTextRect = new Rect (Screen.width / 2, buttonSize / 4, Screen.width / 2, buttonSize / 3);
 		resetButtonRect = new Rect (Screen.width * 0.75f - buttonSize / 2, buttonSize * 0.75f, buttonSize, buttonSize / 2);
+		creditsRect = new Rect (Screen.width / 2, Screen.height / 3 * 2, Screen.width / 2, buttonSize / 3);
+		secretRect = new Rect (Screen.width - 20, Screen.height - 20, 20, 20);
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");

@@ -164,6 +164,12 @@ public class WorldSelectScript : MonoBehaviour {
 	void Start () {
 		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
 		showingAnimations = MenuScript.data.animationQueue.Count > 0;
+
+		if (!MenuScript.data.showedEndText && Array.IndexOf (MenuScript.data.puzzleBoxesUnlocked, false) == -1 && Array.IndexOf (MenuScript.data.carsUnlocked, false) == -1) {
+			ShowEndText ();
+			MenuScript.data.showedEndText = true;
+			MenuScript.Save ();
+		}
 	}
 	
 	// Update is called once per frame
@@ -175,7 +181,7 @@ public class WorldSelectScript : MonoBehaviour {
 					Destroy(boxAnimator.gameObject);
 					animationPlaying = false;
 					animatedItem.GetComponent<CarDisplayScript>().turn = true;
-					ShowTextBox ();
+					ShowReceivedItemTextBox ();
 					showingItemButton = true;
 				}
 			} else if (movingItemToPlace) {
@@ -250,7 +256,7 @@ public class WorldSelectScript : MonoBehaviour {
 		levelConfigurations = worldConfigurations [WorldNames [world]];
 	}
 
-	private void ShowTextBox() {
+	private void ShowReceivedItemTextBox() {
 		String text = "";
 		if (animatedItem.name.Contains("puzzleBoxWorld4"))
 			text = "You have unlocked Explorer mode!\nYou can find more cars/levels here.";
@@ -262,6 +268,16 @@ public class WorldSelectScript : MonoBehaviour {
 			text = "You have unlocked a new car!";
 		else
 			text = "You have unlocked new levels!";
+
+		ShowTextBox (text);
+	}
+
+	private void ShowEndText() {
+		String text = "Wow, you unlocked everything! You are winner!\n \nThank you for playing our little game.\nVinLia Games";
+		ShowTextBox (text);
+	}
+
+	private void ShowTextBox(String text) {
 		String[] messages = new String[1];
 		messages [0] = text;
 
@@ -274,6 +290,7 @@ public class WorldSelectScript : MonoBehaviour {
 		iTutorialBox.name = "TutorialBox";
 		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(messages);
 	}
+		
 
 	private void DestroyTutorialMessageBox() {
 		Destroy (GameObject.Find ("TutorialBox"));
@@ -329,7 +346,7 @@ public class WorldSelectScript : MonoBehaviour {
 			targetScale = animatedItem.transform.localScale;
 			animatedItem.transform.localScale = targetScale * 4;
 			animatedItem.GetComponent<puzzleBoxScript>().SetWorldNumber(itemIndex + 1);
-			ShowTextBox ();
+			ShowReceivedItemTextBox ();
 			showingItemButton = true;
 		}
 		animatedItem.name = itemName;
