@@ -82,7 +82,7 @@ public class GameScript : MonoBehaviour {
 	private GameObject canvas;
 	private GameObject scoreScreen;
 	private GameObject lossScreen;
-	private GameObject tutorialBox;
+	private static GameObject tutorialBox;
 
 	// explorer
 	private static Rect explorerQuitRect;
@@ -100,7 +100,10 @@ public class GameScript : MonoBehaviour {
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
 
-	private void OnLevelWasLoaded(int iLevel) {
+	// Unity functions
+	//
+
+	void OnLevelWasLoaded(int iLevel) {
 		chosenLevel = SceneManager.GetActiveScene().name;
 		car = Resources.Load (MenuScript.data.chosenCar) as GameObject;
 		shop = Resources.Load ("shopScreen") as GameObject;
@@ -154,7 +157,6 @@ public class GameScript : MonoBehaviour {
 		lossScreen = (GameObject)Resources.Load ("failScreen");
 	}
 
-	// Update is called once per frame
 	void Update () {		
 		if (!gameStarted)
 			return;
@@ -189,18 +191,303 @@ public class GameScript : MonoBehaviour {
 			return;
 	}
 
-	private void DisplayTutorialMessages() {
-		if (!MenuScript.data.playTutorials || !tutorialMessages.ContainsKey(chosenLevel))
-			return;
+	//
+	// API methods
 
-		Vector3 position = Camera.main.transform.position + new Vector3 (-0.08f, -0.7f, 0.5f);
-		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, tutorialBox.transform.rotation);
-		iTutorialBox.name = "TutorialBox";
-		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(tutorialMessages [chosenLevel]);
+	public void ShowFirstItemObtainedMessageIfIsFirstItem() {
+		if (MenuScript.data.animationQueue.Count == 0 && !MenuScript.data.puzzleBoxesUnlocked [1] && !MenuScript.data.puzzleBoxesUnlocked [2] &&
+		    Array.LastIndexOf (MenuScript.data.carsUnlocked, true) <= 0) {
+			String[] messages = new String[2];
+			messages [0] = "Nice one! Remember, everything you\nunlock will be queued and waiting\nfor you back at your bookcase. [1/2]";
+			messages [1] = "If you leave Explorer Mode,\nyour location will be saved to\nthe last unmovable piece you\nhave driven over. [2/2]";
+			DisplayTutorialMessage (messages);
+		}
 	}
 
-	private void DestroyTutorialMessageBox() {
+	public void ShowExplorerModeMessage(int world) {
+		halted = true;
+		carScript.carStarted = false;
+		String[] messages = new String[1];
+		if (world == 2) {
+			messages [0] = "Oh my, the bridge crossing the lava is\nopened! Maybe you can find something\nbehind the fort to close the bridge?";
+		} else {
+			messages [0] = "Hrm, there seems to be no\nphysical road towards that puzzlebox...";
+		}
+		DisplayTutorialMessage(messages);
+	}
+
+	public void Reset(string button) {
+		gameStarted = false;
+		halted = false;
+		showingShop = false;
+		carScript.Reset ();
+		Boolean tutorialsFinished = 
+			MenuScript.InTutorialPhase() && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
+
+		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
+			MenuScript.data.worldSelectShown = true;
+			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
+			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
+			MenuScript.Save ();
+			SceneManager.LoadScene ("world_select");
+			return;
+		}
+
+		switch(button) {
+		case "Next":
+			LevelSelectScript.NextLevel();
+			break;
+		case "Retry":
+			SceneManager.LoadScene (chosenLevel);
+			break;
+		case "Back":
+			StopGameMusicAndPlayMenuMusic();
+			if (chosenLevel == "explorer")
+				SceneManager.LoadScene ("world_select");
+			else if (MenuScript.InTutorialPhase())
+				SceneManager.LoadScene ("menu");
+			else
+				SceneManager.LoadScene("level_select");
+			break;
+		}
+	}
+
+	public void Halt() {
+		gameStarted = false;
+		halted = true;
+		goStyle.normal.background = goTexture0;
+	}
+
+	public void ShowShop() {
+		showingShop = true;
+		Vector3 cameraPosition = Camera.main.transform.position;
+		Vector3 position = new Vector3 (cameraPosition.x - 0.011f, cameraPosition.y - 1.395f, cameraPosition.z - 0.15f);
+		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
+		iShop.name = "shopScreen";
+		SetMarbleText ();
+
+		Pair<String, int>[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
+
+		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
+		scripts [1].carIndex = cars[0].Second;
+		if (MenuScript.data.carsUnlocked[cars[0].Second])
+			scripts [1].SetToBought ();
+		scripts [0].carIndex = cars[1].Second;
+		if (MenuScript.data.carsUnlocked[cars[1].Second])
+			scripts [0].SetToBought ();
+
+		GameObject firstCar = Resources.Load (cars [0].First) as GameObject;
+		GameObject secondCar = Resources.Load (cars [1].First) as GameObject;
+
+		Vector3 firstCarPosition = new Vector3 (position.x - 0.465f, position.y + 0.065f, position.z + 0.65f);
+		Vector3 secondCarPosition = new Vector3 (position.x + 0.393f, position.y + 0.12f, position.z + 0.65f);
+		Quaternion firstCarRotation = Quaternion.Euler (new Vector3 (317.585f, 211.129f, 340.11f));
+		Quaternion secondCarRotation = Quaternion.Euler (new Vector3 (324.33f, 229.77f,  323.61f));
+
+		iFirstCar = Instantiate (firstCar, firstCarPosition, firstCarRotation) as GameObject;
+		iSecondCar = Instantiate (secondCar, secondCarPosition, secondCarRotation) as GameObject;
+		iFirstCar.transform.localScale = iFirstCar.transform.localScale / 2.75f;
+		iSecondCar.transform.localScale = iSecondCar.transform.localScale / 2.75f;
+
+		iFirstCar.GetComponent<CarDisplayScript> ().shopCar = true;
+		iSecondCar.GetComponent<CarDisplayScript> ().shopCar = true;
+	}
+
+	public void SetMarbleText() {
+		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
+	}
+
+	public void CloseShop() {
+		GameObject.Destroy (GameObject.Find ("shopScreen"));
+		GameObject.Destroy (iFirstCar);
+		GameObject.Destroy (iSecondCar);
+		showingShop = false;
+	}
+
+	public Boolean ShopTriggerPiece(String name) {
+		return shopTriggerPieces.ContainsKey (name);
+	}
+
+	public GameObject GetPuzzleBoxForPuzzlePiece(String name) {
+		if (name == "puzzlePiece_turnabout_S (2)")
+			return puzzleBoxWorld2;
+		else if (name == "puzzlePiece_turnabout_W (3)")
+			return puzzleBoxWorld3;
+		else
+			return null;
+	}
+
+	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
+		Debug.Log("Clicked: " + puzzlePiece.name);
+		if (carScript.GameOver () || carScript.falling || carScript.crashing)
+			return;
+		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
+			carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost))) {
+			carScript.PlayCarHorn ();
+			return;
+		}
+		if (puzzlePiece.CompareTag ("UnmovablePuzzlePiece"))
+			return;
+
+		int boardHeight = levelConfiguration.BoardHeight;
+		int boardWidth = levelConfiguration.BoardWidth;
+		float leftXPosition = levelConfiguration.LeftXPosition;
+		float pieceSize = levelConfiguration.PieceSize;
+		float topZPosition = levelConfiguration.TopZPosition;
+
+		Vector3 temp = puzzlePiece.transform.position;
+		int x = (int)((temp.x - leftXPosition) / pieceSize);
+		int y = (int)(-(temp.z - topZPosition) / pieceSize);
+		//if (board [y] [x] != puzzlePiece)
+		//		throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
+		int new_x = -1;
+		int new_y = -1;
+		if (puzzlePiece.name.Contains ("beacon")) {
+			Boolean done = false;
+			foreach(GameObject[] row in board) {
+				new_y += 1;
+				new_x = -1;
+				foreach(GameObject obj in row) {
+					new_x += 1;
+					if (obj == null) {
+						done = true;
+						break;
+					}
+				}
+				if (done)
+					break;
+			}
+			board [new_y] [new_x] = puzzlePiece;
+			board [y] [x] = null;
+			puzzlePiece.transform.position = GetPuzzlePiecePosition(new_x, new_y);
+			MenuScript.PlayPuzzlePieceSound();
+			movesMade += 1;
+		} else {
+			int[][] points = new int[][] {new int[] {1,0}, new int[] {0, 1}, new int[] {-1,0}, new int[] {0,-1}};
+			int[] point2 = new int[0];
+			foreach (int[] point in points) {
+				new_x = x + point [0];
+				new_y = y + point [1];
+				if (new_x >= 0 && new_y >= 0 && new_x < boardWidth && new_y < boardHeight && board [new_y] [new_x] == null) {
+					point2 = point;
+					break;
+				}
+			}
+			if (new_x >= 0 && new_y >= 0 && new_x < boardWidth && new_y < boardHeight && board [new_y] [new_x] == null) {
+				board [new_y] [new_x] = puzzlePiece;
+				board [y] [x] = null;
+				temp.x += point2 [0] * pieceSize;
+				temp.z -= point2 [1] * pieceSize;
+				puzzlePiece.transform.position = temp;
+
+				MenuScript.PlayPuzzlePieceSound();
+				movesMade += 1;
+				if (!gameStarted && chosenLevel != "explorer") {
+					goStyle.normal.background = goTexture1;
+					StartTheGame ();
+				}
+			}
+		}
+	}
+
+	// Closes the bridges that are open, opens the bridges that are closed.
+	public void FlipBridgePositions() {
+		MenuScript.PlayBridgeSound ();
+		foreach (GameObject bridgePiece in bridgePieces) {
+			// bridgePiece.transform.GetComponent<AudioSource>().Play();
+			Vector3 pos = bridgePiece.transform.position;
+			if (bridgePiece.transform.parent.name.Contains("NS")) {
+				if (IsBridgeOpen(pos))
+					pos.z += BridgeOpenDistance;
+				else
+					pos.z -= BridgeOpenDistance;
+			} else {
+				if (IsBridgeOpen(pos))
+					pos.x -= BridgeOpenDistance;
+				else
+					pos.x += BridgeOpenDistance;
+			}
+			bridgePiece.transform.position = pos;
+		}
+		bridgesFlipped = !bridgesFlipped;
+	}
+
+	// return true when  the bridge is open, false otherwise.
+	public Boolean IsBridgeOpen(Vector3 pos) {
+		float relativeX = pos.x % 0.5f;
+		float relativeZ = pos.z % 0.5f;
+		if (Math.Abs (relativeX - BridgeOpenDistance) < 0.01)
+			return true;
+		else if (Math.Abs (relativeZ + BridgeOpenDistance) < 0.01)
+			return true;
+		else if (relativeX < 0.01 && relativeZ < 0.01)
+			return false;
+		else
+			throw new System.InvalidOperationException ("Bridge is in invalid position: " + relativeX);
+	}
+
+	public GameObject GetOtherPortalPiece(GameObject portalPiece) {
+		GameObject portal = null;
+		foreach(Transform child in portalPiece.transform) {
+			if (child.gameObject.name == "Portal") {
+				portal = child.gameObject;
+				break;
+			}
+		}
+
+		GameObject[] portals = GameObject.FindGameObjectsWithTag (portal.tag);
+		GameObject otherPortal = null;
+		if (portals [0] == portal)
+			otherPortal = portals [1];
+		else
+			otherPortal = portals [0];
+
+		return otherPortal.transform.parent.gameObject;
+	}
+
+	public GameObject[] GetPuzzlePieces() {
+		if (puzzlePieces != null && puzzlePieces.Length > 0) 
+			return puzzlePieces;
+		GameObject[] movablePuzzlePieces = GameObject.FindGameObjectsWithTag ("PuzzlePiece");
+		GameObject[] unmovablePuzzlePieces = GameObject.FindGameObjectsWithTag ("UnmovablePuzzlePiece");
+		puzzlePieces = new GameObject[movablePuzzlePieces.Length + unmovablePuzzlePieces.Length];
+		int i = 0;
+		foreach (GameObject piece in movablePuzzlePieces) {
+			puzzlePieces [i] = piece;
+			i++;
+		}
+		foreach (GameObject piece in unmovablePuzzlePieces) {
+			puzzlePieces [i] = piece;
+			i++;
+		}
+		return puzzlePieces;
+	}
+
+	// Static Macros 
+	// 
+
+	private static void DisplayTutorialMessage(String[] message) {
+		if (!MenuScript.data.playTutorials)
+			return;
+		
+		Vector3 position = Camera.main.transform.position + new Vector3 (-0.2f, -0.7f, 0.5f);
+		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, tutorialBox.transform.rotation);
+		iTutorialBox.name = "TutorialBox";
+		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(message);
+	}
+
+	private static void DestroyTutorialMessageBox() {
 		Destroy (GameObject.Find ("TutorialBox"));
+	}
+
+	// Macros 
+	// 
+
+	private void DisplayTutorialMessages() {
+		if (!tutorialMessages.ContainsKey(chosenLevel))
+			return;
+
+		DisplayTutorialMessage(tutorialMessages [chosenLevel]);
 	}
 
 	private void ProcessGameOver() {	
@@ -269,6 +556,9 @@ public class GameScript : MonoBehaviour {
 		MenuScript.data.marbles += marbles;
 
 		if (MenuScript.data.marbles >= UnlockButtonScript.COST && !MenuScript.data.puzzleBoxesUnlocked[3] && !MenuScript.data.animationQueue.Contains (explorerPair)) {
+			String[] messages = new String[1];
+			messages [0] = "All those shiny marbles you have\ncollected! How about you check back\nat the bookcase, and there might\nbe something waiting for you..."; 
+			DisplayTutorialMessage (messages);
 			MenuScript.data.animationQueue.Enqueue (explorerPair);
 		}
 		// Give the Tardis when a space level was completed
@@ -455,253 +745,6 @@ public class GameScript : MonoBehaviour {
 					piece.transform.position = new Vector3 (x * pieceSize, 0f, -(y * pieceSize));
 			}
 		}
-	}
-
-	public void Reset(string button) {
-		gameStarted = false;
-		halted = false;
-		showingShop = false;
-		carScript.Reset ();
-		Boolean tutorialsFinished = 
-			MenuScript.InTutorialPhase() && MenuScript.data.levelProgress.Count == WorldSelectScript.levelsTutorial.Length;
-		
-		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
-			MenuScript.data.worldSelectShown = true;
-			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
-			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
-			MenuScript.Save ();
-			SceneManager.LoadScene ("world_select");
-			return;
-		}
-
-		switch(button) {
-		case "Next":
-			LevelSelectScript.NextLevel();
-			break;
-		case "Retry":
-			SceneManager.LoadScene (chosenLevel);
-			break;
-		case "Back":
-			StopGameMusicAndPlayMenuMusic();
-			if (chosenLevel == "explorer")
-				SceneManager.LoadScene ("world_select");
-			else if (MenuScript.InTutorialPhase())
-				SceneManager.LoadScene ("menu");
-			else
-				SceneManager.LoadScene("level_select");
-			break;
-		}
-	}
-
-	public void Halt() {
-		gameStarted = false;
-		halted = true;
-		goStyle.normal.background = goTexture0;
-	}
-
-	public void ShowShop() {
-		showingShop = true;
-		Vector3 cameraPosition = Camera.main.transform.position;
-		Vector3 position = new Vector3 (cameraPosition.x - 0.011f, cameraPosition.y - 1.395f, cameraPosition.z - 0.15f);
-		GameObject iShop = (GameObject)Instantiate (shop, position, shop.transform.rotation);
-		iShop.name = "shopScreen";
-		SetMarbleText ();
-
-		Pair<String, int>[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
-
-		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
-		scripts [1].carIndex = cars[0].Second;
-		if (MenuScript.data.carsUnlocked[cars[0].Second])
-			scripts [1].SetToBought ();
-		scripts [0].carIndex = cars[1].Second;
-		if (MenuScript.data.carsUnlocked[cars[1].Second])
-			scripts [0].SetToBought ();
-
-		GameObject firstCar = Resources.Load (cars [0].First) as GameObject;
-		GameObject secondCar = Resources.Load (cars [1].First) as GameObject;
-
-		Vector3 firstCarPosition = new Vector3 (position.x - 0.465f, position.y + 0.065f, position.z + 0.65f);
-		Vector3 secondCarPosition = new Vector3 (position.x + 0.393f, position.y + 0.12f, position.z + 0.65f);
-		Quaternion firstCarRotation = Quaternion.Euler (new Vector3 (317.585f, 211.129f, 340.11f));
-		Quaternion secondCarRotation = Quaternion.Euler (new Vector3 (324.33f, 229.77f,  323.61f));
-
-		iFirstCar = Instantiate (firstCar, firstCarPosition, firstCarRotation) as GameObject;
-		iSecondCar = Instantiate (secondCar, secondCarPosition, secondCarRotation) as GameObject;
-		iFirstCar.transform.localScale = iFirstCar.transform.localScale / 2.75f;
-		iSecondCar.transform.localScale = iSecondCar.transform.localScale / 2.75f;
-
-		iFirstCar.GetComponent<CarDisplayScript> ().shopCar = true;
-		iSecondCar.GetComponent<CarDisplayScript> ().shopCar = true;
-	}
-
-	public void SetMarbleText() {
-		GameObject.Find ("marbleCounter").GetComponent<TextMesh> ().text = "" + MenuScript.data.marbles;
-	}
-
-	public void CloseShop() {
-		GameObject.Destroy (GameObject.Find ("shopScreen"));
-		GameObject.Destroy (iFirstCar);
-		GameObject.Destroy (iSecondCar);
-		showingShop = false;
-	}
-
-	public Boolean ShopTriggerPiece(String name) {
-		return shopTriggerPieces.ContainsKey (name);
-	}
-
-	public GameObject GetPuzzleBoxForPuzzlePiece(String name) {
-		if (name == "puzzlePiece_turnabout_S (2)")
-			return puzzleBoxWorld2;
-		else if (name == "puzzlePiece_turnabout_W (3)")
-			return puzzleBoxWorld3;
-		else
-			return null;
-	}
-
-	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
-		Debug.Log("Clicked: " + puzzlePiece.name);
-		if (carScript.GameOver () || carScript.falling || carScript.crashing)
-			return;
-		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
-		    	carScript.timeSinceOnLastPuzzlePiece < 0.1 / (levelConfiguration.movement + carScript.boost))) {
-			carScript.PlayCarHorn ();
-			return;
-		}
-		 if (puzzlePiece.CompareTag ("UnmovablePuzzlePiece"))
-			return;
-		
-		int boardHeight = levelConfiguration.BoardHeight;
-		int boardWidth = levelConfiguration.BoardWidth;
-		float leftXPosition = levelConfiguration.LeftXPosition;
-		float pieceSize = levelConfiguration.PieceSize;
-		float topZPosition = levelConfiguration.TopZPosition;
-
-		Vector3 temp = puzzlePiece.transform.position;
-		int x = (int)((temp.x - leftXPosition) / pieceSize);
-		int y = (int)(-(temp.z - topZPosition) / pieceSize);
-		//if (board [y] [x] != puzzlePiece)
-		//		throw new ArgumentException ("Clicked piece " + puzzlePiece.name + ", but calculated position at x: " + x + " y: " + y + ", which contains piece " + board [y] [x]);
-		int new_x = -1;
-		int new_y = -1;
-		if (puzzlePiece.name.Contains ("beacon")) {
-			Boolean done = false;
-			foreach(GameObject[] row in board) {
-				new_y += 1;
-				new_x = -1;
-				foreach(GameObject obj in row) {
-					new_x += 1;
-					if (obj == null) {
-						done = true;
-						break;
-					}
-				}
-				if (done)
-					break;
-			}
-			board [new_y] [new_x] = puzzlePiece;
-			board [y] [x] = null;
-			puzzlePiece.transform.position = GetPuzzlePiecePosition(new_x, new_y);
-			MenuScript.PlayPuzzlePieceSound();
-			movesMade += 1;
-		} else {
-			int[][] points = new int[][] {new int[] {1,0}, new int[] {0, 1}, new int[] {-1,0}, new int[] {0,-1}};
-			int[] point2 = new int[0];
-			foreach (int[] point in points) {
-				new_x = x + point [0];
-				new_y = y + point [1];
-				if (new_x >= 0 && new_y >= 0 && new_x < boardWidth && new_y < boardHeight && board [new_y] [new_x] == null) {
-					point2 = point;
-					break;
-				}
-			}
-			if (new_x >= 0 && new_y >= 0 && new_x < boardWidth && new_y < boardHeight && board [new_y] [new_x] == null) {
-				board [new_y] [new_x] = puzzlePiece;
-				board [y] [x] = null;
-				temp.x += point2 [0] * pieceSize;
-				temp.z -= point2 [1] * pieceSize;
-				puzzlePiece.transform.position = temp;
-				
-				MenuScript.PlayPuzzlePieceSound();
-				movesMade += 1;
-				if (!gameStarted && chosenLevel != "explorer") {
-					goStyle.normal.background = goTexture1;
-					StartTheGame ();
-				}
-			}
-		}
-	}
-
-	// Closes the bridges that are open, opens the bridges that are closed.
-	public void FlipBridgePositions() {
-		MenuScript.PlayBridgeSound ();
-		foreach (GameObject bridgePiece in bridgePieces) {
-			// bridgePiece.transform.GetComponent<AudioSource>().Play();
-			Vector3 pos = bridgePiece.transform.position;
-			if (bridgePiece.transform.parent.name.Contains("NS")) {
-				if (IsBridgeOpen(pos))
-					pos.z += BridgeOpenDistance;
-				else
-					pos.z -= BridgeOpenDistance;
-			} else {
-				if (IsBridgeOpen(pos))
-					pos.x -= BridgeOpenDistance;
-				else
-					pos.x += BridgeOpenDistance;
-			}
-			bridgePiece.transform.position = pos;
-		}
-		bridgesFlipped = !bridgesFlipped;
-	}
-
-	// return true when  the bridge is open, false otherwise.
-	public Boolean IsBridgeOpen(Vector3 pos) {
-		float relativeX = pos.x % 0.5f;
-		float relativeZ = pos.z % 0.5f;
-		if (Math.Abs (relativeX - BridgeOpenDistance) < 0.01)
-			return true;
-		else if (Math.Abs (relativeZ + BridgeOpenDistance) < 0.01)
-			return true;
-		else if (relativeX < 0.01 && relativeZ < 0.01)
-			return false;
-		else
-			throw new System.InvalidOperationException ("Bridge is in invalid position: " + relativeX);
-	}
-
-	public GameObject GetOtherPortalPiece(GameObject portalPiece) {
-		GameObject portal = null;
-		foreach(Transform child in portalPiece.transform) {
-			if (child.gameObject.name == "Portal") {
-				portal = child.gameObject;
-				break;
-			}
-		}
-
-		GameObject[] portals = GameObject.FindGameObjectsWithTag (portal.tag);
-		GameObject otherPortal = null;
-		if (portals [0] == portal)
-			otherPortal = portals [1];
-		else
-			otherPortal = portals [0];
-
-		return otherPortal.transform.parent.gameObject;
-	}
-
-	public GameObject[] GetPuzzlePieces() {
-		if (puzzlePieces != null && puzzlePieces.Length > 0) 
-			return puzzlePieces;
-		GameObject[] movablePuzzlePieces = GameObject.FindGameObjectsWithTag ("PuzzlePiece");
-		GameObject[] unmovablePuzzlePieces = GameObject.FindGameObjectsWithTag ("UnmovablePuzzlePiece");
-		puzzlePieces = new GameObject[movablePuzzlePieces.Length + unmovablePuzzlePieces.Length];
-		int i = 0;
-		foreach (GameObject piece in movablePuzzlePieces) {
-			puzzlePieces [i] = piece;
-			i++;
-		}
-		foreach (GameObject piece in unmovablePuzzlePieces) {
-			puzzlePieces [i] = piece;
-			i++;
-		}
-		return puzzlePieces;
 	}
 
 	// Find and set the bridge pieces for easy access later
@@ -972,7 +1015,7 @@ public class GameScript : MonoBehaviour {
 
 		// level 2-1
 		String[] messages5 = new String[1];
-		messages5 [0] = "Drive over buttons to open and close bridges.";
+		messages5 [0] = "Drive over buttons to open\nand close bridges.";
 		tutorialMessages.Add ("level_l01", messages5);
 
 		// level 3-1
@@ -987,23 +1030,6 @@ public class GameScript : MonoBehaviour {
 		messages7 [1] = "You can also stop and start your car\nwhenever it pleases you! Tap the\nsteering wheel in your interface for that.\n[2/3]";
 		messages7 [2] = "How about you try and reach\nthat shop northeast of you?\nSpend your acquired marbles\non cool new cars! [3/3]";
 		tutorialMessages.Add ("explorer", messages7);
-
-		// Explorer Mode - after first obtained item
-		String[] messages8 = new String[2];
-		messages8 [0] = "Nice one! Remember, everything you\nunlock will be queued and waiting\nfor you back at your bookcase. [1/2]";
-		messages8 [1] = "If you leave Explorer Mode,\nyour location will be saved to\nthe last unmovable piece you\nhave driven over. [2/2]";
-
-		// Explorer Mode - World 2 puzzlebox
-		String[] messages9 = new String[1];
-		messages9 [0] = "Oh my, the bridge crossing the lava\nis opened! Maybe you can find something\nbehind the fort to close the bridge?";
-
-		// Explorer Mode - World 3 puzzlebox
-		String[] messages10 = new String[1];
-		messages10 [0] = "Hrm, there seems to be no\nphysical road towards that puzzlebox...";
-
-		// 12 marbles - enabling Explorer Mode
-		String[] messages11 = new String[1];
-		messages11 [0] = "All those shiny marbles you\nhave collected! How about you check back\nat the bookcase, and I'll give you\nExplorer Mode!"; 
 	}
 
 	// Comparer to sort puzzle pieces

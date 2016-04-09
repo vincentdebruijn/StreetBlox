@@ -32,6 +32,8 @@ public class UnlockButtonScript : MonoBehaviour {
 					default: 
 						throw new ArgumentException("Unknown carIndex: " + carIndex);
 				}
+
+				gameScript.ShowFirstItemObtainedMessageIfIsFirstItem ();
 				MenuScript.data.animationQueue.Enqueue(new Pair<string, int>(carName, carIndex));
 				MenuScript.Save();
 				gameScript.SetMarbleText();
