@@ -47,9 +47,6 @@ public class CarScript : MonoBehaviour {
 	private Boolean portalEntryAnimationDone;
 	private Boolean portalExitAnimationDone;
 
-	private Boolean enteredShopPiece;
-	private Boolean enteredSavePiece;
-
 	private Vector3 distanceMovedSinceStartPuzzlePiece;
 
 	private Transform mainCamera;
@@ -118,8 +115,6 @@ public class CarScript : MonoBehaviour {
 		this.levelConfiguration = levelConfiguration;
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		enteredPortalPiece = currentPuzzlePiece.name.Contains ("portal") && PuzzlePieceScript.GetSideOfPortal(currentPuzzlePiece) == currentDirection;
-		enteredShopPiece = false;
-		enteredSavePiece = false;
 		clickedButtonWhileOnCurrentPuzzlePiece = ButtonNearby ();
 		carStarted = true;
 		PlayEngineSound ();
@@ -150,8 +145,6 @@ public class CarScript : MonoBehaviour {
 		portalEntryAnimationDone = true;
 		portalExitAnimationDone = true;
 		enteredPortalPiece = false;
-		enteredShopPiece = false;
-		enteredSavePiece = false;
 		cameraShakeDone = false;
 		distanceMovedSinceStartPuzzlePiece = new Vector3 ();
 	}
@@ -216,6 +209,10 @@ public class CarScript : MonoBehaviour {
 		MoveTowardsTarget (x, z);
 		float currentX = PointOfCar ().x;
 		float currentZ = PointOfCar ().z;
+
+		Boolean enteredShopPiece = false;
+		Boolean enteredSavePiece = false;
+		int explorerModeTriggerPiece = -1;
 		if (Math.Abs (currentX - x) < 0.01f && Math.Abs (currentZ - z) < 0.01f) {
 			// Get the next coordinate
 			currentCoordinateIndex = currentConnection.getNextCoordinateIndex (currentCoordinateIndex, currentDirection);
@@ -248,7 +245,14 @@ public class CarScript : MonoBehaviour {
 						enteredSavePiece = true;
 					if (gameScript.ShopTriggerPiece(currentPuzzlePiece.name))
 				    	enteredShopPiece = true;
+					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (7)")
+						explorerModeTriggerPiece = 2;
+					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (19)")
+						explorerModeTriggerPiece = 3;
+					
+					Debug.Log ("HIER: "+ currentPuzzlePiece.name);
 					puzzleBoxObtained = gameScript.GetPuzzleBoxForPuzzlePiece(currentPuzzlePiece.name);
+					Debug.Log (puzzleBoxObtained);
 				}
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
 				    	OnOpenBridgePiece(currentPuzzlePiece)) {
@@ -284,18 +288,20 @@ public class CarScript : MonoBehaviour {
 				enteredShopPiece = false;
 				return;
 			}
+			Debug.Log ("In front of");
 			if (puzzleBoxObtained != null) {
 				int index = 1;
 				if (puzzleBoxObtained.name == "puzzleBoxWorld3")
 					index = 2;
+				gameScript.ShowFirstItemObtainedMessageIfIsFirstItem ();
 				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>(puzzleBoxObtained.name, index));
 				GameObject.Destroy (puzzleBoxObtained);
 				MenuScript.Save ();
 			}
-			if (enteredSavePiece) {
+			if (enteredSavePiece)
 				gameScript.RecordCurrentState();
-				enteredSavePiece = false;
-			}
+			if (explorerModeTriggerPiece != -1)
+				gameScript.ShowExplorerModeMessage (explorerModeTriggerPiece);
 		}
 		CheckForNearbyButton();
 	}
@@ -402,7 +408,6 @@ public class CarScript : MonoBehaviour {
 		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < levelConfiguration.PieceSize;
 		return atEnd;
 	}
-
 
 	// Explorer stuff
 	//

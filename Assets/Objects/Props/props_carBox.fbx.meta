@@ -99,11 +99,11 @@ ModelImporter:
         weight: 1
       maskType: 0
       maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+      additiveReferencePoseFrame: 1
     - serializedVersion: 16
       name: end
       takeName: Take 001
-      firstFrame: 70
+      firstFrame: 72
       lastFrame: 80
       wrapMode: 0
       orientationOffsetY: 0
