@@ -1020,7 +1020,7 @@ public class GameScript : MonoBehaviour {
 
 		// level 3-1
 		String[] messages6 = new String[2];
-		messages6 [0] = "Driving through portals from the\ncolored side in will move you\nto the other portal with the same color. [1/2]";
+		messages6 [0] = "Driving through portals from the\ncolored side in will move you\nto the other portal with the same color.\n[1/2]";
 		messages6 [1] = "Driving through the grey circle first\nmakes the portal ignore you. [2/2]";
 		tutorialMessages.Add ("level_s01", messages6);
 
