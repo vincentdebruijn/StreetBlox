@@ -250,9 +250,7 @@ public class CarScript : MonoBehaviour {
 					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (19)")
 						explorerModeTriggerPiece = 3;
 					
-					Debug.Log ("HIER: "+ currentPuzzlePiece.name);
 					puzzleBoxObtained = gameScript.GetPuzzleBoxForPuzzlePiece(currentPuzzlePiece.name);
-					Debug.Log (puzzleBoxObtained);
 				}
 				if (!PuzzlePieceScript.PuzzlePieceConnections.HasPuzzlePieceConnections (currentPuzzlePiece) || 
 				    	OnOpenBridgePiece(currentPuzzlePiece)) {
@@ -285,10 +283,7 @@ public class CarScript : MonoBehaviour {
 				gameScript.Halt();
 				carStarted = false;
 				gameScript.ShowShop();
-				enteredShopPiece = false;
-				return;
 			}
-			Debug.Log ("In front of");
 			if (puzzleBoxObtained != null) {
 				int index = 1;
 				if (puzzleBoxObtained.name == "puzzleBoxWorld3")
