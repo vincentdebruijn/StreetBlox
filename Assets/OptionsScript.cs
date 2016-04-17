@@ -50,6 +50,8 @@ public class OptionsScript : MonoBehaviour {
 	private static GUIStyle resetButtonStyle;
 	private static GUIStyle creditsStyle;
 
+	private static Boolean secretTriggered;
+
 	// Dynamic one time loading of all static variables
 	private static Boolean staticVariablesSet = false;
 
@@ -122,9 +124,12 @@ public class OptionsScript : MonoBehaviour {
 
 		GUI.Label (creditsRect, "Credits:\nA small learning project,\nMade with Unity and Maya.\nMusic and sfx thanks to FreeSFX\nSome altered imagery from DeviantArt and others\nInspired by Street Shuffle (1994)", optionTextStyle);
 
-		if (GUI.Button(secretRect, "", optionTextStyle)) {
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
-			MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+		if (!secretTriggered && GUI.Button(secretRect, "", optionTextStyle)) {
+			if (!MenuScript.data.puzzleBoxesUnlocked[1])
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+			if (!MenuScript.data.puzzleBoxesUnlocked[2])
+				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+			secretTriggered = true;
 		}
 	}
 
@@ -166,7 +171,7 @@ public class OptionsScript : MonoBehaviour {
 		
 		optionTextStyle = new GUIStyle ();
 		optionTextStyle.alignment = TextAnchor.MiddleLeft;
-		optionTextStyle.normal.textColor = Color.white;
+		optionTextStyle.normal.textColor = Color.black;
 		optionTextStyle.fontSize = 32;
 
 		resetButtonStyle = new GUIStyle ();
@@ -176,6 +181,8 @@ public class OptionsScript : MonoBehaviour {
 		Texture2D texture = new Texture2D (1, 1, TextureFormat.RGBA32, false);
 		texture.SetPixel (0, 0, new Color (0, 0, 0, 0.75f));
 		resetButtonStyle.normal.background = resetButtonTexture;
+
+		secretTriggered = false;
 
 		backButtonChosenStyle = MenuScript.backButtonStyle;
 	}
