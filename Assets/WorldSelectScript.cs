@@ -52,25 +52,25 @@ public class WorldSelectScript : MonoBehaviour {
 	// The world2 levels
 	public static readonly string[] levelsWorld2 = {
 		"level_l01",
-		"level_l02",
-		"level_l03",
-		"level_l04",
 		"level_l05",
-		"level_l06",
+		"level_l09",
 		"level_l07",
-		"level_l08",
-		"level_l09"
+		"level_l03",
+		"level_l06",
+		"level_l04",
+		"level_l02",
+		"level_l08"
 	};
 	// The world3 levels
 	public static readonly string[] levelsWorld3 = {
 		"level_s01",
 		"level_s02",
-		"level_s03",
-		"level_s04",
 		"level_s05",
+		"level_s08",
+		"level_s04",
 		"level_s06",
 		"level_s07",
-		"level_s08"
+		"level_s03"
 	};
 	// Mapping of level names to the name that should be displayed in level select
 	public static Dictionary<string, string> displayNames;
@@ -551,24 +551,24 @@ public class WorldSelectScript : MonoBehaviour {
 		world2Configuration.Add ("level_l01", new LevelConfiguration (5, 5, 0f, 0f, 9));
 		world2Configuration.Add ("level_l02", new LevelConfiguration (5, 5, 0f, 0f, 34));
 		world2Configuration.Add ("level_l03", new LevelConfiguration (7, 5, 0f, 0f, 21));
-		world2Configuration.Add ("level_l04", new LevelConfiguration (5, 5, 0f, 0f, 11));
-		world2Configuration.Add ("level_l05", new LevelConfiguration (6, 5, 0f, 0f, 11));
-		world2Configuration.Add ("level_l06", new LevelConfiguration (4, 5, 0f, 0f, 12));
-		world2Configuration.Add ("level_l07", new LevelConfiguration (6, 6, 0f, 0f, 12));
+		world2Configuration.Add ("level_l04", new LevelConfiguration (5, 5, 0f, 0f, 23));
+		world2Configuration.Add ("level_l05", new LevelConfiguration (6, 5, 0f, 0f, 17));
+		world2Configuration.Add ("level_l06", new LevelConfiguration (5, 5, 0f, 0f, 12));
+		world2Configuration.Add ("level_l07", new LevelConfiguration (6, 6, 0f, 0f, 17));
 		world2Configuration.Add ("level_l08", new LevelConfiguration (6, 6, 0f, 0f, 38));
 		world2Configuration.Add ("level_l09", new LevelConfiguration (5, 4, 0f, 0f, 15));
 
 		Dictionary<string, LevelConfiguration> world3Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[3], world3Configuration);
 		
-		world3Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 6));
-		world3Configuration.Add ("level_s02", new LevelConfiguration (4, 5, 0f, 0f, 15));
-		world3Configuration.Add ("level_s03", new LevelConfiguration (5, 5, 0f, 0f, 15));
-		world3Configuration.Add ("level_s04", new LevelConfiguration (5, 5, 0f, 0f, 15));
-		world3Configuration.Add ("level_s05", new LevelConfiguration (4, 5, 0f, 0f, 15));
-		world3Configuration.Add ("level_s06", new LevelConfiguration (9, 5, 0f, 0f, 25));
+		world3Configuration.Add ("level_s01", new LevelConfiguration (4, 5, 0f, 0f, 5));
+		world3Configuration.Add ("level_s02", new LevelConfiguration (4, 5, 0f, 0f, 7));
+		world3Configuration.Add ("level_s03", new LevelConfiguration (5, 5, 0f, 0f, 11));
+		world3Configuration.Add ("level_s04", new LevelConfiguration (5, 5, 0f, 0f, 13));
+		world3Configuration.Add ("level_s05", new LevelConfiguration (4, 5, 0f, 0f, 8));
+		world3Configuration.Add ("level_s06", new LevelConfiguration (9, 5, 0f, 0f, 17));
 		world3Configuration.Add ("level_s07", new LevelConfiguration (7, 4, 0f, 0f, 25));
-		world3Configuration.Add ("level_s08", new LevelConfiguration (7, 6, 0f, 0f, 25));
+		world3Configuration.Add ("level_s08", new LevelConfiguration (7, 6, 0f, 0f, 40));
 
 		displayNames = new Dictionary<string, string> ();
 		displayNames.Add ("tutorial_1", "0-1");
@@ -599,23 +599,23 @@ public class WorldSelectScript : MonoBehaviour {
 		displayNames.Add ("level_20", "1-23");
 
 		displayNames.Add ("level_l01", "2-1");
-		displayNames.Add ("level_l02", "2-2");
-		displayNames.Add ("level_l03", "2-3");
-		displayNames.Add ("level_l04", "2-4");
-		displayNames.Add ("level_l05", "2-5");
+		displayNames.Add ("level_l02", "2-8");
+		displayNames.Add ("level_l03", "2-5");
+		displayNames.Add ("level_l04", "2-7");
+		displayNames.Add ("level_l05", "2-2");
 		displayNames.Add ("level_l06", "2-6");
-		displayNames.Add ("level_l07", "2-7");
-		displayNames.Add ("level_l08", "2-8");
-		displayNames.Add ("level_l09", "2-9");
+		displayNames.Add ("level_l07", "2-4");
+		displayNames.Add ("level_l08", "2-9");
+		displayNames.Add ("level_l09", "2-3");
 
 		displayNames.Add ("level_s01", "3-1");
 		displayNames.Add ("level_s02", "3-2");
-		displayNames.Add ("level_s03", "3-3");
-		displayNames.Add ("level_s04", "3-4");
-		displayNames.Add ("level_s05", "3-5");
+		displayNames.Add ("level_s03", "3-8");
+		displayNames.Add ("level_s04", "3-5");
+		displayNames.Add ("level_s05", "3-3");
 		displayNames.Add ("level_s06", "3-6");
 		displayNames.Add ("level_s07", "3-7");
-		displayNames.Add ("level_s08", "3-8");
+		displayNames.Add ("level_s08", "3-4");
 	}
 }
 

@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 
 public class UnlockButtonScript : MonoBehaviour {
-	public const int COST = 1;
+	public const int COST = 12;
 
 	public int carIndex;
 

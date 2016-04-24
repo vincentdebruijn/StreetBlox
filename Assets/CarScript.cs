@@ -381,7 +381,7 @@ public class CarScript : MonoBehaviour {
 	Boolean AtEndPiece() {
 		if (ExplorerLevel())
 			return false;
-		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < levelConfiguration.PieceSize;
+		atEnd = (GameObject.FindGameObjectWithTag ("EndPuzzlePiece").transform.position - transform.position).sqrMagnitude < (levelConfiguration.PieceSize / 2);
 		return atEnd;
 	}
 
