@@ -7,24 +7,24 @@ using UnityEngine.UI;
 public class OptionsScript : MonoBehaviour {
 
 	/*
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car2", 1));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car3", 2));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car4", 3));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car5", 4));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car6", 5));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car7", 6));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car8", 7));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car9", 8));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car10", 9));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car11", 10));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car12", 11));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car13", 12));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car14", 13));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car15", 14));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("car16", 15));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car2", 1));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car3", 2));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car4", 3));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car5", 4));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car6", 5));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car7", 6));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car8", 7));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car9", 8));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car10", 9));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car11", 10));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car12", 11));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car13", 12));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car14", 13));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car15", 14));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("car16", 15));
 
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
-		MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("puzzleBoxWorld2", 1));
+		MenuScript.data.animationQueue.Enqueue (new Pair ("puzzleBoxWorld3", 2));
 	*/
 
 	// GUI stuff
@@ -126,9 +126,9 @@ public class OptionsScript : MonoBehaviour {
 
 		if (!secretTriggered && GUI.Button(secretRect, "", optionTextStyle)) {
 			if (!MenuScript.data.puzzleBoxesUnlocked[1])
-				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld2", 1));
+				MenuScript.data.animationQueue.Enqueue (new Pair ("puzzleBoxWorld2", 1));
 			if (!MenuScript.data.puzzleBoxesUnlocked[2])
-				MenuScript.data.animationQueue.Enqueue (new Pair<string, int> ("puzzleBoxWorld3", 2));
+				MenuScript.data.animationQueue.Enqueue (new Pair ("puzzleBoxWorld3", 2));
 			secretTriggered = true;
 		}
 	}

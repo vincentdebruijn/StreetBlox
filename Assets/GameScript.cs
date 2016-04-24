@@ -13,7 +13,7 @@ public class GameScript : MonoBehaviour {
 	public const string explorerStartPiece = "puzzlePiece_straight_WE";
 	
 	// The names of the pieces in explorer mode that will trigger the shop
-	public static Dictionary<String, Pair<String, int>[]> shopTriggerPieces;
+	public static Dictionary<String, Pair[]> shopTriggerPieces;
 
 	// The distance the bridge piece has to move to make the bridge completely open.
 	public const float BridgeOpenDistance = 0.145f;
@@ -47,9 +47,6 @@ public class GameScript : MonoBehaviour {
 	private Boolean bridgesFlipped;
 
 	public string chosenLevel;
-
-	private static Pair<string, int> explorerPair = new Pair<string, int> ("puzzleBoxWorld4", 3);
-	private static Pair<string, int> tardisPair = new Pair<String, int> ("car11", 10);
 
 	// In game UI
 	private static Texture2D quitTexture;
@@ -127,6 +124,8 @@ public class GameScript : MonoBehaviour {
 					GameObject.Destroy (puzzleBoxWorld2);
 				if (MenuScript.data.puzzleBoxesUnlocked [2])
 					GameObject.Destroy (puzzleBoxWorld3);
+				MenuScript.data.puzzleBoxWorld2MessageShown = false;
+				MenuScript.data.puzzleBoxWorld3MessageShown = false;
 				return;
 			}
 		} else
@@ -205,15 +204,20 @@ public class GameScript : MonoBehaviour {
 	}
 
 	public void ShowExplorerModeMessage(int world) {
-		halted = true;
-		carScript.carStarted = false;
-		String[] messages = new String[1];
-		if (world == 2) {
-			messages [0] = "Oh my, the bridge crossing the lava is\nopened! Maybe you can find something\nbehind the fort to close the bridge?";
-		} else {
-			messages [0] = "Hrm, there seems to be no\nphysical road towards that puzzlebox...";
+		if ((world == 2 && !MenuScript.data.puzzleBoxWorld2MessageShown) || (world == 3 && !MenuScript.data.puzzleBoxWorld3MessageShown)) {
+			halted = true;
+			carScript.carStarted = false;
+			String[] messages = new String[1];
+			if (world == 2) {
+				MenuScript.data.puzzleBoxWorld2MessageShown = true;
+				messages [0] = "Oh my, the bridge crossing the lava is\nopened! Maybe you can find something\nbehind the fort to close the bridge?";
+			} else {
+				MenuScript.data.puzzleBoxWorld3MessageShown = true;
+				messages [0] = "Hrm, there seems to be no\nphysical road towards that puzzlebox...";
+			}
+			DisplayTutorialMessage (messages);
+			MenuScript.Save ();
 		}
-		DisplayTutorialMessage(messages);
 	}
 
 	public void Reset(string button) {
@@ -226,8 +230,8 @@ public class GameScript : MonoBehaviour {
 
 		if (tutorialsFinished && !MenuScript.data.worldSelectShown) {
 			MenuScript.data.worldSelectShown = true;
-			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("car1", 0));
-			MenuScript.data.animationQueue.Enqueue(new Pair<string, int>("puzzleBoxWorld1", 0));
+			MenuScript.data.animationQueue.Enqueue(new Pair("car1", 0));
+			MenuScript.data.animationQueue.Enqueue(new Pair("puzzleBoxWorld1", 0));
 			MenuScript.Save ();
 			SceneManager.LoadScene ("world_select");
 			return;
@@ -266,14 +270,19 @@ public class GameScript : MonoBehaviour {
 		iShop.name = "shopScreen";
 		SetMarbleText ();
 
-		Pair<String, int>[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
+		Pair[] cars = shopTriggerPieces [carScript.currentPuzzlePiece.name];
 
 		UnlockButtonScript[] scripts = iShop.GetComponentsInChildren<UnlockButtonScript> ();
 		scripts [1].carIndex = cars[0].Second;
-		if (MenuScript.data.carsUnlocked[cars[0].Second])
+
+		String car0String = "car" + (cars [0].Second + 1);
+		String car1String = "car" + (cars [1].Second + 1);
+		Pair newPair1 = new Pair(car0String, cars[0].Second);
+		Pair newPair2 = new Pair(car1String, cars[1].Second);
+		if (MenuScript.data.carsUnlocked[cars[0].Second] || MenuScript.data.animationQueue.Contains(newPair1))
 			scripts [1].SetToBought ();
 		scripts [0].carIndex = cars[1].Second;
-		if (MenuScript.data.carsUnlocked[cars[1].Second])
+		if (MenuScript.data.carsUnlocked[cars[1].Second] || MenuScript.data.animationQueue.Contains(newPair2))
 			scripts [0].SetToBought ();
 
 		GameObject firstCar = Resources.Load (cars [0].First) as GameObject;
@@ -318,7 +327,7 @@ public class GameScript : MonoBehaviour {
 	}
 
 	public void ClickedPuzzlePiece(GameObject puzzlePiece) {
-		Debug.Log("Clicked: " + puzzlePiece.name);
+		//Debug.Log("Clicked: " + puzzlePiece.name);
 		if (carScript.GameOver () || carScript.falling || carScript.crashing)
 			return;
 		if (carScript.currentPuzzlePiece == puzzlePiece || (carScript.previousPuzzlePiece == puzzlePiece && 
@@ -555,6 +564,7 @@ public class GameScript : MonoBehaviour {
 			marbles = 0;
 		MenuScript.data.marbles += marbles;
 
+		Pair explorerPair = new Pair ("puzzleBoxWorld4", 3);
 		if (MenuScript.data.marbles >= UnlockButtonScript.COST && !MenuScript.data.puzzleBoxesUnlocked[3] && !MenuScript.data.animationQueue.Contains (explorerPair)) {
 			String[] messages = new String[1];
 			messages [0] = "All those shiny marbles you have\ncollected! How about you check back\nat the bookcase, and there might\nbe something waiting for you..."; 
@@ -562,6 +572,7 @@ public class GameScript : MonoBehaviour {
 			MenuScript.data.animationQueue.Enqueue (explorerPair);
 		}
 		// Give the Tardis when a space level was completed
+		Pair tardisPair = new Pair ("car11", 10);
 		if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0 && !MenuScript.data.carsUnlocked [10] && !MenuScript.data.animationQueue.Contains (tardisPair)) {
 			MenuScript.data.animationQueue.Enqueue (tardisPair);
 			GameObject obj = (GameObject)GameObject.Instantiate (((GameObject)Resources.Load ("displayCar11")), new Vector3 (-100, -100, -100), new Quaternion ());
@@ -629,7 +640,7 @@ public class GameScript : MonoBehaviour {
 			}
 		}
 
-		GUI.Label (displayRect, "" + movesMade + "             " + levelConfiguration.par + "\n             ", displayStyle);
+		GUI.Label (displayRect, "" + movesMade + "            " + levelConfiguration.par, displayStyle);
 	}
 
 	private void DisplayExplorerButtonBar() {
@@ -950,9 +961,9 @@ public class GameScript : MonoBehaviour {
 
 		displayStyle = new GUIStyle ();
 		displayStyle.normal.background = displayTexture;
-		displayStyle.fontSize = 24;
+		displayStyle.fontSize = 28;
 		displayStyle.normal.textColor = Color.green;
-		displayStyle.alignment = TextAnchor.LowerCenter;
+		displayStyle.alignment = TextAnchor.MiddleCenter;
 
 		emptyDisplayStyle = new GUIStyle ();
 		emptyDisplayStyle.normal.background = emptyDisplayTexture;
@@ -962,14 +973,14 @@ public class GameScript : MonoBehaviour {
 		boostStyle4 = new GUIStyle ();
 		boostStyle4.normal.background = boostTexture4;
 
-		shopTriggerPieces = new Dictionary<String, Pair<String, int>[]> ();
-		Pair<String, int>[] carsShop1 = {new Pair<String, int>("displayCar2", 1), new Pair<String, int>("displayCar3", 2)};
-		Pair<String, int>[] carsShop2 = {new Pair<String, int>("displayCar4", 3), new Pair<String, int>("displayCar5", 4)};
-		Pair<String, int>[] carsShop3 = {new Pair<String, int>("displayCar6", 5), new Pair<String, int>("displayCar7", 6)};
-		Pair<String, int>[] carsShop4 = {new Pair<String, int>("displayCar8", 7), new Pair<String, int>("displayCar9", 8)};
-		Pair<String, int>[] carsShop5 = {new Pair<String, int>("displayCar10", 9), new Pair<String, int>("displayCar12", 10)};
-		Pair<String, int>[] carsShop6 = {new Pair<String, int>("displayCar13", 11), new Pair<String, int>("displayCar14", 12)};
-		Pair<String, int>[] carsShop7 = {new Pair<String, int>("displayCar15", 13), new Pair<String, int>("displayCar16", 14)};
+		shopTriggerPieces = new Dictionary<String, Pair[]> ();
+		Pair[] carsShop1 = {new Pair("displayCar2", 1), new Pair("displayCar3", 2)};
+		Pair[] carsShop2 = {new Pair("displayCar4", 3), new Pair("displayCar5", 4)};
+		Pair[] carsShop3 = {new Pair("displayCar6", 5), new Pair("displayCar7", 6)};
+		Pair[] carsShop4 = {new Pair("displayCar8", 7), new Pair("displayCar9", 8)};
+		Pair[] carsShop5 = {new Pair("displayCar10", 9), new Pair("displayCar12", 10)};
+		Pair[] carsShop6 = {new Pair("displayCar13", 11), new Pair("displayCar14", 12)};
+		Pair[] carsShop7 = {new Pair("displayCar15", 13), new Pair("displayCar16", 14)};
 		// Center (start)
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
 		// Center

@@ -16,13 +16,14 @@ public class UnlockButtonScript : MonoBehaviour {
 
 	void OnMouseOver () {
 		if (Input.GetMouseButtonDown(0)) {
-			if (MenuScript.data.marbles >= COST && !MenuScript.data.carsUnlocked[carIndex]) {
+			String carName = "car" + (carIndex + 1);
+			Pair pair = new Pair (carName, carIndex);
+			if (MenuScript.data.marbles >= COST && !MenuScript.data.carsUnlocked[carIndex] && !MenuScript.data.animationQueue.Contains(pair)) {
 				SetToBought();
 				MenuScript.data.marbles -= COST;
-				String carName = "car" + (carIndex + 1);
 
 				gameScript.ShowFirstItemObtainedMessageIfIsFirstItem ();
-				MenuScript.data.animationQueue.Enqueue(new Pair<string, int>(carName, carIndex));
+				MenuScript.data.animationQueue.Enqueue(pair);
 				MenuScript.Save();
 				gameScript.SetMarbleText();
 			}

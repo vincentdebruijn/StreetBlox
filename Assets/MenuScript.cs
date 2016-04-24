@@ -155,7 +155,7 @@ public class MenuScript : MonoBehaviour {
 			for(int i = 0; i < data.puzzleBoxesUnlocked.Length; i++)
 				data.puzzleBoxesUnlocked[i] = false;
 
-			data.animationQueue = new Queue<Pair<string, int>> ();
+			data.animationQueue = new Queue<Pair> ();
 		}
 	}
 
@@ -352,7 +352,7 @@ public class MenuScript : MonoBehaviour {
 		public String chosenCar;
 		public Boolean[] carsUnlocked;
 		// Animation queue for newly bought cars and found puzzle boxes
-		public Queue<Pair<string, int>> animationQueue;
+		public Queue<Pair> animationQueue;
 
 		public Boolean[] puzzleBoxesUnlocked;
 
@@ -360,6 +360,8 @@ public class MenuScript : MonoBehaviour {
 		public string[] puzzlePieces;
 		public string[][] board;
 		public Boolean bridgesFlipped;
+		public Boolean puzzleBoxWorld2MessageShown;
+		public Boolean puzzleBoxWorld3MessageShown;
 
 		public float carPositionX;
 		public float carPositionY;

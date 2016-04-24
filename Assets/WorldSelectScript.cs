@@ -285,7 +285,6 @@ public class WorldSelectScript : MonoBehaviour {
 		Vector3 position = new Vector3 (-2.66f, 10.69f, -8.2f);
 		Quaternion rotation = Quaternion.Euler(new Vector3(60, 180, 0));
 		GameObject iTutorialBox = (GameObject)GameObject.Instantiate (tutorialBox, position, rotation);
-		iTutorialBox.transform.GetComponentInChildren<TextMesh> ().fontSize = 18;
 		iTutorialBox.transform.localScale = new Vector3 (12, 4, 4);
 		iTutorialBox.name = "TutorialBox";
 		iTutorialBox.GetComponent<TutorialBoxScript>().SetMessages(messages);
@@ -300,7 +299,7 @@ public class WorldSelectScript : MonoBehaviour {
 	//
 
 	private void StartItemAnimation() {
-		Pair<string, int> nextPair = MenuScript.data.animationQueue.Dequeue ();
+		Pair nextPair = MenuScript.data.animationQueue.Dequeue ();
 		String itemName = nextPair.First;
 		int itemIndex = nextPair.Second;
 		GameObject item = null;
@@ -534,7 +533,7 @@ public class WorldSelectScript : MonoBehaviour {
 		world1Configuration.Add ("level_10", new LevelConfiguration (7, 5, 0f, 0f, 25));
 		world1Configuration.Add ("level_11", new LevelConfiguration (5, 5, 0f, 0f, 20));
 		world1Configuration.Add ("level_12", new LevelConfiguration (4, 5, 0f, 0f, 12));
-		world1Configuration.Add ("level_13", new LevelConfiguration (7, 7, 0f, 0f, 22));
+		world1Configuration.Add ("level_13", new LevelConfiguration (7, 7, 0f, 0f, 21));
 		world1Configuration.Add ("level_14", new LevelConfiguration (7, 7, 0f, 0f, 35));
 		world1Configuration.Add ("level_15", new LevelConfiguration (7, 5, 0f, 0f, 20));
 		world1Configuration.Add ("level_16", new LevelConfiguration (6, 5, 0f, 0f, 33));
@@ -667,16 +666,27 @@ public class LevelConfiguration {
 }
 
 [Serializable]
-public class Pair<T, U> {
-	public Pair() {
-	}
-	
-	public Pair(T first, U second) {
+public class Pair : IEquatable<Pair> {	
+	public Pair(String first, int second) {
 		this.First = first;
 		this.Second = second;
 	}
+		
+	public override bool Equals(object obj)
+	{
+		return Equals(obj as Pair);
+	}
+
+	public bool Equals(Pair other) {
+		return this.First == other.First && this.Second == other.Second;
+	}
+
+	public override int GetHashCode ()
+	{
+		return this.First.GetHashCode () + this.Second;
+	}
 	
-	public T First { get; set; }
-	public U Second { get; set; }
+	public String First { get; set; }
+	public int Second { get; set; }
 };
 

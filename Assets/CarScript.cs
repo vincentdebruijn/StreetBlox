@@ -93,19 +93,11 @@ public class CarScript : MonoBehaviour {
 		currentPuzzlePiece = ClosestPuzzlePiece (null);
 		if (ExplorerLevel ())
 			currentPuzzlePiece = ClosestPuzzlePiece (currentPuzzlePiece);
-		Debug.Log (currentPuzzlePiece);
 		currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
-		Debug.Log (currentPuzzlePieceConnections);
 		currentConnection = currentPuzzlePieceConnections.getConnectionForSide (PuzzlePieceScript.Coordinate.WEST);
 		currentDirection = currentConnection.OtherSide (PuzzlePieceScript.Coordinate.WEST);
 		currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
-		Debug.Log ("First coordinate index: " + currentCoordinateIndex);
 		currentCoordinate = currentConnection.coordinates [currentCoordinateIndex];
-		Debug.Log ("Going to " + currentPuzzlePiece.name + ", first waypoint x: " + currentCoordinate.x + " z: " + currentCoordinate.z);
-		PuzzlePieceScript.Coordinate startDestination = 
-			PuzzlePieceScript.Coordinate.GetCoordinateFor (currentCoordinate.x, currentCoordinate.z, currentPuzzlePiece, levelConfiguration.PieceSize);
-		Debug.Log ("Which is at: x: " + startDestination.x + " z: " + startDestination.z);
-		Debug.Log ("And point of car is at: x: " + PointOfCar ().x + " z: " + PointOfCar ().z);
 		buttons = GameObject.FindGameObjectsWithTag ("Button");
 		carStarted = true;
 		PlayEngineSound ();
@@ -216,7 +208,6 @@ public class CarScript : MonoBehaviour {
 		if (Math.Abs (currentX - x) < 0.01f && Math.Abs (currentZ - z) < 0.01f) {
 			// Get the next coordinate
 			currentCoordinateIndex = currentConnection.getNextCoordinateIndex (currentCoordinateIndex, currentDirection);
-			Debug.Log ("New coordinate index: " + currentCoordinateIndex);
 			GameObject puzzleBoxObtained = null;
 			if (currentCoordinateIndex == currentConnection.coordinates.Length || currentCoordinateIndex == -1) {
 				timeSinceOnLastPuzzlePiece = 0f;
@@ -237,8 +228,6 @@ public class CarScript : MonoBehaviour {
 					falling = true;
 					return;
 				}
-				Debug.Log ("New destination: " + currentPuzzlePiece.name);
-				Debug.Log ("Entering from: " + currentDirection);
 				distanceMovedSinceStartPuzzlePiece = new Vector3();
 				if (ExplorerLevel()) {
 					if (currentPuzzlePiece.tag == "UnmovablePuzzlePiece")
@@ -263,7 +252,6 @@ public class CarScript : MonoBehaviour {
 
 				currentPuzzlePieceConnections = PuzzlePieceScript.PuzzlePieceConnections.GetPuzzlePieceConnections (currentPuzzlePiece);
 				int startSide = currentCoordinate.InverseSide (currentDirection);
-				Debug.Log ("Entering at: " + startSide);
 				currentConnection = currentPuzzlePieceConnections.getConnectionForSide (startSide);
 				if (currentConnection == null) {
 					crashing = true;
@@ -272,7 +260,6 @@ public class CarScript : MonoBehaviour {
 					return;
 				}
 				currentDirection = currentConnection.OtherSide (startSide);
-				Debug.Log ("new bearing: " + currentDirection);
 				currentCoordinateIndex = currentConnection.getFirstCoordinateIndexFor (currentDirection);
 				// Get the next one, because the first one of the new piece is the same as the last of the previous piece.
 				currentCoordinateIndex = currentConnection.getNextCoordinateIndex (currentCoordinateIndex, currentDirection);
@@ -289,7 +276,7 @@ public class CarScript : MonoBehaviour {
 				if (puzzleBoxObtained.name == "puzzleBoxWorld3")
 					index = 2;
 				gameScript.ShowFirstItemObtainedMessageIfIsFirstItem ();
-				MenuScript.data.animationQueue.Enqueue(new Pair<String, int>(puzzleBoxObtained.name, index));
+				MenuScript.data.animationQueue.Enqueue(new Pair(puzzleBoxObtained.name, index));
 				GameObject.Destroy (puzzleBoxObtained);
 				MenuScript.Save ();
 			}
@@ -330,11 +317,8 @@ public class CarScript : MonoBehaviour {
 		Vector3 point = PointOfCar ();
 		float deltaX = targetCoord.x - point.x;
 		float deltaZ = targetCoord.z - point.z;
-		Debug.Log (deltaX + " " + deltaZ);
 		float angleInDegrees = (float)(Math.Atan2 (-deltaZ, deltaX) * 180.0f / Math.PI);
-		Debug.Log ("New Angle: " + (angleInDegrees + 90.0f));
 		Vector3 eulerAngles = transform.eulerAngles;
-		Debug.Log ("current Angle: " + eulerAngles.y);
 		eulerAngles.y = angleInDegrees + 90.0f;
 		transform.eulerAngles = eulerAngles;
 	}
@@ -346,8 +330,6 @@ public class CarScript : MonoBehaviour {
 		Vector3 carPoint = PointOfCar ();
 		Vector3 center = new Vector3 (0.5f * levelConfiguration.PieceSize, 0.0f, -0.5f * levelConfiguration.PieceSize);
 		// Iterate through them and find the closest one
-		Debug.Log ("Closest");
-		Debug.Log (pieces.Length);
 		foreach (GameObject piece in pieces) {
 			if (piece == exclude) continue;
 			Vector3 diff = (piece.transform.position + center - carPoint);
@@ -357,7 +339,6 @@ public class CarScript : MonoBehaviour {
 				distance = curDistance; 
 			} 
 		}
-		Debug.Log (closest);
 		return closest;
 	}
 
