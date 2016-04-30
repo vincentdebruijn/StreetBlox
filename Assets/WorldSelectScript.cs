@@ -260,7 +260,7 @@ public class WorldSelectScript : MonoBehaviour {
 		String text = "";
 		if (animatedItem.name.Contains("puzzleBoxWorld4"))
 			text = "You have unlocked Explorer mode!\nYou can find more cars/levels here.";
-		else if (animatedItem.name.Contains ("car1"))
+		else if (animatedItem.name == "car1")
 			text = "You have unlocked your first car!";
 		else if (animatedItem.name.Contains("puzzleBoxWorld1"))
 			text = "You have unlocked a puzzle Box!\nThis contains the first levels to play.";

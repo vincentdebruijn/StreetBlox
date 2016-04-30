@@ -118,14 +118,7 @@ public class GameScript : MonoBehaviour {
 				SetBridgePieces ();
 				if (MenuScript.data.bridgesFlipped)
 					FlipBridgePositions ();
-				puzzleBoxWorld2 = GameObject.Find ("puzzleBoxWorld2");
-				puzzleBoxWorld3 = GameObject.Find ("puzzleBoxWorld3");
-				if (MenuScript.data.puzzleBoxesUnlocked [1])
-					GameObject.Destroy (puzzleBoxWorld2);
-				if (MenuScript.data.puzzleBoxesUnlocked [2])
-					GameObject.Destroy (puzzleBoxWorld3);
-				MenuScript.data.puzzleBoxWorld2MessageShown = false;
-				MenuScript.data.puzzleBoxWorld3MessageShown = false;
+				DestroyPuzzleBoxesIfAlreadyObtained ();
 				return;
 			}
 		} else
@@ -137,8 +130,20 @@ public class GameScript : MonoBehaviour {
 
 		Array.Sort (puzzlePieces, new PositionBasedComparer ());
 		CreateBoard ();
+		DestroyPuzzleBoxesIfAlreadyObtained ();
+		MenuScript.data.puzzleBoxWorld2MessageShown = MenuScript.data.puzzleBoxesUnlocked[1];
+		MenuScript.data.puzzleBoxWorld3MessageShown = MenuScript.data.puzzleBoxesUnlocked[2];
 
 		DisplayTutorialMessages ();
+	}
+
+	void DestroyPuzzleBoxesIfAlreadyObtained() {
+		puzzleBoxWorld2 = GameObject.Find ("puzzleBoxWorld2");
+		puzzleBoxWorld3 = GameObject.Find ("puzzleBoxWorld3");
+		if (MenuScript.data.puzzleBoxesUnlocked [1])
+			GameObject.Destroy (puzzleBoxWorld2);
+		if (MenuScript.data.puzzleBoxesUnlocked [2])
+			GameObject.Destroy (puzzleBoxWorld3);
 	}
 
 	void Awake() {	
