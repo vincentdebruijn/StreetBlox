@@ -204,6 +204,8 @@ public class GameScript : MonoBehaviour {
 	}
 
 	public void ShowExplorerModeMessage(int world) {
+		Debug.Log (MenuScript.data.puzzleBoxWorld2MessageShown);
+		Debug.Log (MenuScript.data.puzzleBoxWorld3MessageShown);
 		if ((world == 2 && !MenuScript.data.puzzleBoxWorld2MessageShown) || (world == 3 && !MenuScript.data.puzzleBoxWorld3MessageShown)) {
 			halted = true;
 			carScript.carStarted = false;
@@ -245,7 +247,7 @@ public class GameScript : MonoBehaviour {
 			SceneManager.LoadScene (chosenLevel);
 			break;
 		case "Back":
-			StopGameMusicAndPlayMenuMusic();
+			LevelSelectScript.StopGameMusicAndPlayMenuMusic();
 			if (chosenLevel == "explorer")
 				SceneManager.LoadScene ("world_select");
 			else if (MenuScript.InTutorialPhase())
@@ -604,7 +606,7 @@ public class GameScript : MonoBehaviour {
 
 		if (GUI.Button (quitRect, "", quitStyle)) {
 			MenuScript.PlayButtonSound ();
-			StopGameMusicAndPlayMenuMusic();
+			LevelSelectScript.StopGameMusicAndPlayMenuMusic();
 			if (MenuScript.InTutorialPhase ())
 				SceneManager.LoadScene ("menu");
 			else
@@ -661,12 +663,14 @@ public class GameScript : MonoBehaviour {
 				halted = true;
 				carScript.carStarted = false;
 			} else if (gameStarted && halted) {
+				DestroyTutorialMessageBox ();
 				goStyle.normal.background = goTexture7;
 				halted = false;
 				showingShop = false;
 				carScript.carStarted = true;
 				gameStarted = true;
 			} else if (halted) {
+				DestroyTutorialMessageBox ();
 				gameStarted = true;
 				halted = false;
 				goStyle.normal.background = goTexture7;
@@ -822,19 +826,6 @@ public class GameScript : MonoBehaviour {
 		                    -y * levelConfiguration.PieceSize + levelConfiguration.TopZPosition);
 	}
 
-	private void StopGameMusicAndPlayMenuMusic() {
-		if (Array.IndexOf (WorldSelectScript.levelsWorld1, chosenLevel) >= 0) {
-			MenuScript.StopWorld1Music ();
-			MenuScript.PlayMenuMusic ();
-		} else if (Array.IndexOf (WorldSelectScript.levelsWorld2, chosenLevel) >= 0) {
-			MenuScript.StopWorld2Music ();
-			MenuScript.PlayMenuMusic ();
-		} else if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0) {
-			MenuScript.StopWorld3Music ();
-			MenuScript.PlayMenuMusic ();
-		}
-	}
-
 	// VARIABLE STUFF
 	//
 
@@ -978,9 +969,9 @@ public class GameScript : MonoBehaviour {
 		Pair[] carsShop2 = {new Pair("displayCar4", 3), new Pair("displayCar5", 4)};
 		Pair[] carsShop3 = {new Pair("displayCar6", 5), new Pair("displayCar7", 6)};
 		Pair[] carsShop4 = {new Pair("displayCar8", 7), new Pair("displayCar9", 8)};
-		Pair[] carsShop5 = {new Pair("displayCar10", 9), new Pair("displayCar12", 10)};
-		Pair[] carsShop6 = {new Pair("displayCar13", 11), new Pair("displayCar14", 12)};
-		Pair[] carsShop7 = {new Pair("displayCar15", 13), new Pair("displayCar16", 14)};
+		Pair[] carsShop5 = {new Pair("displayCar10", 9), new Pair("displayCar12", 11)};
+		Pair[] carsShop6 = {new Pair("displayCar13", 12), new Pair("displayCar14", 13)};
+		Pair[] carsShop7 = {new Pair("displayCar15", 14), new Pair("displayCar16", 15)};
 		// Center (start)
 		shopTriggerPieces.Add ("puzzlePiece_turnabout_W", carsShop1);
 		// Center

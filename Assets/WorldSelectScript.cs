@@ -515,8 +515,8 @@ public class WorldSelectScript : MonoBehaviour {
 		Dictionary<string, LevelConfiguration> world0Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[0], world0Configuration);
 		world0Configuration.Add ("tutorial_1", new LevelConfiguration (4, 5, 0f, 0f, 5));
-		world0Configuration.Add ("tutorial_2", new LevelConfiguration (4, 5, 0f, 0f, 6));
-		world0Configuration.Add ("tutorial_3", new LevelConfiguration (4, 5, 0f, 0f, 8));
+		world0Configuration.Add ("tutorial_2", new LevelConfiguration (4, 5, 0f, 0f, 5));
+		world0Configuration.Add ("tutorial_3", new LevelConfiguration (4, 5, 0f, 0f, 7));
 
 		Dictionary<string, LevelConfiguration> world1Configuration = new Dictionary<string, LevelConfiguration> ();
 		worldConfigurations.Add (WorldNames[1], world1Configuration);

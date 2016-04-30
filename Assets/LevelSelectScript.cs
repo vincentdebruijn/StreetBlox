@@ -156,7 +156,8 @@ public class LevelSelectScript : MonoBehaviour {
 		if (index + 1 < levels.Length) {
 			chosenLevel = levels [index + 1];
 			SceneManager.LoadScene (chosenLevel);
-		} else {
+		} else  {
+			StopGameMusicAndPlayMenuMusic ();
 			SceneManager.LoadScene ("level_select");
 		}
 	}
@@ -167,6 +168,19 @@ public class LevelSelectScript : MonoBehaviour {
 				return true;
 		}
 		return false;
+	}
+
+	public static void StopGameMusicAndPlayMenuMusic() {
+		if (Array.IndexOf (WorldSelectScript.levelsWorld1, chosenLevel) >= 0) {
+			MenuScript.StopWorld1Music ();
+			MenuScript.PlayMenuMusic ();
+		} else if (Array.IndexOf (WorldSelectScript.levelsWorld2, chosenLevel) >= 0) {
+			MenuScript.StopWorld2Music ();
+			MenuScript.PlayMenuMusic ();
+		} else if (Array.IndexOf (WorldSelectScript.levelsWorld3, chosenLevel) >= 0) {
+			MenuScript.StopWorld3Music ();
+			MenuScript.PlayMenuMusic ();
+		}
 	}
 
 	private static void MoveLevelButtons(Vector2 position1, Vector2 position2) {

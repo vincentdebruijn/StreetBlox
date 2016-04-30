@@ -236,7 +236,7 @@ public class CarScript : MonoBehaviour {
 				    	enteredShopPiece = true;
 					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (7)")
 						explorerModeTriggerPiece = 2;
-					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (19)")
+					if (currentPuzzlePiece.name == "puzzlePiece_straight_WE (20)")
 						explorerModeTriggerPiece = 3;
 					
 					puzzleBoxObtained = gameScript.GetPuzzleBoxForPuzzlePiece(currentPuzzlePiece.name);
