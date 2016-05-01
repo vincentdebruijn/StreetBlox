@@ -146,7 +146,7 @@ public class OptionsScript : MonoBehaviour {
 		resetTextRect = new Rect (Screen.width / 2, buttonSize / 4, Screen.width / 2, buttonSize / 3);
 		resetButtonRect = new Rect (Screen.width * 0.75f - buttonSize / 2, buttonSize * 0.75f, buttonSize, buttonSize / 2);
 		creditsRect = new Rect (Screen.width / 2, Screen.height / 3 * 2, Screen.width / 2, buttonSize / 3);
-		secretRect = new Rect (Screen.width - 20, Screen.height - 20, 20, 20);
+		secretRect = new Rect (Screen.width - 40, Screen.height - 40, 40, 40);
 
 		optionButtonTexture = (Texture2D)Resources.Load ("ui_button_unchecked");
 		optionSelectedButtonTexture = (Texture2D)Resources.Load ("ui_button_checked");

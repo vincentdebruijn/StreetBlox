@@ -273,7 +273,7 @@ public class WorldSelectScript : MonoBehaviour {
 	}
 
 	private void ShowEndText() {
-		String text = "Wow, you unlocked everything! You are winner!\n \nThank you for playing our little game.\nVinLia Games";
+		String text = "Wow, you unlocked everything!\nYou are winner!\nThank you for playing our little game.\nVinLia Games";
 		ShowTextBox (text);
 	}
 

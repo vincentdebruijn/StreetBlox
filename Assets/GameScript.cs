@@ -209,8 +209,8 @@ public class GameScript : MonoBehaviour {
 	}
 
 	public void ShowExplorerModeMessage(int world) {
-		Debug.Log (MenuScript.data.puzzleBoxWorld2MessageShown);
-		Debug.Log (MenuScript.data.puzzleBoxWorld3MessageShown);
+		if (!MenuScript.data.playTutorials)
+			return;
 		if ((world == 2 && !MenuScript.data.puzzleBoxWorld2MessageShown) || (world == 3 && !MenuScript.data.puzzleBoxWorld3MessageShown)) {
 			halted = true;
 			carScript.carStarted = false;
